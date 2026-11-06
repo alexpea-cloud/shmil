@@ -361,7 +361,7 @@ function makeGrain() {
 
 /* hero date cards (shown while the timeline is large) ---------------------- */
 const HERO = [
-  { a: 9.5, b: 15.7, k: 'Statsforvalteren i Nordland', d: '6. november 2025', s: 'Tilsynsrapport · Brønnøy kommune · saksnr. 2025/4779' },
+  { a: 9.5, b: 16.4, k: 'Statsforvalteren i Nordland', d: '6. november 2025', s: 'Tilsynsrapport · Brønnøy kommune · saksnr. 2025/4779' },
   { a: 27.0, b: 29.7, k: 'Iris Produksjon for SHMIL', d: '9.–10. desember 2025', s: 'Plukkanalyse av husholdningsavfall' },
   { a: 35.9, b: 38.4, k: 'SHMIL → Miljødirektoratet', d: '15. januar 2026', s: 'Henvendelse om behov for regelverksavklaringer' },
   { a: 63.4, b: 65.6, k: 'Miljødirektoratet → SHMIL', d: '7. mai 2026', s: 'Svar på henvendelse om avfallsforskriften kapittel 10a', kc: 't' },
@@ -745,7 +745,7 @@ function sceneSommer() {
   ];
   const pg = {};
   const order = [0, 6, 1, 7, 2, 8, 3, 9, 4, 10, 5, 11];
-  const CX = 2900, CY = 1010;
+  const CX = 2900, CY = 950;
   grid.forEach((g, gi) => {
     const [d, n, col, row, lo] = g;
     const p = new Page(W, d, n, { lo });
@@ -773,9 +773,9 @@ function sceneSommer() {
 
   const wide = (z, rx) => ({ cx: CX, cy: CY, z, rx });
   const camK = [
-    [95.2, wide(0.19, 26)],
-    [P11, wide(0.232, 13), E.o],
-    [P11 + 1.0, wide(0.24, 11), E.lin],
+    [95.2, wide(0.18, 26)],
+    [P11, wide(0.215, 13), E.o],
+    [P11 + 1.0, wide(0.222, 11), E.lin],
     [P11 + 2.2, look(v12, ['v1_44_lbl', 'v1_44'], 1.55, 640, 540), E.io],
     [P11 + 4.2, look(v12, ['v1_44_lbl', 'v1_44'], 1.6, 640, 540), E.lin],
     [P11 + 4.9, look(v11, ['v1_5795', 'v1_5795_status'], 1.6, 640, 540), E.io],
@@ -786,8 +786,8 @@ function sceneSommer() {
     [P12 + 2.3, look(s2, ['sok_t_hdr', 'sok_t_8650', 'sok_t_9228'], 1.18, 760, 500), E.lin],
     [P12 + 3.0, look(s2, ['sok_t_457', 'sok_t_339', 'sok_t_74286'], 1.15, 760, 520), E.io],
     [P13 - 0.3, look(s2, ['sok_t_457', 'sok_t_339', 'sok_t_74286'], 1.2, 760, 520), E.lin],
-    [P13 + 1.0, wide(0.235, 12), E.io],
-    [117.4, wide(0.245, 10), E.lin],
+    [P13 + 1.0, wide(0.215, 12), E.io],
+    [117.4, wide(0.222, 10), E.lin],
     [118.6, look(v11, ['v1_maalt', 'v1_modell'], 1.4, 960, 430), E.io],
     [120.8, look(v11, ['v1_maalt', 'v1_modell'], 1.44, 960, 430), E.lin],
     [122.3, { cx: CX, cy: CY + 40, z: 0.42, rx: 8 }, E.io],
@@ -859,7 +859,7 @@ function sceneSommer() {
     }
     tshow(lk, t, 118.8, 121.2, { st: 0.02 });
     tshow(lh, t, 118.9, 121.2, { st: 0.04 });
-    tshow(fin, t, 121.6, 124.2, { st: 0.05 });
+    tshow(fin, t, 121.6, 123.5, { st: 0.05 });
   };
 }
 
@@ -1010,7 +1010,7 @@ const HEROV = { y: 700, ppd: 13, f: 1, c: D(2026, 3, 22), big: 1, fin: 0, a: 1 }
 const FINV = { y: 780, ppd: 5.0, f: 0, c: D(2026, 4, 1), big: 0.62, fin: 1, a: 1 };
 const TLK = [
   [7.9, { ...HEROV, a: 0 }], [8.9, HEROV, E.o],
-  [15.7, HEROV], [17.0, HUDV, E.io5],
+  [16.3, HEROV], [17.5, HUDV, E.io5],
   [26.5, HUDV], [27.3, HEROV, E.io5], [29.0, HEROV], [30.0, HUDV, E.io5],
   [35.3, HUDV], [36.1, HEROV, E.io5], [38.0, HEROV], [39.0, HUDV, E.io5],
   [61.8, HUDV], [62.6, HEROV, E.io5], [65.4, HEROV], [66.4, HUDV, E.io5],
@@ -1090,7 +1090,7 @@ function drawTimeline(t) {
     else if (big > 0.01 && !isCurrent) la = big * pr(t, m.at, m.at + 0.4);
     if (la > 0.01) {
       g.globalAlpha = A * la;
-      const up = fin ? m.side < 0 : true;
+      const up = fin ? m.side < 0 : !m.minor;
       const fs = fin ? 20 : lerp(16, 20, big);
       g.textAlign = 'center';
       if (up) {
@@ -1102,9 +1102,9 @@ function drawTimeline(t) {
       } else {
         g.textBaseline = 'top';
         g.font = `600 ${fs - 2}px FM`; g.fillStyle = '#9fdcc6';
-        g.fillText(m.minor ? m.date.slice(0, 5) : m.date, x, y + 52);
+        g.fillText(m.minor ? m.date.slice(0, 5) : m.date, x, y + (fin ? 52 : 62));
         g.font = `500 ${fs}px FS`; g.fillStyle = 'rgba(241,244,243,.85)';
-        g.fillText(m.lab, x, y + 78);
+        g.fillText(m.lab, x, y + (fin ? 78 : 88));
       }
       g.globalAlpha = A;
     }
