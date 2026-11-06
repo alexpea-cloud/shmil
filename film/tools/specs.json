@@ -1,0 +1,368 @@
+{
+ "brev_dato": {
+  "doc": "brev",
+  "page": 1,
+  "phrase": "Dato: 15.01.2026"
+ },
+ "brev_ref": {
+  "doc": "brev",
+  "page": 1,
+  "phrase": "Vår ref: 53/26-HJ"
+ },
+ "brev_tittel": {
+  "doc": "brev",
+  "page": 1,
+  "phrase": "Behov for regelverksavklaringer ifm avvik i tilsynssak 2025/4779"
+ },
+ "brev_avvik": {
+  "doc": "brev",
+  "page": 1,
+  "phrase": "«Kommunen har ikke etablert henteordning for alt papp- og papiravfall og glass- og metallemballasjeavfall fra husholdningene»."
+ },
+ "brev_prinsipielle": {
+  "doc": "brev",
+  "page": 1,
+  "phrase": "Miljødirektoratet først avklarer prinsipielle premisser på tre avgjørende områder."
+ },
+ "brev_metoden": {
+  "doc": "brev",
+  "page": 2,
+  "phrase": "Det sentrale spørsmålet er om det er metoden (henteordning for enhver pris) eller miljøgevinsten (faktisk reduksjon av totalbelastning) som skal være styrende."
+ },
+ "brev_h1": {
+  "doc": "brev",
+  "page": 2,
+  "phrase": "Økt materialgjenvinning uavhengig av innsatsfaktorer"
+ },
+ "brev_samlet": {
+  "doc": "brev",
+  "page": 2,
+  "phrase": "Loven forutsetter en samlet vurdering av miljøhensyn, ressursbruk og økonomiske forhold"
+ },
+ "brev_998": {
+  "doc": "brev",
+  "page": 2,
+  "phrase": "99,8 % av regionens areal er definert som spredtbygd strøk"
+ },
+ "brev_ferge": {
+  "doc": "brev",
+  "page": 3,
+  "phrase": "over 1 100 timer årlig der renovasjonskjøretøy står bundet opp i fergekø og fergetid"
+ },
+ "brev_mangedobling": {
+  "doc": "brev",
+  "page": 3,
+  "phrase": "Mangedobling av innsamlingskostnader"
+ },
+ "brev_h2": {
+  "doc": "brev",
+  "page": 5,
+  "phrase": "Praktisering av unntaksbestemmelser i distriktsregioner"
+ },
+ "brev_h3": {
+  "doc": "brev",
+  "page": 6,
+  "phrase": "Finansiering og forholdet til produsentansvarsordningen"
+ },
+ "brev_avslutning": {
+  "doc": "brev",
+  "page": 7,
+  "phrase": "ber SHMIL IKS om Miljødirektoratets skriftlige avklaringer"
+ },
+ "svar_dato": {
+  "doc": "svar",
+  "page": 1,
+  "phrase": "Oslo, 07.05.2026"
+ },
+ "svar_tittel": {
+  "doc": "svar",
+  "page": 1,
+  "phrase": "Svar på henvendelse om avfallsforskriften kapittel 10a"
+ },
+ "svar_mottatt": {
+  "doc": "svar",
+  "page": 1,
+  "phrase": "datert 15. januar, mottatt 19. januar, og foreløpig svar sendt 26. februar 2026."
+ },
+ "svar_seks": {
+  "doc": "svar",
+  "page": 1,
+  "phrase": "I brevet ber dere om svar på seks spørsmål."
+ },
+ "svar_ingen": {
+  "doc": "svar",
+  "page": 2,
+  "phrase": "Det foreligger ikke en unntaksmulighet for innføring av henteordning i forskriften for kommuner som oppnår minimumskravet for utsorteringsandel gjennom en bringeordning."
+ },
+ "svar_plikten": {
+  "doc": "svar",
+  "page": 2,
+  "phrase": "Plikten til henteordning gjelder uavhengig av målkravet for utsorteringsandel."
+ },
+ "svar_ventil": {
+  "doc": "svar",
+  "page": 3,
+  "phrase": "I tillegg er det en generell sikkerhetsventil i avfallsforskriften § 19-4 som åpner for unntak."
+ },
+ "svar_1994": {
+  "doc": "svar",
+  "page": 3,
+  "phrase": "§ 19-4"
+ },
+ "svar_urimelig": {
+  "doc": "svar",
+  "page": 3,
+  "phrase": "Denne kan være aktuell å benytte hvis krav i avfallsforskriften slår urimelig ut i konkrete tilfeller."
+ },
+ "svar_myetil": {
+  "doc": "svar",
+  "page": 3,
+  "phrase": "Vi gjør oppmerksom på at det skal mye til for at det skal være aktuelt å benytte denne unntakshjemmelen."
+ },
+ "svar_info": {
+  "doc": "svar",
+  "page": 3,
+  "phrase": "Vi har ikke tilstrekkelig informasjon til å vurdere om det kan være aktuelt å gjøre noen unntak for deres eierkommuner."
+ },
+ "svar_vedtak": {
+  "doc": "svar",
+  "page": 3,
+  "phrase": "Eventuelle unntak gjøres ved at Miljødirektoratet fatter vedtak om dette."
+ },
+ "svar_avsl_h": {
+  "doc": "svar",
+  "page": 3,
+  "phrase": "Avsluttende om Miljødirektoratets adgang til å gjøre unntak fra kravene i"
+ },
+ "sok_dato": {
+  "doc": "sok",
+  "page": 1,
+  "phrase": "31.08.2026"
+ },
+ "sok_ref": {
+  "doc": "sok",
+  "page": 1,
+  "phrase": "604/26-HJ"
+ },
+ "sok_tittel": {
+  "doc": "sok",
+  "page": 1,
+  "phrase": "Søknad om tidsbegrenset unntak etter avfallsforskriften § 19-4"
+ },
+ "sok_fiber": {
+  "doc": "sok",
+  "page": 1,
+  "phrase": "For avviket som gjelder papp- og papiravfall innfører SHMIL henteordning med egen fiberdunk for samtlige husstander i alle 11 eierkommuner"
+ },
+ "sok_glass": {
+  "doc": "sok",
+  "page": 1,
+  "phrase": "For avviket som gjelder glass- og metallemballasje søker SHMIL, på vegne av selskapets 11 eierkommuner, om tidsbegrenset unntak etter avfallsforskriften § 19-4"
+ },
+ "sok_2030": {
+  "doc": "sok",
+  "page": 1,
+  "phrase": "med virkning fra vedtaksdato frem til 31. desember 2030"
+ },
+ "sok_callout": {
+  "doc": "sok",
+  "page": 1,
+  "phrase": "Dette tilsvarer en årlig merkostnad på 3,39 mill. kroner"
+ },
+ "sok_grunnlaget": {
+  "doc": "sok",
+  "page": 1,
+  "phrase": "Denne søknaden gir det manglende grunnlaget: fysisk veide mengder, en uavhengig plukkanalyse, faktiske driftsdata og dokumenterte produksjons- og kostnadsforutsetninger."
+ },
+ "sok_p2_innledning": {
+  "doc": "sok",
+  "page": 2,
+  "phrase": "Dagens bringeordning samlet i 2025 inn 579,5 tonn samfengt glass- og metallemballasje via 44 returpunkter tømt 178 ganger."
+ },
+ "sok_t_44": {
+  "doc": "sok",
+  "page": 2,
+  "phrase": "44 returpunkter",
+  "occ": 1
+ },
+ "sok_t_8650": {
+  "doc": "sok",
+  "page": 2,
+  "phrase": "ca. 8 650 stoppesteder"
+ },
+ "sok_t_56000": {
+  "doc": "sok",
+  "page": 2,
+  "phrase": "ca. 56 000",
+  "near": 0.36
+ },
+ "sok_t_9228": {
+  "doc": "sok",
+  "page": 2,
+  "phrase": "ca. 9 228",
+  "near": 0.37
+ },
+ "sok_t_5795": {
+  "doc": "sok",
+  "page": 2,
+  "phrase": "579,5 tonn",
+  "occ": 1
+ },
+ "sok_t_457": {
+  "doc": "sok",
+  "page": 2,
+  "phrase": "45,7 tonn"
+ },
+ "sok_t_339": {
+  "doc": "sok",
+  "page": 2,
+  "phrase": "3,39 mill. kr",
+  "occ": 0
+ },
+ "sok_t_74286": {
+  "doc": "sok",
+  "page": 2,
+  "phrase": "74 286 kr"
+ },
+ "sok_t_hdr": {
+  "doc": "sok",
+  "page": 2,
+  "phrase": "Modellert henteordning"
+ },
+ "sok_t_hdr2": {
+  "doc": "sok",
+  "page": 2,
+  "phrase": "Dagens bringeordning",
+  "occ": 1
+ },
+ "sok_939": {
+  "doc": "sok",
+  "page": 4,
+  "phrase": "Den uavhengige plukkanalysen fra Iris Produksjon viste samtidig 93,9 prosent riktig sortert materiale"
+ },
+ "sok_metodekravet": {
+  "doc": "sok",
+  "page": 5,
+  "phrase": "SHMIL søker unntak fra metodekravet i § 10a-5, ikke fra resultatkravene i kapittel 10a."
+ },
+ "sok_h52": {
+  "doc": "sok",
+  "page": 5,
+  "phrase": "5.2 Forholdsmessighetsavveiningen"
+ },
+ "sok_sokerpa": {
+  "doc": "sok",
+  "page": 6,
+  "phrase": "SHMIL IKS søker på vegne av sine 11 eierkommuner om tidsbegrenset unntak etter avfallsforskriften § 19-4"
+ },
+ "sok_vedlegges": {
+  "doc": "sok",
+  "page": 6,
+  "phrase": "Søknaden vedlegges: nøkkeltall, kilder og datastatus (Vedlegg 1) og plukkanalysen for 2025 (Vedlegg 2)."
+ },
+ "v1_tittel": {
+  "doc": "v1",
+  "page": 1,
+  "phrase": "Nøkkeltall, kilder og datastatus"
+ },
+ "v1_maalt": {
+  "doc": "v1",
+  "page": 1,
+  "phrase": "Målt/registrert er direkte hentet fra kildesystem eller prøve."
+ },
+ "v1_modell": {
+  "doc": "v1",
+  "page": 1,
+  "phrase": "Modellscenario bygger på uttrykkelige forutsetninger."
+ },
+ "v1_5795": {
+  "doc": "v1",
+  "page": 1,
+  "phrase": "579,53 t/år"
+ },
+ "v1_5795_status": {
+  "doc": "v1",
+  "page": 1,
+  "phrase": "Målt/registrert",
+  "occ": 1
+ },
+ "v1_939": {
+  "doc": "v1",
+  "page": 1,
+  "phrase": "93,9 %"
+ },
+ "v1_939_lbl": {
+  "doc": "v1",
+  "page": 1,
+  "phrase": "Riktig sortert i prøven"
+ },
+ "v1_457": {
+  "doc": "v1",
+  "page": 1,
+  "phrase": "45,7 t/år"
+ },
+ "v1_457_status": {
+  "doc": "v1",
+  "page": 1,
+  "phrase": "Modellscenario",
+  "near": 0.6
+ },
+ "v1_44_lbl": {
+  "doc": "v1",
+  "page": 2,
+  "phrase": "Dagens returpunktstruktur"
+ },
+ "v1_44": {
+  "doc": "v1",
+  "page": 2,
+  "phrase": "44 steder"
+ },
+ "v1_178": {
+  "doc": "v1",
+  "page": 2,
+  "phrase": "Registrerte tømminger"
+ },
+ "v1_modellA": {
+  "doc": "v1",
+  "page": 3,
+  "phrase": "3,39 mill. kr/år; 74"
+ },
+ "v1_modellA_lbl": {
+  "doc": "v1",
+  "page": 3,
+  "phrase": "Modell A - gunstig, betinget"
+ },
+ "v1_prinsipp": {
+  "doc": "v1",
+  "page": 4,
+  "phrase": "Tall med status Estimat eller Modellscenario skal ikke omtales som målte resultater."
+ },
+ "v2_dato": {
+  "doc": "v2",
+  "page": 1,
+  "phrase": "Dato: 9.-10. desember 2025"
+ },
+ "v2_939_pie": {
+  "doc": "v2",
+  "page": 13,
+  "phrase": "93,9 %",
+  "near": 0.52
+ },
+ "v2_122": {
+  "doc": "v2",
+  "page": 5,
+  "phrase": "122"
+ },
+ "v2_939_a": {
+  "doc": "v2",
+  "page": 13,
+  "phrase": "Faktisk andel glass - og metallemballasje",
+  "occ": 0
+ },
+ "v2_939_b": {
+  "doc": "v2",
+  "page": 13,
+  "phrase": "er på 9 3,9 %.",
+  "occ": 0
+ }
+}

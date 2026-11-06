@@ -1,0 +1,12 @@
+{
+  "name": "shmil-dokumentarfilm",
+  "private": true,
+  "description": "Animert dokumentarfilm: SHMILs sak hos Miljødirektoratet (nov. 2025 – aug. 2026)",
+  "scripts": {
+    "render": "node render.cjs",
+    "stills": "node render.cjs --stills 12,50,82,112,145"
+  },
+  "devDependencies": {
+    "playwright": "^1.45.0"
+  }
+}

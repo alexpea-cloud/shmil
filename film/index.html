@@ -1,0 +1,156 @@
+<!doctype html>
+<html lang="no">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>SHMIL – Fra tilsynsavvik til søknad</title>
+<style>
+@font-face{font-family:FS;src:url(assets/fonts/Inter-Light.otf);font-weight:300}
+@font-face{font-family:FS;src:url(assets/fonts/Inter-Regular.otf);font-weight:400}
+@font-face{font-family:FS;src:url(assets/fonts/Inter-Medium.otf);font-weight:500}
+@font-face{font-family:FS;src:url(assets/fonts/Inter-SemiBold.otf);font-weight:600}
+@font-face{font-family:FS;src:url(assets/fonts/Inter-Bold.otf);font-weight:700}
+@font-face{font-family:FD;src:url(assets/fonts/InterDisplay-Medium.otf);font-weight:500}
+@font-face{font-family:FD;src:url(assets/fonts/InterDisplay-SemiBold.otf);font-weight:600}
+@font-face{font-family:FD;src:url(assets/fonts/InterDisplay-Bold.otf);font-weight:700}
+@font-face{font-family:FM;src:url(assets/fonts/JetBrainsMono-Regular.ttf);font-weight:400}
+@font-face{font-family:FM;src:url(assets/fonts/JetBrainsMono-Medium.ttf);font-weight:500}
+
+:root{
+  --bg:#0d1113; --bg2:#172024;
+  --green:#007B61; --gl:#3cc79a; --gd:#0b5c49;
+  --blue:#164A5B; --bl:#68b6dc;
+  --teal:#005E5D; --tl:#4fb3ae;
+  --white:#f1f4f3; --soft:rgba(241,244,243,.78); --grey:#93a1a6;
+}
+html,body{margin:0;height:100%;background:#000;overflow:hidden}
+#stage{position:absolute;left:0;top:0;width:1920px;height:1080px;overflow:hidden;background:var(--bg);
+  transform-origin:0 0;font-family:FS,system-ui,sans-serif;color:var(--white);
+  -webkit-font-smoothing:antialiased;font-feature-settings:"tnum" 1,"cv11" 1;}
+.layer{position:absolute;left:0;top:0;width:1920px;height:1080px;pointer-events:none}
+#bg{background:radial-gradient(ellipse 80% 70% at 50% 45%,#1b252a 0%,#121a1d 45%,#0b0f11 100%)}
+#tint{background:radial-gradient(ellipse 80% 70% at 60% 40%,rgba(30,90,110,.35),rgba(10,30,40,0) 70%);opacity:0}
+.scene{position:absolute;left:0;top:0;width:1920px;height:1080px;overflow:hidden;display:none}
+.world{position:absolute;left:0;top:0;width:0;height:0;transform-origin:0 0}
+.desk{position:absolute;left:-7000px;top:-5000px;width:20000px;height:14000px;
+  background-image:linear-gradient(rgba(255,255,255,.045) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.045) 1px,transparent 1px);
+  background-size:140px 140px}
+.page{position:absolute;left:0;top:0;transform-origin:50% 50%;background:#fff;
+  box-shadow:0 26px 70px rgba(0,0,0,.55),0 3px 10px rgba(0,0,0,.35)}
+.page img{position:absolute;left:0;top:0;width:100%;height:100%;display:block}
+.page .shade{position:absolute;left:0;top:0;width:100%;height:100%;background:#0d1214;opacity:0}
+.page.mdir{box-shadow:0 26px 70px rgba(0,0,0,.55),0 3px 10px rgba(0,0,0,.35),0 0 0 3px rgba(79,179,174,.0)}
+.hlr{position:absolute}
+.hlb{position:absolute;left:0;top:0;width:100%;height:100%;transform-origin:0 50%;transform:scaleX(0);border-radius:3px}
+.hlb.m-g{background:rgba(40,200,150,.36);mix-blend-mode:multiply}
+.hlb.m-b{background:rgba(80,160,230,.34);mix-blend-mode:multiply}
+.hlb.u-g{top:auto;bottom:-3px;height:4px;background:#00a37c;border-radius:2px}
+.hlb.u-b{top:auto;bottom:-3px;height:4px;background:#2f8fc6;border-radius:2px}
+.hlb.box-g{background:transparent;border:4px solid #00a37c;border-radius:6px;transform-origin:50% 50%}
+.hlb.box-b{background:transparent;border:4px solid #2f8fc6;border-radius:6px;transform-origin:50% 50%}
+.dim{position:absolute;left:0;top:0;width:100%;height:100%;background:#0b1012;opacity:0}
+
+.ov{position:absolute;left:0;top:0;white-space:nowrap;will-change:auto}
+.w{display:inline-block;overflow:hidden;vertical-align:top;padding:0 .02em .08em;margin-bottom:-.08em}
+.wi{display:inline-block}
+.kicker{font:600 22px/1 FS;letter-spacing:.24em;text-transform:uppercase;color:var(--gl)}
+.kicker.b{color:var(--bl)} .kicker.t{color:var(--tl)} .kicker.g{color:var(--grey)}
+.h1{font:700 128px/1.0 FD;letter-spacing:-.015em}
+.h2{font:600 88px/1.04 FD;letter-spacing:-.015em}
+.h3{font:600 60px/1.1 FD;letter-spacing:-.01em}
+.h4{font:600 46px/1.15 FD;letter-spacing:-.005em}
+.lead{font:400 36px/1.35 FS;color:var(--soft)}
+.body{font:400 30px/1.4 FS;color:var(--soft)}
+.small{font:400 23px/1.35 FS;color:var(--grey)}
+.mono{font:500 21px/1.3 FM;color:var(--grey);letter-spacing:.02em}
+.quote{font:300 40px/1.38 FS;color:var(--white);white-space:normal}
+.wrap{white-space:normal}
+
+.tag{display:inline-flex;align-items:center;gap:12px;font:600 19px/1 FS;letter-spacing:.16em;text-transform:uppercase;
+  padding:9px 14px 8px;border-radius:5px}
+.tag.m{background:rgba(60,199,154,.16);color:#7fe0bd;border:2px solid rgba(60,199,154,.75)}
+.tag.s{background:rgba(104,182,220,.08);color:#a6d5ef;border:2px dashed rgba(104,182,220,.85)}
+.tag .src{font:400 19px/1 FS;letter-spacing:.02em;text-transform:none;color:var(--soft)}
+
+.chip{display:inline-flex;align-items:center;gap:14px;font:500 22px/1 FS;letter-spacing:.04em;color:var(--soft);
+  padding:12px 18px;border-radius:6px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.16)}
+.chip .dot{width:12px;height:12px;border-radius:50%;background:var(--gl)}
+.chip.mdir .dot{background:var(--tl)} .chip.mdir{border-color:rgba(79,179,174,.45)}
+.chip.iris .dot{background:#9be564}
+
+.card{position:absolute;left:0;top:0;width:560px;padding:26px 30px 28px 34px;border-radius:8px;white-space:normal;
+  background:rgba(255,255,255,.045);border:1px solid rgba(255,255,255,.14)}
+.card .bar{position:absolute;left:0;top:0;bottom:0;width:6px;border-radius:8px 0 0 8px;background:var(--grey)}
+.card .lbl{font:600 18px/1 FS;letter-spacing:.2em;text-transform:uppercase;color:var(--grey);margin-bottom:14px}
+.card .ttl{font:600 44px/1.1 FD}
+.card .st{font:400 26px/1.35 FS;color:var(--soft);margin-top:14px}
+
+.msg{position:absolute;left:0;top:0;width:600px;white-space:normal}
+.msg .n{display:flex;align-items:center;justify-content:center;width:64px;height:64px;border-radius:50%;
+  border:2px solid var(--bl);font:600 32px/1 FD;color:var(--bl);margin-bottom:22px}
+.msg .t{font:500 44px/1.22 FD;letter-spacing:-.005em}
+.msg .s{font:400 25px/1.4 FS;color:var(--grey);margin-top:18px}
+
+.co{position:absolute;left:0;top:0;white-space:nowrap;transform-origin:0 0}
+.co .num{font:700 132px/0.95 FD;letter-spacing:-.02em}
+.co .num .u{font:600 60px/1 FD;letter-spacing:-.01em;margin-left:14px;color:var(--soft)}
+.co .lab{font:400 32px/1.3 FS;color:var(--soft);margin-top:14px;white-space:normal;width:560px}
+.co .tg{margin-top:22px}
+.co .acc{position:absolute;left:-30px;top:6px;width:6px;height:112px;border-radius:3px}
+
+.board{position:absolute;left:0;top:0;width:760px;white-space:normal}
+.board .hd{display:flex;align-items:center;gap:14px;margin-bottom:26px}
+.board .it{display:flex;align-items:baseline;gap:22px;padding:18px 0;border-top:1px solid rgba(255,255,255,.12)}
+.board .it .v{font:700 54px/1 FD;min-width:300px;letter-spacing:-.01em}
+.board .it .d{font:400 25px/1.3 FS;color:var(--soft)}
+
+.badge{font:700 64px/1 FD;letter-spacing:-.01em}
+.para{font:700 300px/1 FD;letter-spacing:-.03em}
+
+.band-t{position:absolute;left:0;top:0;width:1920px;height:210px;pointer-events:none;
+  background:linear-gradient(to bottom,rgba(11,15,17,.93) 0%,rgba(11,15,17,.8) 45%,rgba(11,15,17,0) 100%)}
+.band-b{position:absolute;left:0;top:660px;width:1920px;height:420px;pointer-events:none;
+  background:linear-gradient(to bottom,rgba(11,15,17,0) 0%,rgba(11,15,17,.86) 32%,rgba(11,15,17,.95) 100%)}
+.pan-l,.pan-r{position:absolute;top:0;width:1000px;height:1080px;pointer-events:none}
+.pan-l{left:0;background:linear-gradient(to right,rgba(11,15,17,.96) 0%,rgba(11,15,17,.94) 72%,rgba(11,15,17,0) 100%)}
+.pan-r{left:920px;background:linear-gradient(to left,rgba(11,15,17,.96) 0%,rgba(11,15,17,.94) 74%,rgba(11,15,17,0) 100%)}
+.chip{background:rgba(16,22,25,.92)!important}
+#svg{position:absolute;left:0;top:0;overflow:visible}
+#scrim{background:#0b0f11;opacity:0}
+#grain{opacity:.055;mix-blend-mode:overlay}
+#vign{background:radial-gradient(ellipse 75% 75% at 50% 50%,rgba(0,0,0,0) 55%,rgba(0,0,0,.55) 100%)}
+#black{background:#000;opacity:1}
+
+/* preview controls (not rendered in film) */
+#ui{position:fixed;left:0;right:0;bottom:0;display:flex;gap:14px;align-items:center;padding:10px 16px;
+  background:rgba(10,12,14,.88);color:#dfe6e8;font:500 14px system-ui,sans-serif;z-index:10}
+#ui button{font:600 14px system-ui;padding:8px 14px;border-radius:6px;border:1px solid #3b474c;background:#1c2529;color:#fff;cursor:pointer}
+#ui input[type=range]{flex:1}
+#ui .time{font-variant-numeric:tabular-nums;min-width:110px}
+body.render #ui{display:none}
+</style>
+</head>
+<body>
+<div id="stage">
+  <div class="layer" id="bg"></div>
+  <div class="layer" id="tint"></div>
+  <div class="layer" id="scenes"></div>
+  <div class="layer" id="scrim"></div>
+  <canvas class="layer" id="tl" width="1920" height="1080"></canvas>
+  <div class="layer" id="ov"></div>
+  <svg class="layer" id="svg" width="1920" height="1080" viewBox="0 0 1920 1080"></svg>
+  <div class="layer" id="vign"></div>
+  <canvas class="layer" id="grain" width="1920" height="1080"></canvas>
+  <div class="layer" id="black"></div>
+</div>
+<div id="ui">
+  <button id="play">▶ Spill av</button>
+  <span class="time" id="time">0:00.0 / 2:29.8</span>
+  <input type="range" id="scrub" min="0" max="149.8" step="0.01" value="0">
+  <span>Forhåndsvisning – ferdig MP4 ligger i <code>output/</code></span>
+</div>
+<audio id="audio" src="assets/audio/tactical-stillness.mp3" preload="auto"></audio>
+<script src="data.js"></script>
+<script src="film.js"></script>
+</body>
+</html>
