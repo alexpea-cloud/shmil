@@ -4,7 +4,7 @@
  *
  *   node render.cjs                       -> output/SHMIL_fra_tilsynsavvik_til_soknad.mp4
  *   node render.cjs --stills 12.5,40,81   -> PNG stills in output/stills/
- *   options: --workers 3 --fps 30 --out <file.mp4> --from <s> --to <s> --keep
+ *   options: --workers 3 --fps 30 --crf 22 --out <file.mp4> --from <s> --to <s> --keep
  */
 const { chromium } = require('playwright');
 const { spawnSync } = require('child_process');
@@ -83,7 +83,7 @@ async function full() {
     '-framerate', String(FPS), '-i', path.join(frames, 'f%05d.jpg'),
     '-ss', String(from), '-i', audio,
     '-map', '0:v', '-map', '1:a',
-    '-c:v', 'libx264', '-preset', 'slow', '-crf', '17', '-tune', 'film',
+    '-c:v', 'libx264', '-preset', 'slow', '-crf', opt('crf', '22'), '-aq-mode', '3',
     '-pix_fmt', 'yuv420p', '-profile:v', 'high', '-level', '4.1', '-r', String(FPS),
     '-x264-params', 'keyint=60:min-keyint=30',
     '-c:a', 'aac', '-b:a', '192k', '-ar', '48000',
