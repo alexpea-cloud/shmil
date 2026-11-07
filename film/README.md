@@ -1,36 +1,36 @@
-# SHMIL – Fra tilsynsavvik til søknad
+# SHMIL – Grunnlaget for søknaden
 
-Animert dokumentarfilm (2:30, 16:9, Full HD) om SHMILs oppfølging av tilsynsavviket fra
-Statsforvalteren i Nordland, avklaringen med Miljødirektoratet, dokumentasjonsarbeidet
-sommeren 2026 og søknaden om tidsbegrenset unntak etter avfallsforskriften § 19-4.
+Animert dokumentarfilm (3:24, 16:9, Full HD) om arbeidet bak SHMILs søknad om tidsbegrenset
+unntak etter avfallsforskriften § 19-4: hvordan dokumentasjonen ble hentet inn fra arkiver og
+fagsystemer, analysert og sammenstilt i Vedlegg 1 og 2, og hvordan søknaden bygger på den.
 Laget for visning i PowerPoint for representanter fra SHMILs 11 eierkommuner.
 
-**Ferdig film:** [`output/SHMIL_fra_tilsynsavvik_til_soknad.mp4`](../output/SHMIL_fra_tilsynsavvik_til_soknad.mp4)
-(H.264/AAC, 1920×1080, 30 fps, lydspor «Tactical Stillness»)
+**Ferdig film:** [`output/SHMIL_grunnlaget_for_soknaden.mp4`](../output/SHMIL_grunnlaget_for_soknaden.mp4)
+(H.264/AAC, 1920×1080, 30 fps, lydspor «Cosmos 18 (Remix)»)
 
-## Disposisjon (versjon 2)
+## Disposisjon (versjon 3)
 
-Lyst, rolig uttrykk – én ting om gangen, store bokstaver og lange hold, så teksten kan leses
-fra bakerste rad. Scenene klippes på musikkens frasetakter.
+Lyst, rolig uttrykk med lange hold og store bokstaver. Scenene klippes på musikkens fraser
+(128 bpm, 15-sekunders fraser).
 
 | Tid | Del | Innhold |
 |-----|-----|---------|
-| 0:00 | Åpning | Tittel over de fem originaldokumentene; tidslinjen med stasjonene tegnes |
-| 0:09 | Tilsynet | 6.11.2025 · avviket som sitat · papp/papir og glass/metall mangler henteordning |
-| 0:22 | Henvendelsen | 15.01.2026 · «metoden … eller miljøgevinsten» · 7 sider, 3 tema, 6 spørsmål |
-| 0:40 | Svaret | 07.05.2026 · plikten gjelder uavhengig av målkravet · **§ 19-4** som vendepunkt · «Grunnlaget manglet.» |
-| 1:06 | Dokumentasjonsarbeidet | Ni kilder hentes fram fra fagsystemer, arkiver og prosjektmapper (KOSTRA, Retura, Komtek, plukkanalysen, Sirkel, SSB, sorteringstest, konsekvensutredningen, kostnadsmodellen) · kontroll med kilde og datastatus · Vedlegg 1 og 2 |
-| 1:32 | Søknaden | 31.08.2026 · fiberdunk for papp/papir, unntakssøknad for glass/metall · hver påstand viser til dokumentasjonen |
-| 1:47 | Nytte og belastning | Ni av ti kilo samles allerede inn · det den siste tidelen ville kreve (56 000 stopp, 0,8 kg per stopp, 9 228 beholdere, tungtrafikk i boliggatene) |
-| 1:59 | Konklusjonen | Boksen på side 1: 74 286 kr per ekstra tonn – over 40 ganger direktoratets anslag · 3,39 mill. kr i året, 3–4 % høyere gebyr |
-| 2:12 | Oversendt | Søknad + Vedlegg 1 + Vedlegg 2 sendes Miljødirektoratet |
-| 2:20 | Avslutning | «SHMIL søker om tidsbegrenset unntak etter § 19-4» · hele tidslinjen · «Vi venter fortsatt på svar.» |
+| 0:00 | Tittel | «Grunnlaget for søknaden» over søknaden og vedleggene |
+| 0:12 | Prolog | Saksgangen langs én tidslinje: tilsynsavvik 6.11.2025 · henvendelse 15.01.2026 · svar 07.05.2026 («ikke tilstrekkelig informasjon») · «Grunnlaget manglet.» |
+| 0:35 | Hente inn | Arkivet (illustrasjon) · åtte kilder legges i saksmappen: KOSTRA, Komtek, Retura, SSB, Sirkel, plukkanalysen, sorteringstest, konsekvensutredningen |
+| 1:05 | Analysere – plukkanalysen | Vedlegg 2: ca. 122 kg sortert og veid · 93,9 % riktig sortert (målt) |
+| 1:20 | Analysere – beregningsmodellen | 8 959 avtaler → ca. 8 650 stoppesteder → ca. 56 000 tømmestopp → 225 kjøretøydager → 2,99 + 0,40 mill. kr = 3,39 mill. kr i året · sensitivitet 59 000–110 000 kr per tonn |
+| 1:50 | Sammenstille | Vedlegg 1 fylles rad for rad · datastatus (målt, avledet, estimat, modellscenario) · prinsipp for bruk · «Bygget fra auditerte originalkilder …» |
+| 2:20 | Søknaden | Søknaden legges på grunnlaget · «Denne søknaden gir det manglende grunnlaget» – koblet til kildene |
+| 2:35 | Nytte og belastning | Ni av ti kilo samles allerede inn · den siste tidelen krever ca. 56 000 tømmestopp i året |
+| 2:42 | Konklusjonen | Boksen på side 1: 74 286 kr per ekstra tonn – over 40 ganger direktoratets anslag · 3,39 mill. kr i året, 3–4 % høyere gebyr |
+| 3:05 | Oversendt | Søknad + Vedlegg 1 + Vedlegg 2 sendes 31.08.2026 |
+| 3:11 | Avslutning | «SHMIL søker om tidsbegrenset unntak etter § 19-4» · tidslinjen · «Vi venter fortsatt på svar.» |
 
 Alle tall og sitater er hentet ordrett fra de fem PDF-ene i `source/`. Tilsynsrapporten var ikke
-vedlagt og vises derfor ikke; avviket gjengis som sitat med kildehenvisning. Kildene i
-dokumentasjonsdelen er navnene fra kilderegisteret i Vedlegg 1; arkivveggen er en grafisk
-illustrasjon, ikke skjermbilder. CO₂ og trafikksikkerhet er ikke tallfestet i dokumentene, så
-belastningen beskrives med søknadens egne formuleringer.
+vedlagt og vises ikke. Kildenavnene kommer fra kilderegisteret i Vedlegg 1, og arkivet er en
+grafisk illustrasjon, ikke skjermbilder. Beregningskjeden følger Vedlegg 1 kap. 3 og søknaden
+kap. 2.2; hvert ledd er merket med datastatus slik vedlegget gjør.
 
 ## Bruk i PowerPoint
 
@@ -53,8 +53,8 @@ film/
 ```bash
 cd film
 npm install && npx playwright install chromium   # krever også ffmpeg
-node render.cjs                                  # skriver output/SHMIL_fra_tilsynsavvik_til_soknad.mp4
-node render.cjs --stills 59.5,126.8              # enkeltbilder til output/stills/
+node render.cjs                                  # skriver output/SHMIL_grunnlaget_for_soknaden.mp4
+node render.cjs --stills 99,173                  # enkeltbilder til output/stills/
 ```
 
 Nye uthevinger legges inn i `tools/specs.json` og genereres slik (krever poppler-utils):

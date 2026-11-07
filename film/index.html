@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Fra tilsynsavvik til søknad</title>
+<title>Grunnlaget for søknaden</title>
 <style>
 @font-face{font-family:FS;src:url(assets/fonts/Inter-Regular.otf);font-weight:400}
 @font-face{font-family:FS;src:url(assets/fonts/Inter-Medium.otf);font-weight:500}
@@ -91,6 +91,29 @@ html,body{margin:0;height:100%;background:var(--chrome);overflow:hidden}
 .tag .x{font:400 22px/1 var(--sans);letter-spacing:.01em;text-transform:none;color:var(--ink2)}
 
 #cveil{background:var(--paper);opacity:0}
+.lpan{position:absolute;left:0;top:0;width:1200px;height:1080px;pointer-events:none;
+  background:linear-gradient(to right,rgba(236,235,230,.97) 0%,rgba(236,235,230,.93) 62%,rgba(236,235,230,0) 100%)}
+.folder{position:absolute;left:0;top:0;box-sizing:border-box;border-radius:0 16px 16px 16px;background:#E7DDC5;
+  box-shadow:0 26px 60px rgba(60,50,30,.16),0 3px 10px rgba(60,50,30,.10)}
+.folder .tab{position:absolute;left:0;top:-50px;height:52px;padding:0 30px;border-radius:14px 14px 0 0;background:#E7DDC5;
+  display:flex;align-items:center;font:600 24px/1 var(--sans);letter-spacing:.06em;color:#5B4F36}
+.folder .back{position:absolute;left:18px;right:18px;top:18px;bottom:18px;border-radius:10px;background:#DED2B6}
+.fc{position:absolute;left:0;top:0;box-sizing:border-box;width:650px;height:76px;padding:13px 22px;border-radius:9px;background:#fff;white-space:nowrap;
+  box-shadow:0 10px 24px rgba(27,35,38,.10),0 1px 4px rgba(27,35,38,.08);transform-origin:0 0}
+.fc .nm{font:600 27px/1.1 var(--display);color:var(--ink)}
+.fc .ty{font:400 19px/1.2 var(--sans);color:var(--ink3);margin-top:5px}
+.fc .dot{position:absolute;right:20px;top:31px;width:12px;height:12px;border-radius:50%;background:var(--green-hi)}
+.node{position:absolute;left:0;top:0;box-sizing:border-box;width:500px;height:204px;padding:24px 28px;border-radius:12px;background:#fff;white-space:normal;
+  box-shadow:0 18px 40px rgba(27,35,38,.09),0 2px 6px rgba(27,35,38,.06)}
+.node .v{font:700 66px/1 var(--display);letter-spacing:-.02em;color:var(--ink)}
+.node .l{font:400 27px/1.3 var(--sans);color:var(--ink2);margin-top:12px}
+.stc{display:inline-block;font:600 17px/1 var(--sans);letter-spacing:.14em;text-transform:uppercase;padding:7px 10px 6px;border-radius:5px}
+.stc.m{color:var(--green);border:2px solid var(--green-hi);background:rgba(14,156,121,.08)}
+.stc.a{color:var(--ink2);border:2px solid #9AA4A8}
+.stc.e{color:var(--ink2);border:2px dashed #9AA4A8}
+.stc.s{color:var(--blue);border:2px dashed var(--blue-hi);background:rgba(42,127,166,.06)}
+.node .stc{position:absolute;right:22px;top:22px}
+.mask{position:absolute;background:#fff}
 #grain{opacity:.035;mix-blend-mode:multiply}
 #vign{background:radial-gradient(ellipse 80% 80% at 50% 50%,rgba(0,0,0,0) 62%,rgba(40,44,40,.10) 100%)}
 #black{background:#000;opacity:1}
@@ -119,11 +142,11 @@ body.render #ui{display:none}
 </div>
 <div id="ui">
   <button id="play" type="button">▶ Spill av</button>
-  <span class="time" id="time">0:00.0 / 2:29.8</span>
-  <input type="range" id="scrub" min="0" max="149.8" step="0.01" value="0" aria-label="Spol i filmen">
+  <span class="time" id="time">0:00.0 / 3:24.7</span>
+  <input type="range" id="scrub" min="0" max="204.7" step="0.01" value="0" aria-label="Spol i filmen">
   <button id="fs" type="button">Fullskjerm</button>
 </div>
-<audio id="audio" src="assets/audio/tactical-stillness.mp3" preload="auto"></audio>
+<audio id="audio" src="assets/audio/cosmos-18-remix.mp3" preload="auto"></audio>
 <script src="data.js"></script>
 <script src="film.js"></script>
 </body>

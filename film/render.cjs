@@ -2,7 +2,7 @@
 /* Renders film/index.html frame by frame with headless Chromium (Playwright)
  * and encodes an MP4 (H.264 + AAC) with ffmpeg.
  *
- *   node render.cjs                       -> output/SHMIL_fra_tilsynsavvik_til_soknad.mp4
+ *   node render.cjs                       -> output/SHMIL_grunnlaget_for_soknaden.mp4
  *   node render.cjs --stills 12.5,40,81   -> PNG stills in output/stills/
  *   options: --workers 3 --fps 30 --crf 22 --out <file.mp4> --from <s> --to <s> --keep
  */
@@ -77,7 +77,7 @@ async function full() {
   }));
   await browser.close();
   console.log('\nencoding…');
-  const out = opt('out', path.join(OUTDIR, 'SHMIL_fra_tilsynsavvik_til_soknad.mp4'));
+  const out = opt('out', path.join(OUTDIR, 'SHMIL_grunnlaget_for_soknaden.mp4'));
   const audio = path.join(ROOT, 'assets', 'audio', 'tactical-stillness.mp3');
   const r = spawnSync('ffmpeg', ['-y', '-v', 'error', '-stats',
     '-framerate', String(FPS), '-i', path.join(frames, 'f%05d.jpg'),
