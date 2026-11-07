@@ -364,5 +364,72 @@
   "page": 13,
   "phrase": "er på 9 3,9 %.",
   "occ": 0
+ },
+ "sok_box": {
+  "doc": "sok",
+  "page": 1,
+  "phrase": "Omlegging til henteordning koster 74 286 kroner per ekstra tonn i SHMILs pliktområde – over 40 ganger det direktoratet selv la til grunn i sine beregninger da kravet ble innført. Dette tilsvarer en årlig merkostnad på 3,39 mill. kroner, som utgjør en økning i renovasjonsgebyret på 3–4 %."
+ },
+ "sok_box1": {
+  "doc": "sok",
+  "page": 1,
+  "phrase": "Omlegging til henteordning koster 74 286 kroner per ekstra tonn i SHMILs pliktområde – over 40 ganger det direktoratet selv la til grunn i sine beregninger da kravet ble innført."
+ },
+ "sok_ref_p1": {
+  "doc": "sok",
+  "page": 1,
+  "phrase": "Nøkkeltall, kilder og datastatus fremgår av Vedlegg 1."
+ },
+ "sok_ref_p2": {
+  "doc": "sok",
+  "page": 2,
+  "phrase": "(jf. Vedlegg 1)"
+ },
+ "sok_ref_p3a": {
+  "doc": "sok",
+  "page": 3,
+  "phrase": "Miljødirektoratet, rapport M-2021 | 2021, vedlegg 1, tiltak UH4"
+ },
+ "sok_ref_p3b": {
+  "doc": "sok",
+  "page": 3,
+  "phrase": "Miljødirektoratets oppdragssvar til Klima- og miljødepartementet 27.11.2023"
+ },
+ "sok_ref_p4a": {
+  "doc": "sok",
+  "page": 4,
+  "phrase": "(jf. Vedlegg 2)"
+ },
+ "sok_ref_p4b": {
+  "doc": "sok",
+  "page": 4,
+  "phrase": "Sirkels mottaksrapportering for SHMILs leveranser (2025)"
+ },
+ "sok_ref_p4c": {
+  "doc": "sok",
+  "page": 4,
+  "phrase": "Dokumentert ved sorteringstest, jf. Vedlegg 1"
+ },
+ "sok_ref_p5": {
+  "doc": "sok",
+  "page": 5,
+  "phrase": "I brev av 07.05.2026 viste direktoratet"
+ },
+ "v1_datastatus_hdr": {
+  "doc": "v1",
+  "page": 1,
+  "phrase": "Datastatus",
+  "near": 0.36
+ },
+ "v1_kilde_hdr": {
+  "doc": "v1",
+  "page": 1,
+  "phrase": "Kilde, systemgrense og forbehold",
+  "occ": 0
+ },
+ "v1_versjon": {
+  "doc": "v1",
+  "page": 1,
+  "phrase": "31.08.2026 - bygget fra auditerte originalkilder og SHMILs underliggende beregningsmodell."
  }
 }

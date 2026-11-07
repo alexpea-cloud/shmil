@@ -1,66 +1,63 @@
 # SHMIL – Fra tilsynsavvik til søknad
 
 Animert dokumentarfilm (2:30, 16:9, Full HD) om SHMILs oppfølging av tilsynsavviket fra
-Statsforvalteren i Nordland: korrespondansen med Miljødirektoratet, og søknaden om
-tidsbegrenset unntak etter avfallsforskriften § 19-4 for glass- og metallemballasje.
-Filmen er laget for å vises i PowerPoint for representanter fra SHMILs 11 eierkommuner.
+Statsforvalteren i Nordland, avklaringen med Miljødirektoratet, dokumentasjonsarbeidet
+sommeren 2026 og søknaden om tidsbegrenset unntak etter avfallsforskriften § 19-4.
+Laget for visning i PowerPoint for representanter fra SHMILs 11 eierkommuner.
 
 **Ferdig film:** [`output/SHMIL_fra_tilsynsavvik_til_soknad.mp4`](../output/SHMIL_fra_tilsynsavvik_til_soknad.mp4)
 (H.264/AAC, 1920×1080, 30 fps, lydspor «Tactical Stillness»)
 
-## Innhold
+## Disposisjon (versjon 2)
 
-| Tid | Kapittel | Innhold |
-|-----|----------|---------|
-| 0:00 | Åpning | Tittel over de faktiske dokumentsidene |
-| 0:09 | 01 Tilsyn og oppfølging | 6.11.2025: tilsynsavvik – krav om henteordning (papp/papir og glass/metall). 9.–10.12.2025: plukkanalysen gjennomføres (Iris Produksjon) |
-| 0:35 | 02 Henvendelse | SHMILs brev 15.01.2026: dato, overskrift, «metoden eller miljøgevinsten», samlet vurdering, 99,8 % spredtbygd, fergetid – og oversikt over 7 sider / 3 tema / 6 spørsmål |
-| 1:02 | 03 Avklaring | Miljødirektoratets svar 07.05.2026 (mottatt 19.01, foreløpig svar 26.02): henteplikten gjelder i utgangspunktet, **§ 19-4** som vendepunkt, høy terskel, «ikke tilstrekkelig informasjon» – en prinsipiell avklaring, ikke et avslag |
-| 1:33 | 04 Dokumentasjon | Sommeren 2026: Vedlegg 1, Vedlegg 2 og søknadens beregninger på en arbeidsflate. Målte tall (44 returpunkter, 579,5 tonn, 93,9 % fra plukkanalysen des. 2025) holdes tydelig adskilt fra modellscenarier (ca. 56 000 tømmestopp, 45,7 tonn, 3,39 mill. kr/år) |
-| 2:04 | 05 Søknad | Søknaden 31.08.2026: fiberdunk for papp/papir, unntakssøknad for glass/metall frem til 31.12.2030, samlet pakke med Vedlegg 1 og 2 oversendt |
-| 2:20 | Avslutning | «SHMIL søker om tidsbegrenset unntak etter § 19-4» – hele tidslinjen november 2025 – august 2026 |
+Lyst, rolig uttrykk – én ting om gangen, store bokstaver og lange hold, så teksten kan leses
+fra bakerste rad. Scenene klippes på musikkens frasetakter.
 
-Filmen fungerer uten lyd: all informasjon står som tekst på skjermen.
+| Tid | Del | Innhold |
+|-----|-----|---------|
+| 0:00 | Åpning | Tittel over de fem originaldokumentene; tidslinjen med stasjonene tegnes |
+| 0:09 | Tilsynet | 6.11.2025 · avviket som sitat · papp/papir og glass/metall mangler henteordning |
+| 0:22 | Henvendelsen | 15.01.2026 · «metoden … eller miljøgevinsten» · 7 sider, 3 tema, 6 spørsmål |
+| 0:40 | Svaret | 07.05.2026 · plikten gjelder uavhengig av målkravet · **§ 19-4** som vendepunkt · «Grunnlaget manglet.» |
+| 1:06 | Dokumentasjonsarbeidet | Ni kilder hentes fram fra fagsystemer, arkiver og prosjektmapper (KOSTRA, Retura, Komtek, plukkanalysen, Sirkel, SSB, sorteringstest, konsekvensutredningen, kostnadsmodellen) · kontroll med kilde og datastatus · Vedlegg 1 og 2 |
+| 1:32 | Søknaden | 31.08.2026 · fiberdunk for papp/papir, unntakssøknad for glass/metall · hver påstand viser til dokumentasjonen |
+| 1:47 | Nytte og belastning | Ni av ti kilo samles allerede inn · det den siste tidelen ville kreve (56 000 stopp, 0,8 kg per stopp, 9 228 beholdere, tungtrafikk i boliggatene) |
+| 1:59 | Konklusjonen | Boksen på side 1: 74 286 kr per ekstra tonn – over 40 ganger direktoratets anslag · 3,39 mill. kr i året, 3–4 % høyere gebyr |
+| 2:12 | Oversendt | Søknad + Vedlegg 1 + Vedlegg 2 sendes Miljødirektoratet |
+| 2:20 | Avslutning | «SHMIL søker om tidsbegrenset unntak etter § 19-4» · hele tidslinjen · «Vi venter fortsatt på svar.» |
+
+Alle tall og sitater er hentet ordrett fra de fem PDF-ene i `source/`. Tilsynsrapporten var ikke
+vedlagt og vises derfor ikke; avviket gjengis som sitat med kildehenvisning. Kildene i
+dokumentasjonsdelen er navnene fra kilderegisteret i Vedlegg 1; arkivveggen er en grafisk
+illustrasjon, ikke skjermbilder. CO₂ og trafikksikkerhet er ikke tallfestet i dokumentene, så
+belastningen beskrives med søknadens egne formuleringer.
 
 ## Bruk i PowerPoint
 
 1. **Sett inn → Video → Denne enheten…** og velg MP4-filen.
-2. Under **Avspilling**: velg *Start: Automatisk* (eller *Ved klikk*) og eventuelt *Spill av i fullskjerm*.
-3. Filmen er 2 min 30 s og slutter i svart.
+2. Under **Avspilling**: *Start: Automatisk* eller *Ved klikk*, eventuelt *Spill av i fullskjerm*.
 
 ## Slik er filmen laget
 
-Alt i filmen er bygget fra de opplastede PDF-ene – sidene vises som originale faksimiler
-(gjengitt fra PDF-ene i 300 dpi), og alle uthevinger er plassert på ordenes faktiske
-koordinater i dokumentene. Statsforvalterens tilsynsrapport var ikke vedlagt, så den vises
-ikke; avviket gjengis som tekst med kildehenvisning til SHMILs brev av 15.01.2026.
-
 ```
 film/
-  index.html      animasjonen (åpne i Chrome for forhåndsvisning med lyd og tidslinje)
-  film.js         all animasjon – hvert bilde er en funksjon av tid
+  index.html      animasjonen – åpne i Chrome for forhåndsvisning med lyd, spoling og fullskjerm
+  film.js         all animasjon; hvert bilde er en funksjon av tid
   data.js         ordposisjoner for uthevinger (generert fra PDF-ene)
   render.cjs      gjengir filmen bilde for bilde (Playwright) og koder MP4 (ffmpeg)
-  assets/         sidebilder, SHMIL-logo (fra brevarket), skrifter (Inter, JetBrains Mono – OFL), lydspor
+  assets/         sidebilder fra PDF-ene, SHMIL-logo fra brevarket, skrifter (Inter, JetBrains Mono – OFL), lydspor
   source/         de fem original-PDF-ene
-  tools/          hl.py + specs.json: finner tekstpassasjer i PDF-ene
-output/
-  SHMIL_fra_tilsynsavvik_til_soknad.mp4
+  tools/          hl.py + specs.json (finner tekstpassasjer), build_artifact.py (nettversjon)
 ```
-
-### Forhåndsvise og eksportere på nytt
 
 ```bash
 cd film
-open index.html                 # forhåndsvisning i nettleser (play/pause og spoling nederst)
-npm install                     # installerer Playwright (krever også ffmpeg)
-npx playwright install chromium
-node render.cjs                 # skriver output/SHMIL_fra_tilsynsavvik_til_soknad.mp4
-node render.cjs --stills 82,112 # enkeltbilder til output/stills/
+npm install && npx playwright install chromium   # krever også ffmpeg
+node render.cjs                                  # skriver output/SHMIL_fra_tilsynsavvik_til_soknad.mp4
+node render.cjs --stills 59.5,126.8              # enkeltbilder til output/stills/
 ```
 
-Tekster, tidspunkter og kamerabevegelser endres i `film.js`. Nye uthevinger legges inn i
-`tools/specs.json` og genereres slik (krever poppler-utils):
+Nye uthevinger legges inn i `tools/specs.json` og genereres slik (krever poppler-utils):
 
 ```bash
 mkdir -p /tmp/shmil/bbox
