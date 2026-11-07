@@ -431,5 +431,90 @@
   "doc": "v1",
   "page": 1,
   "phrase": "31.08.2026 - bygget fra auditerte originalkilder og SHMILs underliggende beregningsmodell."
+ },
+ "brev_q1a": {
+  "doc": "brev",
+  "page": 4,
+  "phrase": "Innebærer praktiseringen av avfallsforskriften kapittel 10a at hensynet til henteordning skal tillegges avgjørende vekt selv der dette skjer på bekostning av samlet miljøeffekt, økt ressursbruk, betydelige samfunnsøkonomiske kostnader, i strid med de overordnede prinsippene i forurensningsloven?"
+ },
+ "brev_q1b": {
+  "doc": "brev",
+  "page": 4,
+  "phrase": "Hvordan mener direktoratet at de økonomiske og miljømessige besparelsene som ligger til grunn for et eventuelt unntak fra målkravene (§ 10a-4), skal kunne realiseres dersom den kostnadsdrivende innsamlingsmetodikken (§ 10a-5) opprettholdes uendret?"
+ },
+ "brev_q1c": {
+  "doc": "brev",
+  "page": 4,
+  "phrase": "SHMIL ber om avklaring på hvorvidt forskriften åpner for bruk av bringeordning dersom det kan dokumenteres å gi tilfredsstillende utsortering (§ 10a-4), eller er det krav om henteordning uavhengig av måloppnåelse?"
+ },
+ "brev_q2a": {
+  "doc": "brev",
+  "page": 6,
+  "phrase": "Aksepterer Miljødirektoratet at kommunen legger den dominerende geografiske strukturen til grunn for valg av løsning, slik at regionen/området under ett kan unntas fra kravet om henteordning for å sikre en helhetlig og rasjonell drift?"
+ },
+ "brev_q2b": {
+  "doc": "brev",
+  "page": 6,
+  "phrase": "Er direktoratet enig i at unntakshjemmelen"
+ },
+ "brev_q3a": {
+  "doc": "brev",
+  "page": 7,
+  "phrase": "Mener Miljødirektoratet at kommunen har en ubetinget plikt til å foreta irreversible investeringer i henteordning, før det foreligger avtaler og garantier for at produsentansvarsordningen dekker nødvendige kostnader med en slik omlegging?"
+ },
+ "svar_a2a": {
+  "doc": "svar",
+  "page": 2,
+  "phrase": "Avfallsforskriften kapittel 10a inneholder ikke en hjemmel som åpner for et slikt unntak, men vi viser til den avsluttende omtalen av vår adgang til å gjøre unntak fra kravene (nederst i dette brevet)."
+ },
+ "svar_a3a": {
+  "doc": "svar",
+  "page": 3,
+  "phrase": "Kommunenes plikter etter avfallsforskriften kapittel 10a gjelder uavhengig av pliktene til produsentansvaret."
+ },
+ "sok_h23": {
+  "doc": "sok",
+  "page": 3,
+  "phrase": "2.3 Forutsetninger og sensitivitet"
+ },
+ "sok_23_txt": {
+  "doc": "sok",
+  "page": 3,
+  "phrase": "Sensitivitetsanalysen viser dermed at det høye kostnadsnivået ikke er avhengig av én enkelt forutsetning om ruteytelse eller tømmefrekvens, men består gjennom hele det testede spennet."
+ },
+ "sok_h34": {
+  "doc": "sok",
+  "page": 4,
+  "phrase": "3.4 Vurderte alternativer"
+ },
+ "sok_34_txt": {
+  "doc": "sok",
+  "page": 4,
+  "phrase": "SHMIL har vurdert om henteplikten kan løses med mindre ressurskrevende løsninger:"
+ },
+ "sok_h42": {
+  "doc": "sok",
+  "page": 4,
+  "phrase": "4.2 Mengdeeffekten av henteordning er usikker"
+ },
+ "sok_42_txt": {
+  "doc": "sok",
+  "page": 4,
+  "phrase": "Meruttaket på 45,7 tonn er et modellscenario basert på 50 prosent fangst av beregnet restpotensial, ikke en målt lokal effekt av henteordning."
+ },
+ "sok_52_txt": {
+  "doc": "sok",
+  "page": 5,
+  "phrase": "Etter SHMILs vurdering viser dette et betydelig misforhold mellom den forventede tilleggseffekten og den samlede økonomiske, ressursmessige og miljømessige belastningen ved omleggingen."
+ },
+ "v1_kval_hdr": {
+  "doc": "v1",
+  "page": 2,
+  "phrase": "Kvalitetsindikatorer må ikke blandes"
+ },
+ "v1_kval_txt": {
+  "doc": "v1",
+  "page": 2,
+  "phrase": "Tallene har ulike nevnere og brukes ikke om hverandre."
  }
 }
