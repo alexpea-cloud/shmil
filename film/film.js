@@ -520,7 +520,7 @@ function sceneMai() {
 
 /* ================================================================== 1:35 Dokumentasjonen i faktiske tekster */
 function sceneDokumenter() {
-  const sc = mkScene(94.6, 125.3, 0.6, 0.6);
+  const sc = mkScene(94.6, 127.3, 0.6, 0.6);
   const W = sc.world;
   const sok = [], v1 = [], v2 = [];
   let k = 0;
@@ -530,23 +530,23 @@ function sceneDokumenter() {
   for (let j = 0; j < 21; j++) add(new Page(W, 'v2', j + 1, { lo: true }), { x: -250 + (j % 11) * 560, y: 3180 + Math.floor(j / 11) * 790, s: 0.5, r: ((j * 7) % 5 - 2) * 0.4, o: 1, shade: 0 }, v2);
   const [p3, p4, p5] = [sok[2], sok[3], sok[4]], [w1, w2] = [v1[0], v1[1]];
   const STOPS = [
-    { t: 99.4, page: w1, ids: ['v1_datastatus_hdr', 'v1_kilde_hdr'], z: 1.15, hl: [['v1_datastatus_hdr', 'box-g'], ['v1_kilde_hdr', 'box-g']], lab: 'Hvert tall har verdi, datastatus og kilde', src: 'Vedlegg 1, side 1' },
-    { t: 103.5, page: w2, ids: ['v1_kval_hdr', 'v1_kval_txt'], z: 1.3, hl: [['v1_kval_hdr', 'u-g'], ['v1_kval_txt', 'm-g']], lab: 'Ulike kvalitetsindikatorer holdes adskilt', src: 'Vedlegg 1, side 2' },
-    { t: 107.7, page: p3, ids: ['sok_h23', 'sok_23_txt'], z: 1.2, hl: [['sok_h23', 'u-g'], ['sok_23_txt', 'm-g']], lab: 'Sensitivitet: kostnadsnivået består i hele det testede spennet', src: 'Søknaden 2.3' },
-    { t: 111.9, page: p4, ids: ['sok_h34', 'sok_34_txt'], z: 1.2, at: [0.5, 0.17], hl: [['sok_h34', 'u-g'], ['sok_34_txt', 'm-g']], lab: 'Alternativer vurdert: fellesbeholdere, bunntømte fellespunkter, samkjøring', src: 'Søknaden 3.4' },
-    { t: 116.1, page: p4, ids: ['sok_h42', 'sok_42_txt'], z: 1.3, hl: [['sok_h42', 'u-g'], ['sok_42_txt', 'm-g']], lab: 'Usikkerheten er synliggjort – meruttaket er et modellscenario', src: 'Søknaden 4.2' },
-    { t: 120.3, page: p5, ids: ['sok_h52', 'sok_52_txt'], z: 1.05, hl: [['sok_h52', 'u-g'], ['sok_52_txt', 'm-g']], lab: 'Nytte og belastning veid mot hverandre', src: 'Søknaden 5.2' },
+    { t: 101.4, page: w1, ids: ['v1_datastatus_hdr', 'v1_kilde_hdr'], z: 1.15, hl: [['v1_datastatus_hdr', 'box-g'], ['v1_kilde_hdr', 'box-g']], lab: 'Hvert tall har verdi, datastatus og kilde', src: 'Vedlegg 1, side 1' },
+    { t: 105.5, page: w2, ids: ['v1_kval_hdr', 'v1_kval_txt'], z: 1.3, hl: [['v1_kval_hdr', 'u-g'], ['v1_kval_txt', 'm-g']], lab: 'Ulike kvalitetsindikatorer holdes adskilt', src: 'Vedlegg 1, side 2' },
+    { t: 109.7, page: p3, ids: ['sok_h23', 'sok_23_txt'], z: 1.2, hl: [['sok_h23', 'u-g'], ['sok_23_txt', 'm-g']], lab: 'Sensitivitet: kostnadsnivået består i hele det testede spennet', src: 'Søknaden 2.3' },
+    { t: 113.9, page: p4, ids: ['sok_h34', 'sok_34_txt'], z: 1.2, at: [0.5, 0.17], hl: [['sok_h34', 'u-g'], ['sok_34_txt', 'm-g']], lab: 'Alternativer vurdert: fellesbeholdere, bunntømte fellespunkter, samkjøring', src: 'Søknaden 3.4' },
+    { t: 118.1, page: p4, ids: ['sok_h42', 'sok_42_txt'], z: 1.3, hl: [['sok_h42', 'u-g'], ['sok_42_txt', 'm-g']], lab: 'Usikkerheten er synliggjort – meruttaket er et modellscenario', src: 'Søknaden 4.2' },
+    { t: 122.3, page: p5, ids: ['sok_h52', 'sok_52_txt'], z: 1.05, hl: [['sok_h52', 'u-g'], ['sok_52_txt', 'm-g']], lab: 'Nytte og belastning veid mot hverandre', src: 'Søknaden 5.2' },
   ];
   STOPS.forEach(s => {
     s.cam = s.at ? (() => { const [wx, wy] = s.page.pt(s.at[0], s.at[1]); return { cx: wx, cy: wy - (400 - 540) / s.z, z: s.z, rx: 0 }; })() : look(s.page, s.ids, s.z, 960, 400);
     s.hl.forEach(([id, kind], i) => H(sc, s.page, id, kind, s.t + 0.6 + i * 0.5, s.t + 1.3 + i * 0.5));
   });
   const wide = { cx: 2550, cy: 1310, z: 0.17, rx: 0 };
-  const camK = [[94.6, wide], [98.4, { ...wide, z: 0.175 }, E.lin]];
-  flyKeys(camK, 98.4, { ...wide, z: 0.175 }, STOPS[0].t, STOPS[0].cam, 0.35);
+  const camK = [[94.6, wide], [100.4, { ...wide, z: 0.178 }, E.lin]];
+  flyKeys(camK, 100.4, { ...wide, z: 0.178 }, STOPS[0].t, STOPS[0].cam, 0.35);
   for (let i = 0; i < STOPS.length; i++) {
     const s = STOPS[i], n = STOPS[i + 1];
-    const dwellEnd = (n ? n.t : 125.3) - (n ? 1.1 : 0);
+    const dwellEnd = (n ? n.t : 127.3) - (n ? 1.1 : 0);
     camK.push([dwellEnd, { ...s.cam, z: s.cam.z * 1.03 }, E.lin]);
     if (n) flyKeys(camK, dwellEnd, { ...s.cam, z: s.cam.z * 1.03 }, n.t, n.cam, 0.6);
   }
@@ -562,16 +562,16 @@ function sceneDokumenter() {
   sc.upd = t => {
     pagesApply(sc, t); hlsApply(sc, t);
     const c = camApply(sc, t, camK);
-    tshow(k0, t, 95.2, 98.9, { st: 0.015 });
-    tshow(h0, t, 95.3, 98.9, { st: 0.07 });
+    tshow(k0, t, 95.2, 100.9, { st: 0.015 });
+    tshow(h0, t, 95.3, 100.9, { st: 0.07 });
     LB.forEach(([e, page], i) => {
       const [, y] = toScreen(c, 0, page.rest.y);
       e.style.top = (y - 40) + 'px';
-      fshow(e, t, 96.0 + i * 0.3, 98.9, { dx: -20, dy: 0 });
+      fshow(e, t, 96.0 + i * 0.3, 100.9, { dx: -20, dy: 0 });
     });
-    band.style.opacity = env(t, STOPS[0].t - 0.4, 125.1, 0.6, 0.5).toFixed(3);
+    band.style.opacity = env(t, STOPS[0].t - 0.4, 127.1, 0.6, 0.5).toFixed(3);
     labs.forEach((L, i) => {
-      const a = STOPS[i].t + 0.5, b = (STOPS[i + 1] ? STOPS[i + 1].t - 0.6 : 125.0);
+      const a = STOPS[i].t + 0.5, b = (STOPS[i + 1] ? STOPS[i + 1].t - 0.6 : 127.0);
       tshow(L.k, t, a, b, { st: 0.015 });
       tshow(L.h, t, a + 0.1, b, { st: 0.04 });
     });
@@ -580,7 +580,7 @@ function sceneDokumenter() {
 
 /* ================================================================== 2:05 Beregningsmodellen (kort) */
 function sceneModell() {
-  const sc = mkScene(124.6, 140.3, 0.6, 0.6);
+  const sc = mkScene(126.6, 140.3, 0.6, 0.6);
   const ov = sc.ov;
   const k = txt(ov, 'k', 'Beregningsmodellen', 150, 112);
   const h1 = txt(ov, 'st', 'Hva ville henteordning i tettbygd strøk kreve?', 150, 150, { size: 66 });
@@ -594,7 +594,7 @@ function sceneModell() {
     ['0,40 mill. kr', 'i året for ca. 9 228 nye beholdere', 's', 'Modell'],
   ];
   const XS = [150, 720, 1290], YS = [292, 566];
-  const TA = [125.6, 126.8, 128.0, 129.2, 130.4, 131.2];
+  const TA = [127.6, 128.6, 129.6, 130.6, 131.6, 132.3];
   const nodes = N.map(([v, l, cls, st], i) => {
     const e = $('div', 'node', ov, `<span class="stc ${cls}">${st}</span><div class="v">${v}</div><div class="l">${l}</div>`);
     return place(e, XS[i % 3], YS[Math.floor(i / 3)]);
@@ -605,9 +605,9 @@ function sceneModell() {
   const res = txt(ov, 'st', '= *3,39* *mill.* *kr* *i* *året*', 150, 818, { size: 76 });
   const rsrc = txt(ov, 'src', 'Modellert merkostnad ved henteordning i tettbygd strøk (Modell A) · søknaden kap. 2.2 og Vedlegg 1', 150, 908, { w: 1620 });
   sc.upd = t => {
-    tshow(k, t, 125.0, 140.0, { st: 0.02 });
-    tshow(h1, t, 125.1, 134.4, { st: 0.05 });
-    tshow(h2, t, 134.8, 140.0, { st: 0.06 });
+    tshow(k, t, 127.0, 140.0, { st: 0.02 });
+    tshow(h1, t, 127.1, 135.4, { st: 0.05 });
+    tshow(h2, t, 135.8, 140.0, { st: 0.06 });
     nodes.forEach((e, i) => fshow(e, t, TA[i], 140.0, { dy: 30, fi: 0.7 }));
     ar.forEach((p, i) => {
       const tt = TA[i + 1];
@@ -616,8 +616,8 @@ function sceneModell() {
       p.style.opacity = (a * (1 - pr(t, 139.6, 140.2))).toFixed(3);
     });
     show(plus, env(t, TA[5], 140.0, 0.5, 0.5), 'none');
-    tshow(res, t, 132.6, 140.0, { st: 0.08, du: 0.9 });
-    tshow(rsrc, t, 133.4, 140.0, { st: 0.008 });
+    tshow(res, t, 133.4, 140.0, { st: 0.08, du: 0.9 });
+    tshow(rsrc, t, 134.2, 140.0, { st: 0.008 });
   };
 }
 
