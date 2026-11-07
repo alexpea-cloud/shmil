@@ -78,7 +78,10 @@ async function full() {
   await browser.close();
   console.log('\nencoding…');
   const out = opt('out', path.join(OUTDIR, 'SHMIL_grunnlaget_for_soknaden.mp4'));
-  const audio = path.join(ROOT, 'assets', 'audio', 'tactical-stillness.mp3');
+  // soundtrack: whatever index.html plays
+  const audioSrc = fs.readFileSync(path.join(ROOT, 'index.html'), 'utf8').match(/<audio[^>]*src="([^"]+)"/)[1];
+  const audio = path.join(ROOT, audioSrc);
+  if (!fs.existsSync(audio)) { console.error('soundtrack not found:', audio); process.exit(1); }
   const r = spawnSync('ffmpeg', ['-y', '-v', 'error', '-stats',
     '-framerate', String(FPS), '-i', path.join(frames, 'f%05d.jpg'),
     '-ss', String(from), '-i', audio,
