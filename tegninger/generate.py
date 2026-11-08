@@ -1,16 +1,16 @@
 #!/usr/bin/env python3
 """Lindsetvegen 19 – stålbjelker IPE 180 i 1. etasje.
 
-Genererer de tre tegningsarkene (plan 1:50, snitt langs B1 og B2 1:25) som
-HTML/SVG. render.mjs skriver HTML-en ut til PDF i A4 liggende.
+Genererer vedleggene til svaret til Vefsn kommune (sak 2023/6670):
+  E3–E5  tegninger (plan 1:50, snitt langs B1 og B2 1:25), A4 liggende
+  F3     beregning av stålbjelkene, A4 stående
+Notatet (F2) lages separat som Word-fil med notat.cjs.
 
-Geometrien er hentet ut av rev. 9 og ligger her i samme koordinater (pt på
-A4, dvs. allerede i riktig målestokk: 1 m = 56,69 pt i plan og 113,39 pt i
-snitt). Bare layout og grafikk er nytt – mål, tekster og beregninger er de
-samme som i rev. 9.
+Geometrien ligger i pt på A4, dvs. allerede i riktig målestokk:
+1 m = 56,69 pt i plan og 113,39 pt i snitt.
 
-Bruk:  python3 generate.py            -> build/tegninger.html
-       node render.mjs                -> PDF
+Bruk:  python3 generate.py            -> build/tegninger.html, build/beregning.html
+       node render.cjs                -> PDF
 """
 from __future__ import annotations
 
@@ -23,9 +23,11 @@ import os
 PROJECT = "Lindsetvegen 19"
 SUBJECT = "Stålbjelker IPE 180 i 1. etasje"
 STATUS = "Prinsippskisse – ikke arbeidstegning"
-REV = "10"
+GNR = "gnr. 199 bnr. 9"
+CASE = "sak 2023/6670"
+REV = "A"
 REV_DATE = "08.11.2026"
-REV_NOTE = "ny layout, beskrivelse i notat"
+REV_NOTE = "første utgave"
 
 # ---------------------------------------------------------------------------
 # Grafisk profil
@@ -43,6 +45,7 @@ UNDER = "#8a919a"      # under gulvet (stiplet grått)
 UPPER = "#39424d"      # 2. etasje (strekpunktert) / bjelkelag (stiplet)
 SNOW = "#2f74bd"       # takterrasse / snø
 RED = "#d0352b"        # fjernet hjørnestolpe
+RED_TINT = "#fbe4e0"   # fjernet vegg (flate)
 AMBER = "#b06d00"      # til kontroll
 WOOD = "#9b8667"
 WOOD_FILL = "#fbf8f2"
@@ -242,20 +245,21 @@ def title_row(title: str, scale: str, metres: float, unit_pt: float, step: float
             + scalebar(x_bar, MARGIN + 5.0, metres, unit_pt, step))
 
 
-def foot(drawing: str, scale: str, sheet: int) -> str:
+def foot(drawing: str, scale: str, vedlegg: str) -> str:
     cells = [
-        ("Prosjekt", f'<b class="big">{esc(PROJECT)}</b><br>{esc(SUBJECT)}', "1.55fr"),
+        ("Prosjekt", f'<b class="big">{esc(PROJECT)}</b> <span class="m">{esc(GNR)}</span><br>'
+                     f'{esc(SUBJECT)} · {esc(CASE)}', "1.75fr"),
         ("Tegning", esc(drawing), "1.35fr"),
         ("Målestokk", esc(scale), "0.62fr"),
         ("Status", esc(STATUS), "1.15fr"),
         ("Revisjon", f"{REV} · {REV_DATE}<br><span class='m'>{esc(REV_NOTE)}</span>", "1.05fr"),
     ]
-    cols = " ".join(c[2] for c in cells) + " 17mm"
+    cols = " ".join(c[2] for c in cells) + " 19mm"
     inner = "".join(
         f'<div class="fc"><div class="fl">{lab}</div><div class="fv">{val}</div></div>'
         for lab, val, _ in cells)
-    inner += (f'<div class="fc sheetno"><div class="fl">Ark</div>'
-              f'<div class="fv"><span class="no">{sheet}</span><span class="of">/3</span></div></div>')
+    inner += (f'<div class="fc sheetno"><div class="fl">Vedlegg</div>'
+              f'<div class="fv"><span class="no">{vedlegg}</span></div></div>')
     return f'<div class="foot" style="grid-template-columns:{cols}">{inner}</div>'
 
 
@@ -269,13 +273,11 @@ def sheet(svg_body: str, html_body: str) -> str:
 # ===========================================================================
 # ARK 1 – PLAN 1:50
 # ===========================================================================
-# Koordinater (pt) fra rev. 9. Planen roteres 90° mot klokka slik at B1 og B2
-# ligger vannrett og leses i samme retning som snittene (pipa/grunnmuren til
-# venstre).
-PLAN_CROP = (45.0, 60.0, 487.0, 533.0)        # xo0, yo0, xo1, yo1
-PLAN_OX = 60.0                                 # pt på arket
-PLAN_OY = 78.0
-PLAN_ROT = True
+# Koordinater (pt) fra oppmålt prinsippskisse. Planen ligger som E1/E2.
+PLAN_CROP = (45.0, 64.0, 487.0, 530.0)        # xo0, yo0, xo1, yo1
+PLAN_OX = 44.0                                 # pt på arket
+PLAN_OY = 47.0
+PLAN_ROT = False                               # True: rotert 90° (B1/B2 vannrett)
 
 
 def P(xo, yo):
@@ -340,7 +342,7 @@ BOD_X = 303.0
 
 
 def plan_geometry() -> str:
-    """Alt som tegnes i originalkoordinater (inne i rotert gruppe)."""
+    """Alt som tegnes i originalkoordinater (inne i plangruppen)."""
     g = []
     x0, y0, x1, y1 = PLAN_CROP
     g.append(f'<clipPath id="planclip"><rect x="{x0}" y="{y0}" width="{x1 - x0}" height="{y1 - y0}"/></clipPath>')
@@ -361,18 +363,15 @@ def plan_geometry() -> str:
         for t in TREADS:
             g.append(line(t, ya, t, yb, stroke=STAIR, stroke_width=0.35))
 
-    # Under gulvet (stiplet grått): grunnmur, betongkloss, IPN 200, betongsøyle
+    # Under gulvet (stiplet grått): grunnmur, betongkloss, betongsøyle
     dash_u = dict(fill="none", stroke=UNDER, stroke_width=0.55, stroke_dasharray="3.2 2.2")
     g.append(rect(61.0, 301.0, 471.9, 315.3, **dash_u))
     g.append(rect(262.2, 84.0, 285.4, 135.0, **dash_u))
-    g.append(line(270.0, 82.0, 270.0, 301.0, **dash_u))
-    g.append(line(277.6, 82.0, 277.6, 301.0, **dash_u))
     g.append(circle(B2_X, 502.45, 5.7, **dash_u))
 
-    # Bjelkelaget over gangen (stiplet)
+    # Bjelkelaget over gangen (stiplet) og takbjelker under takterrassen (stiplet blått)
     for yy in (343.0, 377.0, 411.0):
         g.append(line(246.0, yy, 330.7, yy, stroke=UPPER, stroke_width=0.6, stroke_dasharray="4.2 2.4"))
-    # Takbjelker under takterrassen (stiplet blått)
     for yy in (454.0, 488.0):
         g.append(line(246.0, yy, 421.9, yy, stroke=SNOW, stroke_width=0.65, stroke_dasharray="4.2 2.4"))
 
@@ -384,6 +383,11 @@ def plan_geometry() -> str:
     # Teglpipe
     g.append(rect(273.8, 75.3, 296.8, 98.3, fill="#f7e7e0"))
     g.append(rect(273.8, 75.3, 296.8, 98.3, fill="url(#brick)", stroke=BRICK, stroke_width=0.6))
+
+    # Vegger fjernet 2018 (rød stiplet kontur, under bjelkene)
+    rm = dict(fill=RED_TINT, stroke=RED, stroke_width=0.55, stroke_dasharray="2.6 1.8")
+    g.append(rect(B1_X - 4.6, 98.3, B1_X + 4.6, 302.2, **rm))      # ved kjøkkenet (F1 1.6)
+    g.append(rect(B2_X - 4.6, 314.4, B2_X + 4.6, GAVL_Y + 3.0, **rm))  # lettvegg i gangen (F1 1.5)
 
     # Stålbjelker + opplegg (svart)
     g.append(rect(271.2, 98.3, 276.4, 309.7, fill=STEEL))
@@ -402,46 +406,46 @@ def plan_geometry() -> str:
 
 
 def plan_annotations() -> str:
-    """Tekst og mål i arkkoordinater."""
+    """Tekst og mål i arkkoordinater (planen ligger som E1/E2)."""
     a = []
-    rooms = [("Kjøkken", 120.0, 214.0), ("Vaskerom", 416.3, 147.3), ("Bod", 416.3, 255.1),
-             ("Bad", 135.6, 385.2), ("Trapp", 448.0, 348.6), ("Soverom", 137.5, 496.0),
-             ("Entré", 290.0, 509.4)]
+    rooms = [("Kjøkken", 135.6, 223.5), ("Vaskerom", 416.3, 147.3), ("Bod", 416.3, 255.1),
+             ("Bad", 135.6, 385.2), ("Trapp", 450.0, 372.0), ("Soverom", 146.9, 517.0),
+             ("Entré", 285.8, 509.4)]
     for name, xo, yo in rooms:
         x, y = P(xo, yo)
         a.append(text(x, y + 2.5, name, size=7.2, fill=MUTED, anchor="middle", halo=2.2))
-    x, y = P(123.5, 496.0)
+    x, y = P(147.3, 485.0)
     a.append(text(x, y + 2.5, "takterrasse over", size=6.6, fill=SNOW, anchor="middle", italic=True, halo=2.2))
-    x, y = P(285.3, 75.3)
-    a.append(text(x - 3, y - 8.5, "teglpipe", size=6, fill=BRICK, anchor="end", halo=2))
+    x, y = P(259.0, 92.0)
+    a.append(text(x, y, "teglpipe", size=6, fill=BRICK, anchor="end", halo=2))
 
     # Bjelker
-    x0, _ = P(B1_X, B1_Y[0])
-    x1, yb = P(B1_X, B1_Y[1])
-    xm = x0 + (x1 - x0) * 0.62
-    a.append(text(xm, yb - 7.5, "B1  IPE 180", size=8.6, weight=700, fill=STEEL, anchor="middle", halo=2.4))
-    a.append(text(xm, yb + 13.5, "L = 3,63 m · snitt ark 2", size=6.4, fill=STEEL, anchor="middle", halo=2.4))
-    x0, _ = P(B2_X, B2_Y[0])
-    x1, yb = P(B2_X, B2_Y[1])
-    xm = x0 + (x1 - x0) * 0.33
-    a.append(text(xm, yb - 20.6, "B2  IPE 180", size=8.6, weight=700, fill=STEEL, anchor="middle", halo=2.6))
-    a.append(text(xm, yb - 9.6, "L = 3,40 m · snitt ark 3", size=6.4, fill=STEEL, anchor="middle", halo=2.6))
+    x, y = P(262.0, 228.0)
+    a.append(text(x, y, "B1  IPE 180", size=8.6, weight=700, fill=STEEL, anchor="end", halo=2.4))
+    a.append(text(x, y + 11, "L = 3,63 m · snitt E4", size=6.4, fill=STEEL, anchor="end", halo=2.4))
+    x, y = P(325.0, 392.0)
+    a.append(text(x, y, "B2  IPE 180", size=8.6, weight=700, fill=STEEL, anchor="end", halo=2.4))
+    a.append(text(x, y + 11, "L = 3,40 m · snitt E5", size=6.4, fill=STEEL, anchor="end", halo=2.4))
 
     # Felt over kjøkkenet og gangen
-    X, _ = P(0, 158.7)
-    a.append(dim_v(X, [P(x, 158.7)[1] for x in (358.85, B1_X, 69.7)], ["felt 1,50", "felt 3,60"]))
-    X, _ = P(0, 327.1)
-    a.append(dim_v(X, [P(x, 327.1)[1] for x in (B2_X, 245.6)], ["felt ca. 1,50"]))
+    _, Y = P(0, 158.7)
+    xs = [P(x, 0)[0] for x in (69.7, B1_X, 358.85)]
+    a.append(dim_h(Y, xs, [None, None]))
+    for i, lab in enumerate(("felt 3,60", "felt 1,50")):
+        a.append(text((xs[i] + xs[i + 1]) / 2 + (4 if i else 0), Y - 2.6, lab, size=6.2, fill=INK2,
+                      anchor="middle", halo=1.4))
+    _, Y = P(0, 327.1)
+    a.append(dim_h(Y, [P(x, 0)[0] for x in (245.6, B2_X)], ["felt 1,50"]))
     # Takbjelker: felt
-    X, _ = P(0, 454.0)
-    a.append(text(X - 2.8, P(288.0, 0)[1], "ca. 1,50", size=6.0, fill=SNOW, anchor="middle", rot=-90, halo=2))
-    a.append(text(X - 2.8, P(378.9, 0)[1], "ca. 1,65", size=6.0, fill=SNOW, anchor="middle", rot=-90, halo=2))
+    for xo, lab in ((288.0, "1,50"), (378.9, "1,65")):
+        x, y = P(xo, 450.6)
+        a.append(text(x, y, lab, size=6.0, fill=SNOW, anchor="middle", halo=2))
 
     # Vegger i 2. etasje – korte navn langs linjene
-    x, y = P(BOD_X, 178.0)
-    a.append(text(x, y - 2.8, "bodvegg i 2. etasje", size=6.0, fill=UPPER, halo=1.6))
-    x, y = P(105.0, GAVL_Y)
-    a.append(text(x - 2.8, y, "gavlvegg i 2. etasje", size=6.0, fill=UPPER, anchor="middle", rot=-90, halo=1.6))
+    x, y = P(BOD_X - 2.4, 212.0)
+    a.append(text(x, y, "bodvegg i 2. etasje", size=6.0, fill=UPPER, anchor="middle", rot=-90, halo=1.6))
+    x, y = P(150.0, GAVL_Y - 2.8)
+    a.append(text(x, y, "gavlvegg i 2. etasje", size=6.0, fill=UPPER, anchor="middle", halo=1.6))
     return "".join(a)
 
 
@@ -453,6 +457,7 @@ def swatch(kind, w=22, h=8):
         "blue": f'<line x1="0" y1="4" x2="22" y2="4" stroke="{SNOW}" stroke-width="1" stroke-dasharray="4.2 2.4"/>',
         "under": f'<line x1="0" y1="4" x2="22" y2="4" stroke="{UNDER}" stroke-width="0.9" stroke-dasharray="3.2 2.2"/>',
         "red": f'<path d="M7.5,0.8 l6.4,6.4 M13.9,0.8 l-6.4,6.4" stroke="{RED}" stroke-width="1.3"/>',
+        "removed": f'<rect x="0.5" y="1" width="21" height="6" fill="{RED_TINT}" stroke="{RED}" stroke-width="0.7" stroke-dasharray="2.6 1.8"/>',
         "steel": f'<rect x="0" y="2" width="22" height="4" fill="{STEEL}"/>',
         "support": f'<rect x="8" y="1" width="6" height="6" fill="{SUPPORT}"/>',
         "wall": f'<rect x="0" y="0" width="22" height="8" fill="{WALL}"/>',
@@ -465,19 +470,20 @@ def sheet1() -> str:
            f'<g transform="{plan_group_transform()}">{plan_geometry()}</g>',
            plan_annotations()]
     legend = [
-        ("steel", "Stålbjelke IPE 180 (B1, B2)"),
-        ("support", "Opplegg – se snitt på ark 2 og 3"),
-        ("under", "Under gulvet: grunnmur, IPN 200, betongkloss, betongsøyle"),
+        ("steel", "Stålbjelke IPE 180 (B1, B2), montert 2018"),
+        ("support", "Opplegg – se snitt E4 og E5"),
+        ("removed", "Vegg fjernet 2018 (F1 pkt. 1.5 og 1.6)"),
+        ("red", "Opprinnelig hjørnestolpe, fjernet 2018"),
+        ("under", "Under gulvet: grunnmur, betongkloss, betongsøyle"),
         ("dashdot", "Vegg i 2. etasje"),
         ("dash", "Bjelkelag over gangen"),
         ("blue", "Takbjelker under takterrassen"),
-        ("red", "Opprinnelig hjørnestolpe, fjernet 2018"),
         ("wall", "Eksisterende vegger i 1. etasje"),
     ]
     legend_html = "".join(f'<li>{swatch(k)}<span>{esc(t)}</span></li>' for k, t in legend)
     strip = (f'<div class="strip"><h3>Tegnforklaring</h3><ul class="legend">{legend_html}</ul>'
-             f'<p class="see">Opplegg, laster og forutsetninger er beskrevet i notatet.</p></div>')
-    return sheet("".join(svg), strip + foot("Plan 1. etasje – utsnitt", "1:50 (A4)", 1))
+             f'<p class="see">Beskrivelse av arbeidet: notat F2.<br>Beregning av bjelkene: vedlegg F3.</p></div>')
+    return sheet("".join(svg), strip + foot("Plan 1. etasje – utsnitt", "1:50 (A4)", "E3"))
 
 
 # ===========================================================================
@@ -545,7 +551,7 @@ B1_SX, B1_SY = -6.0, -13.0             # plassering på arket (pt)
 
 def section_b1() -> str:
     g = []
-    # Teglsteinspipe
+    # Teglsteinspipe (ute av bruk)
     g.append(rect(55.7, 72.0, 101.7, 489.3, fill="#faf0eb"))
     g.append(rect(55.7, 72.0, 101.7, 489.3, fill="url(#brick)"))
     g.append(line(55.7, 72.0, 55.7, 489.3, stroke=BRICK, stroke_width=0.6))
@@ -589,8 +595,8 @@ def section_b1() -> str:
     g.append(text(328.0, 405.8, "IPN 200", size=7.0, weight=600, fill=STEEL, anchor="middle"))
     g.append(text(486.0, 430.4, "stålkonsoll", size=6.0, fill=INK2, anchor="end"))
     g.append(text(503.0, 466.0, "grunnmur", size=6.0, fill=MUTED, anchor="end"))
-    g.append(text(86.0, 160.0, "teglsteinspipe", size=6.2, fill=BRICK, anchor="middle", rot=-90, halo=2.4,
-                  halo_color="#faf0eb"))
+    g.append(text(86.0, 190.0, "teglsteinspipe (ute av bruk)", size=6.2, fill=BRICK, anchor="middle", rot=-90,
+                  halo=2.4, halo_color="#faf0eb"))
     # Mål
     g.append(dim_v(260.8, [132.7, 367.4], ["2,07"], color=INK, size=6.8, weight=600))
     g.append(dim_h(152.0, [107.25, 518.75], [None], color=INK))
@@ -598,11 +604,12 @@ def section_b1() -> str:
                   anchor="middle", halo=4))
     for x, y0_, y1_ in ((107.25, 478.5, 504.0), (175.2, 478.5, 520.0), (73.2, 490.5, 520.0)):
         g.append(line(x, y0_, x, y1_, stroke=MUTED, stroke_width=0.35))
-    g.append(dim_h(501.0, [107.25, 175.2], ["ca. 0,60"], color=INK))
+    g.append(dim_h(501.0, [107.25, 175.2], ["0,60"], color=INK))
     g.append(dim_h(517.0, [73.2, 175.2], ["0,90 betongkloss"], color=INK))
     # Opplegg
-    g.append(tag(112.8, 340.0, 122.0, ["2 stendere 48 × 98"]))
-    g.append(tag(513.2, 336.0, 504.0, ["2 stendere 48 × 148", "på tømmerstokk 148 × 148"], anchor="end"))
+    g.append(tag(112.8, 332.0, 122.0, ["2 stendere 48 × 98, festet til pipa,",
+                                       "på gulvbjelke 48 × 196 → IPN 200"]))
+    g.append(tag(513.2, 332.0, 504.0, ["2 stendere 48 × 148", "på tømmerstokk 148 × 148"], anchor="end"))
     return f'<g transform="translate({n(B1_SX)},{n(B1_SY)})">{"".join(g)}</g>'
 
 
@@ -610,6 +617,7 @@ def section_b1() -> str:
 # Snitt B2
 # ---------------------------------------------------------------------------
 B2_SX, B2_SY = -12.0, -2.0
+POST_X = 113.75 + 2.25 * 113.386      # opprinnelig hjørnestolpe, 2,25 m fra senter opplegg
 
 
 def section_b2() -> str:
@@ -620,7 +628,6 @@ def section_b2() -> str:
     g.append(ground(80.0, 540.0, 490.4))
     g.append(concrete(96.7, 401.2, 125.1, 506.3))
     g.append(concrete(487.9, 415.9, 510.6, 506.3))
-    g.append(line(499.25, 418, 499.25, 446, stroke=STEEL, stroke_width=0.5, stroke_dasharray="2 1.6"))
     g.append(rect(80, 506.1, 540, 516, fill="url(#groundfade)"))
     # Gulv fra badsiden + trappeveksling
     g.append(wood(123.0, 91.3, 358.6, 95.5))
@@ -638,6 +645,9 @@ def section_b2() -> str:
     g.append(rect(396.1, 84.0, 534.0, 87.2, fill="#f6f9fb", stroke="#8aa3bb", stroke_width=0.4))
     for x in (400.1, 468.2):
         g.append(wood_x(x, 95.5, x + 5.4, 112.3))
+    # Opprinnelig hjørnestolpe (fjernet) – stiplet kontur fra gulv til underkant B2
+    g.append(rect(POST_X - 5.4, 132.7, POST_X + 5.4, 384.4, fill=RED_TINT, stroke=RED, stroke_width=0.6,
+                  stroke_dasharray="3 2"))
     # Stendere
     g.append(wood(102.5, 132.7, 119.3, 384.4))
     g.append(line(108.1, 134.4, 108.1, 382.7, stroke="#d8ccb9", stroke_width=0.35))
@@ -653,10 +663,10 @@ def section_b2() -> str:
     for x in (156.4, 224.4, 292.4, 360.5, 428.5, 496.5):
         g.append(wood_x(x, 386.9, x + 5.4, 409.1))
     g.append(wood_x(102.5, 384.4, 119.3, 401.2))
-    # Stålplate + stolpesko
-    g.append(rect(495.7, 409.1, 502.7, 410.0, fill=STEEL))
+    # Stolpesko
     g.append(rect(495.7, 400.0, 496.4, 410.0, fill=STEEL))
     g.append(rect(502.1, 400.0, 502.7, 410.0, fill=STEEL))
+    g.append(rect(495.7, 409.1, 502.7, 410.0, fill=STEEL))
     g.append(rect(497.9, 410.0, 500.6, 415.9, fill=STEEL))
 
     # Laster
@@ -671,24 +681,20 @@ def section_b2() -> str:
                   halo_color=WOOD_FILL))
     # Navn
     g.append(text(240.0, 125.0, "IPE 180 – B2", size=7.8, weight=700, fill=STEEL, anchor="middle"))
-    cx, cy, s = 368.8, 139.0, 3.6
-    g.append(line(cx - s, cy - s, cx + s, cy + s, stroke=RED, stroke_width=1.1))
-    g.append(line(cx - s, cy + s, cx + s, cy - s, stroke=RED, stroke_width=1.1))
+    g.append(text(POST_X + 10.0, 262.0, "opprinnelig hjørnestolpe", size=6.2, fill=RED))
+    g.append(text(POST_X + 10.0, 270.0, "(enden av lettveggen), fjernet 2018", size=6.2, fill=RED))
     g.append(text(129.0, 483.0, "grunnmur", size=6.0, fill=MUTED))
-    g.append(text(484.0, 483.0, "betongsøyle", size=6.0, fill=MUTED, anchor="end"))
-    g.append(text(368.8, 483.0, "opprinnelig hjørnestolpe", size=6.0, fill=RED, anchor="middle"))
-    # Mål
+    g.append(text(484.0, 483.0, "betongsøyle (ekstra støtte)", size=6.0, fill=MUTED, anchor="end"))
+    # Mål: 2,25 | 1,15 og L ved bjelken
     g.append(dim_v(260.8, [132.7, 384.4], ["2,22"], color=INK, size=6.8, weight=600))
-    g.append(dim_h(157.0, [113.75, 499.25], [None], color=INK))
-    g.append(text(306.5, 160.0, "L = 3,40 m (senter opplegg)", size=7.2, weight=600, fill=INK,
+    g.append(dim_h(150.0, [113.75, POST_X, 499.25], ["2,25", "1,15"], color=INK, size=6.8, weight=600))
+    g.append(line(POST_X, 133.5, POST_X, 152.5, stroke=MUTED, stroke_width=0.35))
+    g.append(dim_h(170.0, [113.75, 499.25], [None], color=INK))
+    g.append(text(306.5, 173.0, "L = 3,40 m (senter opplegg)", size=7.2, weight=600, fill=INK,
                   anchor="middle", halo=4))
-    yd = 512.0
-    for x in (113.7, 368.8, 499.2):
-        g.append(line(x, 494.9 if x != 368.8 else 487.0, x, yd + 3, stroke=MUTED, stroke_width=0.35))
-    g.append(dim_h(yd, [113.7, 368.8, 499.2], ["2,25", "1,15"], color=INK, size=6.8, weight=600))
     # Opplegg
     g.append(tag(119.3, 352.0, 128.0, ["2 stendere 48 × 148", "på tømmerstokk 148 × 148"]))
-    g.append(tag(493.7, 352.0, 485.0, ["2 stendere 48 × 98,", "sidestøttet"], anchor="end"))
+    g.append(tag(493.7, 352.0, 485.0, ["2 stendere 48 × 98, sidestøttet,", "på gulvbjelke 48 × 196"], anchor="end"))
     return f'<g transform="translate({n(B2_SX)},{n(B2_SY)})">{"".join(g)}</g>'
 
 
@@ -697,33 +703,27 @@ def section_b2() -> str:
 # ---------------------------------------------------------------------------
 def key_plan(highlight: str, width_pt: float) -> str:
     xo0, yo0, xo1, yo1 = PLAN_CROP
-    w_o, h_o = yo1 - yo0, xo1 - xo0
-    k = width_pt / w_o
-    h = h_o * k
+    k = width_pt / (xo1 - xo0)
+    h = (yo1 - yo0) * k
     walls = "".join(poly(w, fill="#b9c0c8") for w in WALLS) + "".join(rect(*r, fill="#b9c0c8") for r in WALL_RECTS)
-    beams = []
+    beams, lab = [], []
     for name, x, (ya, yb) in (("B1", B1_X, B1_Y), ("B2", B2_X, B2_Y)):
         on = name == highlight
         beams.append(line(x, ya, x, yb, stroke=STEEL if on else "#9aa7b4", stroke_width=11 if on else 6))
-    inner = (f'<clipPath id="kp{highlight}"><rect x="{xo0}" y="{yo0}" width="{h_o}" height="{w_o}"/></clipPath>'
-             f'<g clip-path="url(#kp{highlight})">{walls}{"".join(beams)}</g>')
-    tr = f"translate({n(-yo0 * k)},{n((xo1 - 5.5) * k)}) scale({n(k)}) rotate(-90)"
-    lab = []
-    for name, x, (ya, yb) in (("B1", B1_X, B1_Y), ("B2", B2_X, B2_Y)):
-        on = name == highlight
-        px = ((ya + yb) / 2 - yo0) * k
-        py = (xo1 - 5.5 - x) * k
-        lab.append(text(px, py - 3.6, name, size=6, weight=700 if on else 500,
-                        fill=STEEL if on else MUTED, anchor="middle", halo=1.8))
+        lab.append(text((x - xo0) * k - 4, ((ya + yb) / 2 - yo0) * k + 2, name, size=6,
+                        weight=700 if on else 500, fill=STEEL if on else MUTED, anchor="end", halo=1.8))
+    inner = (f'<clipPath id="kp{highlight}"><rect x="{xo0}" y="{yo0}" width="{xo1 - xo0}" height="{yo1 - yo0}"/>'
+             f'</clipPath><g clip-path="url(#kp{highlight})">{walls}{"".join(beams)}</g>')
+    tr = f"translate({n(-xo0 * k)},{n(-yo0 * k)}) scale({n(k)})"
     return (f'<svg viewBox="0 0 {n(width_pt)} {n(h)}" width="{n(width_pt)}pt" height="{n(h)}pt">'
             f'<g transform="{tr}">{inner}</g>{"".join(lab)}</svg>')
 
 
 # ---------------------------------------------------------------------------
-# Beregningspanel (HTML)
+# Kontrollboks (HTML) – enkel og i klartekst
 # ---------------------------------------------------------------------------
-def bar(pct, tone="dark"):
-    return f'<span class="bar {tone}"><i style="width:{pct}%"></i></span>'
+def bar(pct):
+    return f'<span class="bar"><i style="width:{pct}%"></i></span>'
 
 
 def supports(x0, x1, yb):
@@ -731,198 +731,162 @@ def supports(x0, x1, yb):
                         stroke_width=0.5) for x in (x0, x1))
 
 
-def calc_b1_diagram() -> str:
-    W, H = mm(78), mm(19)
-    x0, x1 = 10.0, W - 10.0
-    yb = 30.0
-    out = [line(x0, yb - 11, x1, yb - 11, stroke=INK2, stroke_width=0.5)]
-    k = 16
+def udl(xa, xb, yb, k, h=9):
+    out = [line(xa, yb - h, xb, yb - h, stroke=INK2, stroke_width=0.5)]
     for i in range(k + 1):
-        x = x0 + (x1 - x0) * i / k
-        out.append(line(x, yb - 11, x, yb - 3.2, stroke=INK2, stroke_width=0.4))
+        x = xa + (xb - xa) * i / k
+        out.append(line(x, yb - h, x, yb - 3.2, stroke=INK2, stroke_width=0.4))
         out.append(poly([(x - 1.1, yb - 3.6), (x + 1.1, yb - 3.6), (x, yb - 1.4)], fill=INK2))
-    out.append(text((x0 + x1) / 2, yb - 14, "q" + sub("Ed", 6.2) + " = 12,70 kN/m", size=6.2,
-                    fill=INK, anchor="middle", raw=True))
-    out.append(line(x0, yb, x1, yb, stroke=STEEL, stroke_width=1.8))
-    out.append(supports(x0, x1, yb))
-    out.append(dim_h(yb + 13, [x0, x1], ["3,63"], color=INK2, size=6))
+    return "".join(out)
+
+
+def diagram_b1() -> str:
+    W, H = mm(78), mm(17)
+    x0, x1, yb = 10.0, W - 10.0, 26.0
+    out = [udl(x0, x1, yb, 16, 10),
+           text((x0 + x1) / 2, yb - 13, "etasjeskille og nyttelast", size=6.0, fill=INK2, anchor="middle"),
+           line(x0, yb, x1, yb, stroke=STEEL, stroke_width=1.8), supports(x0, x1, yb),
+           dim_h(yb + 13, [x0, x1], ["3,63"], color=INK2, size=6)]
     return f'<svg viewBox="0 0 {n(W)} {n(H)}" width="{n(W)}pt" height="{n(H)}pt">{"".join(out)}</svg>'
 
 
-def calc_b2_diagram() -> str:
-    W, H = mm(78), mm(26)
-    x0, x1 = 10.0, W - 10.0
-    L = 3.40
-    sx = lambda m: x0 + (x1 - x0) * m / L  # noqa: E731
-    yb = 50.0
-    out = []
-    xa, xb = sx(0.1), sx(2.1)
-    out.append(line(xa, yb - 9, xb, yb - 9, stroke=INK2, stroke_width=0.5))
-    for i in range(9):
-        x = xa + (xb - xa) * i / 8
-        out.append(line(x, yb - 9, x, yb - 3.2, stroke=INK2, stroke_width=0.4))
-        out.append(poly([(x - 1.1, yb - 3.6), (x + 1.1, yb - 3.6), (x, yb - 1.4)], fill=INK2))
-    out.append(text(sx(0.55), yb - 11.5, "4,14 kN/m", size=5.8, fill=INK2, anchor="middle"))
+def diagram_b2() -> str:
+    W, H = mm(78), mm(22)
+    x0, x1, yb = 10.0, W - 10.0, 38.0
+    sx = lambda m: x0 + (x1 - x0) * m / 3.40  # noqa: E731
+    out = [udl(sx(0.1), sx(2.1), yb, 8),
+           text(sx(0.55), yb - 11.5, "gulv", size=5.8, fill=INK2, anchor="middle")]
 
-    def pl(m, top, label, color):
+    def pl(m, top, color):
         x = sx(m)
         return (line(x, top, x, yb - 3, stroke=color, stroke_width=0.7)
-                + poly([(x - 1.5, yb - 3.6), (x + 1.5, yb - 3.6), (x, yb - 0.8)], fill=color)
-                + text(x, top - 2.5, label, size=5.8, fill=color, anchor="middle", halo=1.6))
-    out.append(pl(1.20, yb - 22, "4,50 kN", INK))
-    out.append(pl(2.25, yb - 27, "6,75 kN", INK))
-    out.append(pl(2.55, yb - 38, "15,12 kN", SNOW))
-    out.append(pl(3.15, yb - 38, "15,12 kN", SNOW))
-    out.append(line(x0, yb, x1, yb, stroke=STEEL, stroke_width=1.8))
-    out.append(supports(x0, x1, yb))
-    out.append(dim_h(yb + 13, [x0, sx(2.25), x1], ["2,25", "1,15"], color=INK2, size=6))
+                + poly([(x - 1.5, yb - 3.6), (x + 1.5, yb - 3.6), (x, yb - 0.8)], fill=color))
+    out += [pl(1.20, yb - 18, INK), text(sx(1.20), yb - 20.5, "trapp", size=5.8, fill=INK, anchor="middle", halo=1.6),
+            pl(2.25, yb - 22, INK), text(sx(2.25) - 2, yb - 24.5, "gavlvegg", size=5.8, fill=INK, anchor="end", halo=1.6),
+            pl(2.55, yb - 28, SNOW), pl(3.15, yb - 28, SNOW),
+            text(sx(2.85), yb - 30.5, "takbjelker (snø)", size=5.8, fill=SNOW, anchor="middle", halo=1.6),
+            line(x0, yb, x1, yb, stroke=STEEL, stroke_width=1.8), supports(x0, x1, yb),
+            dim_h(yb + 13, [x0, sx(2.25), x1], ["2,25", "1,15"], color=INK2, size=6)]
     return f'<svg viewBox="0 0 {n(W)} {n(H)}" width="{n(W)}pt" height="{n(H)}pt">{"".join(out)}</svg>'
 
 
-def calc_panel(title, spec, diagram, load_head, load_cols, loads, checks) -> str:
-    lrows = "".join(f'<tr class="{c}"><td>{a}</td><td>{b}</td><td>{d}</td><td>{e}</td></tr>'
-                    for a, b, d, e, c in loads)
-    crows = "".join(f'<tr><td>{a}</td><td>{b}</td><td>{d}</td><td class="u">{u}</td></tr>'
-                    for a, b, d, u in checks)
+def check_panel(name, span, diagram, rows) -> str:
+    body = "".join(f'<tr><td>{a}</td><td>{b}</td><td>{bar(p)}</td><td>{p} %</td></tr>' for a, b, p in rows)
     return f"""
     <div class="calc">
-      <div class="ch"><span class="ct">{title}</span><span class="cs">{spec}</span></div>
+      <div class="ch"><span class="ct">Kontroll av {name}</span><span class="cs">L = {span}</span></div>
+      <div class="cs2">IPE 180 · stål S235 (forutsatt)</div>
       <div class="dia">{diagram}</div>
-      <table class="t">
-        <thead><tr><th>{load_head}</th>{''.join(f'<th>{c}</th>' for c in load_cols)}</tr></thead>
-        <tbody>{lrows}</tbody>
-      </table>
-      <table class="t k">
-        <thead><tr><th>Kontroll</th><th>E<sub>d</sub></th><th>R<sub>d</sub></th><th>utnyttelse</th></tr></thead>
-        <tbody>{crows}</tbody>
-      </table>
+      <table class="res"><thead><tr><th></th><th>last / kapasitet</th><th colspan="2">utnyttet</th></tr></thead>
+      <tbody>{body}</tbody></table>
     </div>"""
 
 
-def section_strip(calc, highlight) -> str:
-    return (f'<div class="strip">{calc}'
-            f'<p class="see">Opplegg, lastvei og forutsetninger er beskrevet i notatet.</p>'
-            f'<div class="kp"><div class="kh">Nøkkelplan</div>{key_plan(highlight, mm(46))}</div></div>')
+def section_strip(panel, highlight) -> str:
+    return (f'<div class="strip">{panel}'
+            f'<p class="see">Laster og forutsetninger: vedlegg F3.<br>Beskrivelse av arbeidet: notat F2.</p>'
+            f'<div class="kp"><div class="kh">Nøkkelplan</div>{key_plan(highlight, mm(40))}</div></div>')
 
 
 def sheet2() -> str:
     svg = [title_row("Snitt langs B1 – kjøkkenbjelke", "1:25", 1, 113.386, 0.5), section_b1()]
-    calc = calc_panel(
-        "Beregning B1", "IPE 180 · S235 · L = 3,63 m", calc_b1_diagram(), "Laster, kN/m",
-        ["g<sub>k</sub>", "q<sub>k</sub>", "q<sub>Ed</sub>"],
-        [("Etasjeskille, lastbredde 2,55 m", "3,06", "5,10", "", ""),
-         ("Bodvegg i 2. etasje", "0,50", "–", "", ""),
-         ("IPE 180", "0,18", "–", "", ""),
-         ("Sum", "3,74", "5,10", "12,70", "sum")],
-        [("Moment, kNm", "<b>20,9</b>", "32,7", f"{bar(64)}<b>64 %</b>"),
-         ("Skjær, kN", "<b>23,1</b>", "145", f"{bar(16)}<b>16 %</b>"),
-         ("Nedbøyning, mm", "<b>7,2</b>", "12,1", f"{bar(60)}<b>60 %</b>")])
-    return sheet("".join(svg), section_strip(calc, "B1") + foot("Snitt langs B1 – kjøkkenbjelke", "1:25 (A4)", 2))
+    panel = check_panel("B1", "3,63 m", diagram_b1(), [
+        ("Bøyning", "20,9 av 32,7 kNm", 64),
+        ("Skjær", "23,1 av 145 kN", 16),
+        ("Nedbøyning", "7,2 mm, grense 12,1 mm", 60)])
+    return sheet("".join(svg), section_strip(panel, "B1") + foot("Snitt langs B1 – kjøkkenbjelke", "1:25 (A4)", "E4"))
 
 
 def sheet3() -> str:
     svg = [title_row("Snitt langs B2 – gangbjelke", "1:25", 1, 113.386, 0.5), section_b2()]
-    calc = calc_panel(
-        "Beregning B2", "IPE 180 · S235 · L = 3,40 m", calc_b2_diagram(),
-        "Laster ved snøfonn, kN/m · punktlast kN",
-        ["g<sub>k</sub>", "q<sub>k</sub>", "dim."],
-        [("Gulv via veksling, x = 0,1–2,1", "1,40", "1,50", "<b>4,14</b>", ""),
-         ("Trapp, x = 1,20", "–", "3,00", "<b>4,50</b>", ""),
-         ("Gavlvegg, x = 2,25", "5,00", "–", "<b>6,75</b>", ""),
-         ("<span class='snow'>Takbjelker, x = 2,55 og 3,15</span>", "1,42", "8,80", "<b class='snow'>15,12</b>", ""),
-         ("IPE 180", "0,18", "–", "<b>0,24</b>", "")],
-        [("Moment, kNm", "<b>21,4</b>", "32,7", f"{bar(65)}<b>65 %</b>"),
-         ("Skjær, kN", "<b>34,5</b>", "145", f"{bar(24)}<b>24 %</b>"),
-         ("Nedbøyning, mm", "<b>6,2</b>", "11,3", f"{bar(54)}<b>54 %</b>")])
-    return sheet("".join(svg), section_strip(calc, "B2") + foot("Snitt langs B2 – gangbjelke", "1:25 (A4)", 3))
+    panel = check_panel("B2", "3,40 m", diagram_b2(), [
+        ("Bøyning", "21,4 av 32,7 kNm", 65),
+        ("Skjær", "34,5 av 145 kN", 24),
+        ("Nedbøyning", "6,2 mm, grense 11,3 mm", 54)])
+    return sheet("".join(svg), section_strip(panel, "B2") + foot("Snitt langs B2 – gangbjelke", "1:25 (A4)", "E5"))
 
 
 # ===========================================================================
-# NOTAT (A4 stående, 1 side)
+# VEDLEGG F3 – BEREGNING (A4 stående, 1 side)
 # ===========================================================================
 def kv(rows) -> str:
-    return '<dl class="kv">' + "".join(
-        f'<dt class="{c}">{k}</dt><dd>{v}</dd>' for k, v, c in
-        [(r[0], r[1], r[2] if len(r) > 2 else "") for r in rows]) + "</dl>"
+    return '<dl class="kv">' + "".join(f'<dt>{k}</dt><dd>{v}</dd>' for k, v in rows) + "</dl>"
 
 
-def note() -> str:
+def eq(rows) -> str:
+    """Regnelinjer: (navn, uttrykk, resultat)."""
+    return '<table class="eq">' + "".join(
+        f'<tr><td>{a}</td><td>{b}</td><td>{c}</td></tr>' for a, b, c in rows) + "</table>"
+
+
+def calc_page() -> str:
+    S = lambda s: f"<sub>{s}</sub>"  # noqa: E731
+    grunnlag = kv([
+        ("Profil", f"IPE 180, stål S235 (forutsatt): W{S('el')} = 146,3 cm³, I = 1 317 cm⁴, egenvekt 0,18 kN/m, "
+                   "E = 210 000 N/mm²"),
+        ("Kapasitet", f"M{S('Rd')} = W{S('el')} · f{S('y')} / γ{S('M0')} = 146,3 · 235 / 1,05 = 32,7 kNm (elastisk). "
+                      f"V{S('Rd')} = 145 kN"),
+        ("Laster", "Egenlast etasjeskille og terrasse 1,2 kN/m², nyttelast bolig 2,0 kN/m², veksling og rekkverk "
+                   "0,5 kN/m. Snøfonn mot gavlveggen (h = 3,72 m): s = γ · h = 2 · 3,72 = 7,44 kN/m² "
+                   "(NS-EN 1991-1-3, 5.3.6), ikke samtidig med terrassebruk 4,0 kN/m²."),
+        ("Kombinasjon", f"q{S('Ed')} = 1,35 g{S('k')} + 1,5 q{S('k')}, all variabel last fullt samtidig "
+                        "(på den sikre siden)."),
+        ("Modell", "Fritt opplagt bjelke, spenn mellom senter opplegg. Bjelkelag, veksling og takbjelker på "
+                   "overflensen holder bjelkene sideveis. Nedbøyning med g + q mot L/300."),
+    ])
+    b1 = (kv([("Lastbredde", "Bjelkelaget har felt 3,60 m og 1,50 m: 3,60/2 + 1,50/2 = 2,55 m. "
+                             "Bodveggen i 2. etasje (0,5 m fra B1) er tatt med fullt som 0,5 kN/m.")])
+          + eq([
+              ("Laster", f"g{S('k')} = 1,2 · 2,55 + 0,5 + 0,18 = 3,74 kN/m &nbsp;·&nbsp; q{S('k')} = 2,0 · 2,55 = 5,10 kN/m",
+               f"q{S('Ed')} = 12,70 kN/m"),
+              ("Bøyning", f"M{S('Ed')} = 12,70 · 3,63² / 8 = 20,9 kNm", "<b>64 %</b>"),
+              ("Skjær", f"V{S('Ed')} = 12,70 · 3,63 / 2 = 23,1 kN", "<b>16 %</b>"),
+              ("Nedbøyning", "δ = 5 · 8,84 · 3630⁴ / (384 · 210 000 · 1317·10⁴) = 7,2 mm &lt; L/300 = 12,1 mm",
+               "<b>60 %</b>"),
+          ])
+          + '<p class="aside">Med full kontinuitet i bjelkelaget blir lastbredden 3,71 m: M<sub>Ed</sub> = 29,7 kNm '
+            '(91 %) og δ = 10,3 mm – fortsatt innenfor.</p>')
+    b2 = (kv([("Om lastene", "x regnes fra opplegget ved grunnmuren. Takbjelkene (c/c 0,60) er sammenhengende "
+                         "1,50 + 1,65 m over B2, slik at B2 får 1,972 m · 0,60 m av lasten per bjelke.")])
+          + eq([
+              ("Gulv, x = 0,1–2,1", f"1,35 · (1,2 · 0,75 + 0,5) + 1,5 · 2,0 · 0,75", "4,14 kN/m"),
+              ("Trapp, x = 1,20", "1,5 · 3,0 (anslått)", "4,50 kN"),
+              ("Gavlvegg, x = 2,25", "1,35 · 5,0 (anslått egenvekt)", "6,75 kN"),
+              ("Takbjelker, x = 2,55 og 3,15", "1,972 · 0,60 · (1,35 · 1,2 + 1,5 · 7,44)", "2 × 15,12 kN"),
+              ("Bøyning", f"M{S('Ed')} = 21,4 kNm (største moment, ved x = 2,25)", "<b>65 %</b>"),
+              ("Skjær", f"V{S('Ed')} = 34,5 kN", "<b>24 %</b>"),
+              ("Nedbøyning", "δ = 6,2 mm &lt; L/300 = 11,3 mm", "<b>54 %</b>"),
+          ])
+          + '<p class="aside">Med terrassebruk 4,0 kN/m² i stedet for snøfonn: M<sub>Ed</sub> = 16,9 kNm (52 %).</p>')
     summary = """
-    <table class="sum">
-      <thead><tr><th></th><th>Spenn</th><th>Opplegg</th><th>Utnyttelse<br><span>moment · skjær · nedbøyning</span></th><th>Tegning</th></tr></thead>
-      <tbody>
-        <tr><td><b>B1</b> kjøkkenbjelke</td><td>3,63 m</td><td>teglsteinspipa – grunnmuren</td><td>64 % · 16 % · 60 %</td><td>2</td></tr>
-        <tr><td><b>B2</b> gangbjelke</td><td>3,40 m</td><td>grunnmuren – betongsøylen</td><td>65 % · 24 % · 54 %</td><td>3</td></tr>
-      </tbody>
-    </table>"""
-    b1 = kv([
-        ("Opplegg, pipa",
-         "2 stendere 48 × 98, skrudd fast i pipa, på gulvbjelke 48 × 196 → IPN 200 → betongkloss (0,90 m). "
-         "IPN 200 ligger under gulvet, rett under B1, fra betongklossen til stålkonsollen i grunnmuren."),
-        ("Opplegg, grunnmur",
-         "2 stendere 48 × 148 (98 mm opplegg + 50 mm inn i tømmerveggen) på tømmerstokk 148 × 148, "
-         "rett over grunnmur ca. 0,25 m."),
-        ("Last",
-         "Etasjeskille og nyttelast fra bjelkelaget over kjøkkenet (felt 3,60 m og 1,50 m; fire nye bjelker "
-         "går ca. 0,5 m forbi B1). Lastbredde 2,55 m = 3,60/2 + 1,50/2 (to tilstøtende spenn). Bodveggen i "
-         "2. etasje, 0,5 m fra B1, bærer ikke taklast (vurdert ved befaring), men er tatt med fullt som 0,5 kN/m."),
-        ("Avstivning", "Bjelkelaget ligger på overflensen og holder B1 sideveis."),
-        ("Følsomhet",
-         "Med full kontinuitet i bjelkelaget blir lastbredden 3,71 m: moment 29,7 kNm (91 % av 32,7) "
-         "og nedbøyning 10,3 mm (grense 12,1 mm)."),
-    ])
-    b2 = kv([
-        ("Opplegg, grunnmur", "Som for B1: 2 stendere 48 × 148 på tømmerstokk 148 × 148."),
-        ("Opplegg, søyle",
-         "2 stendere 48 × 98, sidestøttet, på gulvbjelke 48 × 196 → stålplate 400 mm → stolpesko → "
-         "betongsøyle Ø\u00a0ca.\u00a0200."),
-        ("Last",
-         "Bare last fra deler som ligger på B2, med snøfonn på terrassen:"
-         "<ul>"
-         "<li>Gulvet fra badsiden ligger på trappevekslingen langs trappeåpningen (x = 0,1–2,1 m), lastbredde "
-         "1,50/2 = 0,75 m. Ellers i gangen ligger bjelkene på veggene.</li>"
-         "<li>Trapp ved x = 1,20 m (3 kN) og gavlvegg i 2. etasje ved x = 2,25 m (5 kN), begge anslått. "
-         "Gavlveggen står på B2 der den opprinnelige hjørnestolpen sto (fjernet 2018; 2,25 m fra grunnmuren "
-         "og 1,15 m fra betongsøylen, senter opplegg). Sperretak uten mønsås – taket bæres av tidligere "
-         "yttervegg ved badveggen og av ytterveggen.</li>"
-         "<li>Takterrassen ligger på takbjelker (c/c 0,60) fra soveromsveggen til ytterveggen; to av dem "
-         "ligger også på B2 (x = 2,55 og 3,15 m). De er sammenhengende 1,50 + 1,65 m over B2; last per bjelke "
-         "1,972 m × 0,60 m × last per m².</li>"
-         "<li>Terrasse: egenlast 1,2 kN/m². Snøfonn mot gavlveggen 2 kN/m³ · 3,72 m = 7,44 kN/m² "
-         "(NS\u2011EN\u00a01991\u20111\u20113, 5.3.6) – større enn terrassebruk 4,0 kN/m², som gir 16,9 kNm (52 %).</li>"
-         "</ul>"),
-        ("Avstivning", "Trappevekslingen og takbjelkene ligger på overflensen og holder B2 sideveis."),
-        ("Til kontroll", "Feste mellom treverket og overflensen (sidestøtte for B2).", "amber"),
-    ])
-    common = kv([
-        ("Profil", "IPE 180, S235: W<sub>el</sub> = 146,3 cm³, I = 1 317 cm⁴, γ<sub>M0</sub> = 1,05."),
-        ("Lastkombinasjon",
-         "Dimensjonerende last 1,35 g<sub>k</sub> + 1,5 q<sub>k</sub> (forenklet, på den sikre siden). "
-         "Nedbøyning med karakteristisk last mot L/300."),
-        ("Laster",
-         "Egenlast etasjeskille og gulv 1,2 kN/m², nyttelast bolig 2,0 kN/m², veksling og rekkverk 0,5 kN/m."),
-        ("Mål",
-         "Mål i meter. Spenn er målt senter opplegg. Høydene 2,07 m (B1) og 2,22 m (B2) er fra underkant "
-         "stendere til underkant stålbjelke. Krypkjellerens høyde er ikke målt."),
-    ])
+      <table class="sum">
+        <thead><tr><th>Bjelke</th><th>Spenn</th><th>Bøyning</th><th>Skjær</th><th>Nedbøyning</th></tr></thead>
+        <tbody>
+          <tr><td><b>B1</b> kjøkken</td><td>3,63 m</td><td>20,9 / 32,7 kNm · 64 %</td><td>16 %</td><td>7,2 / 12,1 mm</td></tr>
+          <tr><td><b>B2</b> gang</td><td>3,40 m</td><td>21,4 / 32,7 kNm · 65 %</td><td>24 %</td><td>6,2 / 11,3 mm</td></tr>
+        </tbody>
+      </table>
+      <p>Begge bjelkene har god margin i bøyning og skjær, og nedbøyningen er under L/300 – også med full
+      kontinuitet i bjelkelaget over B1 og med snøfonn på takterrassen over B2.</p>"""
     return f"""
     <section class="note">
       <header>
-        <div class="kicker">Notat til tegning 1–3</div>
-        <h1>Stålbjelker IPE 180 i 1. etasje</h1>
-        <div class="proj">{esc(PROJECT)}</div>
+        <div class="kicker">Vedlegg F3 · {esc(CASE)}</div>
+        <h1>Beregning av stålbjelkene B1 og B2</h1>
+        <div class="proj">{esc(PROJECT)}, {esc(GNR)} · bjelker montert 2018 · tegning E3–E5</div>
       </header>
-      <p class="lead">To stålbjelker IPE 180 (S235) i 1. etasje – B1 over kjøkkenet og B2 i gangen – står på
-      stendere ved oppleggene. Tegning 1 viser plasseringen, tegning 2 og 3 snitt langs bjelkene med
-      beregning. Her beskrives opplegg, laster og forutsetninger.</p>
-      {summary}
-      <h2>B1 – kjøkkenbjelke <span>L = 3,63 m · tegning 2</span></h2>{b1}
-      <h2>B2 – gangbjelke <span>L = 3,40 m · tegning 3</span></h2>{b2}
-      <h2>Forutsetninger <span>B1 og B2</span></h2>{common}
+      <h2>Grunnlag</h2>{grunnlag}
+      <h2>B1 – kjøkkenbjelke <span>L = 3,63 m</span></h2>{b1}
+      <h2>B2 – gangbjelke <span>L = 3,40 m</span></h2>{b2}
+      <h2>Oppsummering</h2>{summary}
+      <div class="sign">
+        <div><div class="sl"></div>Sted og dato</div>
+        <div><div class="sl"></div>Bekreftet: Jan Sandbukt, ingeniør</div>
+      </div>
       <footer>
         <span><b>{esc(PROJECT)}</b> – {esc(SUBJECT)}</span>
-        <span>{esc(STATUS)}</span>
-        <span>Rev. {REV} · {REV_DATE}</span>
+        <span>{esc(CASE)}</span>
+        <span>Vedlegg F3</span>
       </footer>
     </section>"""
 
@@ -949,8 +913,6 @@ body {{ font-family: InterTT, Inter, sans-serif; color: {INK};
 sub {{ font-size: 72%; vertical-align: -0.28em; line-height: 0; }}
 b {{ font-weight: 600; }}
 .m {{ color: {MUTED}; }}
-.amber {{ color: {AMBER}; }}
-.snow {{ color: {SNOW}; }}
 """
 
 CSS = FONT_FACES + BASE_CSS + f"""
@@ -972,24 +934,21 @@ svg.sw {{ flex: none; }}
 .kp {{ position: absolute; left: 0; bottom: 0; }}
 .kh {{ font-size: 5.6pt; font-weight: 600; letter-spacing: 0.09em; text-transform: uppercase; color: {MUTED}; margin-bottom: 1.4mm; }}
 
-/* Beregning */
+/* Kontrollboks */
 .ch {{ display: flex; justify-content: space-between; align-items: baseline; }}
 .ct {{ font-size: 9pt; font-weight: 700; color: {STEEL}; }}
-.cs {{ color: {INK2}; font-size: 6.2pt; }}
-.dia {{ margin: 1mm 0 0.6mm; }}
-table.t {{ width: 100%; border-collapse: collapse; margin-top: 1.2mm; }}
-table.t th {{ font-size: 5.6pt; font-weight: 600; color: {MUTED}; text-align: right; padding: 0 0 0.6mm;
-              border-bottom: 0.6pt solid {HAIR}; letter-spacing: 0.02em; }}
-table.t th:first-child {{ text-align: left; text-transform: uppercase; letter-spacing: 0.07em; }}
-table.t td {{ text-align: right; padding: 0.45mm 0; white-space: nowrap; }}
-table.t td:first-child {{ text-align: left; }}
-table.t td:nth-child(2), table.t th:nth-child(2),
-table.t td:nth-child(3), table.t th:nth-child(3),
-table.t td:nth-child(4), table.t th:nth-child(4) {{ width: 11mm; }}
-table.t tr.sum td {{ border-top: 0.6pt solid {HAIR}; font-weight: 600; }}
-table.k td:nth-child(4), table.k th:nth-child(4) {{ width: 25mm; }}
-table.k td.u {{ display: flex; align-items: center; justify-content: flex-end; gap: 1.6mm; }}
-.bar {{ display: inline-block; width: 13mm; height: 1.5mm; background: #e8ebef; border-radius: 1mm; overflow: hidden; }}
+.cs {{ color: {INK2}; font-size: 6.6pt; }}
+.cs2 {{ color: {MUTED}; margin-top: 0.4mm; }}
+.dia {{ margin: 2mm 0 1mm; }}
+table.res {{ width: 100%; border-collapse: collapse; }}
+table.res th {{ font-size: 5.6pt; font-weight: 600; color: {MUTED}; text-align: left; padding: 0 0 0.6mm;
+                border-bottom: 0.6pt solid {HAIR}; }}
+table.res td {{ padding: 0.9mm 0; border-bottom: 0.6pt solid {HAIR}; white-space: nowrap; }}
+table.res td:first-child {{ font-weight: 600; width: 17mm; }}
+table.res td:nth-child(3) {{ width: 15mm; }}
+table.res td:last-child {{ text-align: right; font-weight: 600; width: 9mm; }}
+.bar {{ display: inline-block; width: 13mm; height: 1.5mm; background: #e8ebef; border-radius: 1mm;
+        overflow: hidden; vertical-align: middle; }}
 .bar i {{ display: block; height: 100%; background: {STEEL}; border-radius: 1mm; }}
 
 /* Tegningshode */
@@ -1002,35 +961,35 @@ table.k td.u {{ display: flex; align-items: center; justify-content: flex-end; g
 .fv .big {{ font-size: 8.4pt; font-weight: 700; }}
 .sheetno .fv {{ display: flex; align-items: baseline; }}
 .sheetno .no {{ font-size: 17pt; font-weight: 700; line-height: 1; }}
-.sheetno .of {{ font-size: 8pt; color: {MUTED}; margin-left: 0.4mm; }}
 """
 
-NOTE_CSS = FONT_FACES + BASE_CSS + f"""
+CALC_CSS = FONT_FACES + BASE_CSS + f"""
 @page {{ size: 210mm 297mm; margin: 0; }}
-body {{ font-size: 8.3pt; line-height: 1.42; }}
+body {{ font-size: 8pt; line-height: 1.4; }}
 .note {{ width: 210mm; height: 297mm; padding: 14mm 17mm 0; position: relative; overflow: hidden; }}
-header {{ border-bottom: 1pt solid {INK}; padding-bottom: 2.6mm; margin-bottom: 3mm; }}
+header {{ border-bottom: 1pt solid {INK}; padding-bottom: 2.6mm; margin-bottom: 1mm; }}
 .kicker {{ font-size: 6.4pt; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; color: {MUTED}; }}
 h1 {{ font-size: 16pt; font-weight: 700; margin: 0.8mm 0 0.2mm; letter-spacing: -0.01em; }}
-.proj {{ font-size: 9pt; color: {INK2}; }}
-p.lead {{ margin: 0 0 2.6mm; color: {INK}; }}
-table.sum {{ width: 100%; border-collapse: collapse; margin-bottom: 1mm; }}
-table.sum th {{ text-align: left; font-size: 6.2pt; font-weight: 600; color: {MUTED}; letter-spacing: 0.04em;
-                padding: 0 2mm 0.8mm 0; border-bottom: 0.6pt solid {HAIR}; vertical-align: bottom; }}
-table.sum th span {{ font-weight: 400; letter-spacing: 0; }}
-table.sum td {{ padding: 0.8mm 2mm 0.8mm 0; border-bottom: 0.6pt solid {HAIR}; }}
-table.sum td b {{ color: {STEEL}; font-weight: 700; }}
-table.sum td:last-child, table.sum th:last-child {{ text-align: right; padding-right: 0; }}
+.proj {{ font-size: 8.6pt; color: {INK2}; }}
 h2 {{ font-size: 9.6pt; font-weight: 700; color: {STEEL}; margin: 4mm 0 1mm; display: flex;
       justify-content: space-between; align-items: baseline; }}
-h2 span {{ font-size: 7.2pt; font-weight: 400; color: {MUTED}; }}
-dl.kv {{ display: grid; grid-template-columns: 28mm 1fr; margin: 0; column-gap: 3mm; }}
-dl.kv dt {{ color: {INK2}; font-weight: 600; padding: 0.8mm 0; border-top: 0.6pt solid {HAIR}; }}
-dl.kv dd {{ margin: 0; padding: 0.8mm 0; border-top: 0.6pt solid {HAIR}; }}
-dl.kv dt.amber {{ color: {AMBER}; }}
-dl.kv ul {{ margin: 0.6mm 0 0; padding-left: 3.4mm; }}
-dl.kv li {{ margin-bottom: 0.4mm; }}
-dl.kv li::marker {{ color: {MUTED}; }}
+h2 span {{ font-size: 7.4pt; font-weight: 400; color: {MUTED}; }}
+dl.kv {{ display: grid; grid-template-columns: 31mm 1fr; margin: 0; column-gap: 3mm; }}
+dl.kv dt {{ color: {INK2}; font-weight: 600; padding: 0.7mm 0; border-top: 0.6pt solid {HAIR}; }}
+dl.kv dd {{ margin: 0; padding: 0.7mm 0; border-top: 0.6pt solid {HAIR}; }}
+table.eq {{ width: 100%; border-collapse: collapse; }}
+table.eq td {{ padding: 0.7mm 0; border-top: 0.6pt solid {HAIR}; vertical-align: top; }}
+table.eq td:first-child {{ width: 34mm; padding-right: 3mm; color: {INK2}; font-weight: 600; }}
+table.eq td:last-child {{ text-align: right; white-space: nowrap; padding-left: 3mm; }}
+p.aside {{ margin: 1mm 0 0; color: {INK2}; }}
+table.sum {{ width: 100%; border-collapse: collapse; margin-bottom: 1.6mm; }}
+table.sum th {{ text-align: left; font-size: 6.2pt; font-weight: 600; color: {MUTED}; padding: 0 2mm 0.8mm 0;
+                border-bottom: 0.6pt solid {HAIR}; }}
+table.sum td {{ padding: 0.9mm 2mm 0.9mm 0; border-bottom: 0.6pt solid {HAIR}; }}
+table.sum td b {{ color: {STEEL}; font-weight: 700; }}
+.sign {{ display: grid; grid-template-columns: 1fr 1fr; column-gap: 12mm; margin-top: 9mm; color: {INK2};
+         font-size: 7.4pt; }}
+.sign .sl {{ border-bottom: 0.7pt solid {INK}; height: 9mm; margin-bottom: 1.2mm; }}
 footer {{ position: absolute; left: 17mm; right: 17mm; bottom: 10mm; display: flex; justify-content: space-between;
           border-top: 0.6pt solid {HAIR}; padding-top: 2mm; font-size: 6.6pt; color: {MUTED}; }}
 footer b {{ color: {INK}; }}
@@ -1062,9 +1021,9 @@ document.fonts.ready.then(() => {
 
 
 def nobreak(s: str) -> str:
-    """Hindrer linjeskift i faste uttrykk (IPN 200, ca. 0,5 m osv.) i løpende tekst."""
-    for k in ("IPN 200", "IPE 180", "ca. ", "x = ", "L = "):
-        s = s.replace(k, k.replace(" ", "\u00a0"))
+    """Hindrer linjeskift i faste uttrykk i løpende tekst."""
+    for k in ("IPN 200", "IPE 180", "ca. ", "x = ", "L = ", "NS-EN 1991-1-3"):
+        s = s.replace(k, k.replace(" ", " ").replace("-", "‑"))
     return s
 
 
@@ -1075,9 +1034,10 @@ def page(title: str, css: str, body: str) -> str:
 
 def build() -> dict:
     return {
-        "tegninger.html": page(f"{PROJECT} – {SUBJECT} – tegninger rev. {REV}", CSS,
+        "tegninger.html": page(f"{PROJECT} – {SUBJECT} – vedlegg E3–E5, rev. {REV}", CSS,
                                DEFS + sheet1() + sheet2() + sheet3()),
-        "notat.html": page(f"{PROJECT} – {SUBJECT} – notat rev. {REV}", NOTE_CSS, nobreak(note())),
+        "beregning.html": page(f"{PROJECT} – beregning av stålbjelkene – vedlegg F3", CALC_CSS,
+                               nobreak(calc_page())),
     }
 
 

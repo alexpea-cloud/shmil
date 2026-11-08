@@ -1,4 +1,4 @@
-// Skriver build/tegninger.html (A4 liggende) og build/notat.html (A4 stående) ut til PDF.
+// Skriver build/tegninger.html (E3–E5, A4 liggende) og build/beregning.html (F3, A4 stående) ut til PDF.
 //   node render.cjs [--png]      (--png gir også forhåndsvisninger i build/)
 const { chromium } = require('playwright');
 const path = require('node:path');
@@ -6,9 +6,9 @@ const { pathToFileURL } = require('node:url');
 
 const png = process.argv.includes('--png');
 const jobs = [
-  { src: 'tegninger.html', out: 'Lindsetvegen_19_-_tegninger_stalbjelker_3_ark_rev_10.pdf',
+  { src: 'tegninger.html', out: 'Lindsetvegen_19_-_E3-E5_tegninger_stalbjelker_rev_A.pdf',
     width: '297mm', height: '210mm', sel: 'section.sheet', vp: { width: 1123, height: 794 } },
-  { src: 'notat.html', out: 'Lindsetvegen_19_-_notat_stalbjelker_rev_10.pdf',
+  { src: 'beregning.html', out: 'Lindsetvegen_19_-_F3_beregning_stalbjelker.pdf',
     width: '210mm', height: '297mm', sel: 'section.note', vp: { width: 794, height: 1123 } },
 ];
 
