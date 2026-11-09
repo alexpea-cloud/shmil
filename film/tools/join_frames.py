@@ -4,7 +4,7 @@ import os, sys, shutil
 from PIL import Image
 OUT, DUR, FPS = sys.argv[1], float(sys.argv[2]), 30
 # (frames dir, film time of the segment's first frame)
-SEGS = [('s1_kart', 0.0), ('s2_film', 19.3), ('s3_3d', 109.3), ('s4_film', 134.2), ('s5_b', 144.2), ('s6_film', 194.2)]
+SEGS = [('s1_kart', 0.0), ('s2_film', 19.3), ('s3_3d', 109.3), ('s5_b', 136.7), ('s6_film', 186.7)]
 segs = []
 for name, t0 in SEGS:
     d = os.path.join(OUT, 'frames-' + name)

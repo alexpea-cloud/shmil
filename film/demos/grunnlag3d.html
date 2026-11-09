@@ -46,7 +46,7 @@ canvas{position:absolute;left:0;top:0}
 (function () {
 'use strict';
 const FILM_MODE = /film=1/.test(location.search);
-const DUR = FILM_MODE ? 25 : 10, FPS = 30;
+const DUR = FILM_MODE ? +((location.search.match(/dur=([\d.]+)/) || [0, 25])[1]) : 10, FPS = 30;
 const SH = FILM_MODE ? 5.6 : 0;
 const LOOK_END = +((location.search.match(/look=([-\d.]+)/) || [0, 1.0])[1]);   // film: blocks first, then the pages fall
 if (FILM_MODE) window.filmProgress(2);

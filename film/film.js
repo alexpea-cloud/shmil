@@ -7,7 +7,7 @@
 'use strict';
 
 /* ------------------------------------------------------------------ timing (music: 128 bpm, 15 s phrases from 4.8 s) */
-const DUR = 229.8, FPS = 30;   // v5: the opening map, the 3D foundation and sequence B are rendered from demos/ and cut in by tools/assemble.cjs
+const DUR = 222.3, FPS = 30;   // v5: the opening map, the 3D foundation and sequence B are rendered from demos/ and cut in by tools/assemble.cjs
 const Q = k => 4.8 + 15 * k;   // 4.8, 19.8, 34.8, 49.8, 64.8, 79.8, 94.8, 109.8, 124.8, 139.8, 154.8, 169.8, 184.8, 199.8
 /* ------------------------------------------------------------------ math */
 const clamp = (x, a = 0, b = 1) => (x < a ? a : x > b ? b : x);
@@ -323,7 +323,6 @@ function build() {
     mean: 'Kravet gjelder – også uten avklart finansiering.',
   });
   sceneParagraf();
-  sceneForutsetning();
   sceneKonklusjon();
   sceneSendt();
   buildProgress();
@@ -507,30 +506,14 @@ function sceneParagraf() {
 }
 
 
-/* ================================================================== 2:20 A – Forutsetningen */
-function sceneForutsetning() {
-  const a = 134.7, b = 145.2;
-  const sc = mkScene(a - 0.2, b + 0.5, 1.0, 0.9);
-  const ov = sc.ov;
-  const k = txt(ov, 'k b', 'Da kravet ble innført, regnet Miljødirektoratet med', 0, 300, { center: true });
-  const n = txt(ov, 'num', 'ca. 1 810 kr', 0, 352, { center: true, size: 180, color: BLUE });
-  const u = txt(ov, 'sub', 'per ekstra tonn utsortert', 0, 566, { center: true, size: 46 });
-  const s = txt(ov, 'src', 'Konsekvensutredningen for kapittel 10a (M-2021): ca. 1 475 kr i 2020-priser, omregnet til 2025-kroner', 0, 660, { center: true });
-  sc.upd = t => {
-    calm(k, t, a + 0.7, b);
-    calm(n, t, a + 1.2, b, { st: 0.04, du: 1.4 });
-    calm(u, t, a + 2.2, b);
-    calm(s, t, a + 3.2, b);
-  };
-}
 
 
 
 
 
-/* ================================================================== 3:15 Søknadens konklusjon – boksen på side 1 */
+/* ================================================================== 3:07 Søknadens konklusjon – boksen på side 1 */
 function sceneKonklusjon() {
-  const a = 194.7, b = 208.9;
+  const a = 187.2, b = 201.4;
   const sc = mkScene(a - 0.3, b + 0.5, 0.9, 0.9);
   const p1 = new Page(sc.world, 'sok', 1);
   sc.pages.push(p1);
@@ -568,9 +551,9 @@ function sceneKonklusjon() {
   };
 }
 
-/* ================================================================== 3:05 Søknaden sendt */
+/* ================================================================== 3:21 Søknaden sendt */
 function sceneSendt() {
-  const a = 208.7, b = 219.9;
+  const a = 201.2, b = 212.4;
   const sc = mkScene(a - 0.2, b + 0.6, 1.0, 1.0);
   camApply(sc, 0, [[0, ident]]);
   const W = sc.world, ov = sc.ov;
@@ -594,7 +577,7 @@ function sceneSendt() {
 }
 
 /* ================================================================== progress line (bottom) */
-const STEPS = [['Avviket', Q(1)], ['Spørsmål og svar', Q(2)], ['Grunnlaget', 109.8], ['Konsekvensen', 134.7], ['Søknaden', 208.7]];
+const STEPS = [['Avviket', Q(1)], ['Spørsmål og svar', Q(2)], ['Grunnlaget', 109.8], ['Konsekvensen', 137.2], ['Søknaden', 201.2]];
 function buildProgress() {
   PROG = $('div', 'prog', OV);
   PROG.items = STEPS.map(([lab], i) => {
@@ -603,7 +586,7 @@ function buildProgress() {
   });
 }
 function progressUpdate(t) {
-  const A = env(t, Q(1) + 0.6, 219.6, 1.2, 1.0) * (1 - env(t, 195.4, 199.6, 0.6, 0.6));
+  const A = env(t, Q(1) + 0.6, 212.1, 1.2, 1.0) * (1 - env(t, 187.9, 192.1, 0.6, 0.6));
   if (!show(PROG, A, 'none')) return;
   let cur = 0;
   STEPS.forEach(([, ts], i) => { if (t >= ts - 0.3) cur = i; });
@@ -612,7 +595,7 @@ function progressUpdate(t) {
   });
 }
 
-/* ================================================================== 3:15 Avslutning */
+/* ================================================================== 3:32 Avslutning */
 const X0 = 200, DSTART = D(2025, 10, 25), PPD = 4.19;
 const XD = d => X0 + (d - DSTART) * PPD;
 const STN = [
@@ -663,7 +646,7 @@ function drawLine(t, A, Y, t0) {
   g.restore();
 }
 let FIN;
-const FIN_A = 219.8;
+const FIN_A = 212.3;
 function buildFinal() {
   const w = txt(OV, 'st', '*Vi* *venter* *på* *svar.*', 0, 690, { center: true, size: 80 });
   const logo = $('img', 'ov', OV); logo.src = 'assets/shmil-logo-green.png'; logo.alt = 'SHMIL';

@@ -1,31 +1,30 @@
 # SHMIL – Grunnlaget for søknaden
 
-Animert dokumentarfilm (3:24, 16:9, Full HD) om arbeidet bak SHMILs søknad om tidsbegrenset
+Animert dokumentarfilm (3:42, 16:9, Full HD) om arbeidet bak SHMILs søknad om tidsbegrenset
 unntak etter avfallsforskriften § 19-4: hvordan dokumentasjonen ble hentet inn fra arkiver og
 fagsystemer, analysert og sammenstilt i Vedlegg 1 og 2, og hvordan søknaden bygger på den.
 Laget for visning i PowerPoint for representanter fra SHMILs 11 eierkommuner.
 
 **Ferdig film:** [`output/SHMIL_grunnlaget_for_soknaden.mp4`](../output/SHMIL_grunnlaget_for_soknaden.mp4)
-(H.264/AAC, 1920×1080, 30 fps, 3:50, lydspor «Cosmos 18 (Remix)», forlenget med åpningstemaet)
+(H.264/AAC, 1920×1080, 30 fps, 3:42, lydspor «Cosmos 18 (Remix)», forlenget med åpningstemaet)
 
-## Disposisjon (versjon 5, 3:50)
+## Disposisjon (versjon 5, 3:42)
 
 Rolig regi: ett budskap om gangen, få ord, lange hold. Høydepunktet i musikken treffer «22 gram i uka».
 
 | Tid | Del | Innhold |
 |-----|-----|---------|
-| 0:00 | Åpning | Kartet glir fra Norge til Helgeland; de 11 eierkommunene (Kartverket) · «Grunnlaget for søknaden» |
+| 0:00 | Åpning | «Grunnlaget for søknaden» · Statsforvalteren i Nordland førte tilsyn med Brønnøy kommune etter avfallsforskriften kapittel 10a · samme ordning i alle de 11 eierkommunene (Kartverket) |
 | 0:20 | Avviket | Statsforvalteren 6.11.2025 · sorteringsmerkene for papp/papir og glass/metall · «Henteordning mangler» |
-| 0:35 | Brevvekslingen | SHMILs brev (januar) og svaret (mai) |
+| 0:35 | Brevvekslingen | SHMILs brev 15. januar 2026 (7 sider · 6 spørsmål) og svaret 7. mai 2026 – to av svarene var avgjørende |
 | 0:50 | Spørsmål og svar 1c | «Plikten til henteordning gjelder uavhengig av målkravet …» |
 | 1:05 | Spørsmål og svar 3a | «Kommunenes plikter … gjelder uavhengig av pliktene til produsentansvaret.» |
 | 1:20 | Til slutt: § 19-4 | «… slår urimelig ut», «… det skal mye til», «ikke tilstrekkelig informasjon» · «Grunnlaget manglet.» |
 | 1:50 | Grunnlaget | 3D: fire fundamentblokker, de 31 originalsidene faller og legger seg i tre bunker |
-| 2:15 | Forutsetningen | Miljødirektoratet regnet med ca. 1 810 kr per ekstra tonn |
-| 2:25 | Én innbygger | 22 gram i uka per innbygger · konsekvensen av henteordning på kartet (tre biler, ferjer til Vega, Herøy og Dønna, 56 000 stopp, utslipp, støy) · 3,39 mill. kr i året |
-| 3:15 | Konklusjonen | Boksen på søknadens side 1 · 74 286 kr per ekstra tonn – over 40 ganger direktoratets eget anslag |
-| 3:29 | Søknaden sendt | 31.08.2026 · fiberdunk for papp/papir · søknad om unntak til 2030 |
-| 3:40 | Avslutning | Tidslinjen · «Vi venter på svar.» |
+| 2:17 | Én innbygger | 22 gram i uka per innbygger · konsekvensen av henteordning på kartet (tre biler, ferjer til Vega, Herøy og Dønna, 56 000 stopp, utslipp, støy) · 3,39 mill. kr i året |
+| 3:07 | Konklusjonen | Boksen på søknadens side 1 · 74 286 kr per ekstra tonn – over 40 ganger direktoratets eget anslag |
+| 3:21 | Søknaden sendt | 31.08.2026 · fiberdunk for papp/papir · søknad om unntak til 2030 |
+| 3:32 | Avslutning | Tidslinjen · «Vi venter på svar.» |
 
 Filmen settes sammen av `tools/build_film.sh` fra fire sider: `demos/kart.html`, `index.html` (film.js),
 `demos/grunnlag3d.html` og `demos/innbygger.html`, med ett sekunds overtoninger. Kjørerutene og
