@@ -1,16 +1,14 @@
-/* SHMIL – Grunnlaget for søknaden (versjon 3.1)
- * Focus: the documentation work behind the application – gathered from the archives,
- * analysed, compiled into Vedlegg 1 and 2 – and the application that rests on it.
- * Light, calm editorial look; one idea per screen; long holds.
+/* SHMIL – Grunnlaget for søknaden (versjon 4)
+ * Calm direction: one message at a time, few words, long holds, slow transitions.
+ * Geography: SHMIL left (green), Miljødirektoratet right (blue).
  * Every frame is a pure function of time t (seconds): FILM.renderAt(t).
  */
 (function () {
 'use strict';
 
-/* ------------------------------------------------------------------ timing (music: 128 bpm, 8-bar phrases of 15 s from 4.8 s) */
+/* ------------------------------------------------------------------ timing (music: 128 bpm, 15 s phrases from 4.8 s) */
 const DUR = 204.7, FPS = 30;
-const Q = k => 4.8 + 15 * k;   // phrase starts: 4.8, 19.8, 34.8, 49.8, 64.8, 79.8, 94.8, 109.8, 124.8, 139.8, 154.8, 169.8, 184.8, 199.8
-const BAR = 1.875;
+const Q = k => 4.8 + 15 * k;   // 4.8, 19.8, 34.8, 49.8, 64.8, 79.8, 94.8, 109.8, 124.8, 139.8, 154.8, 169.8, 184.8, 199.8
 /* ------------------------------------------------------------------ math */
 const clamp = (x, a = 0, b = 1) => (x < a ? a : x > b ? b : x);
 const lerp = (a, b, p) => a + (b - a) * p;
@@ -271,40 +269,69 @@ function svgPath(sc, color, w = 3, dash) {
   return p;
 }
 
-/* ------------------------------------------------------------------ extra page helper: white mask that "fills" a table row by row */
-Page.prototype.mask = function (u0, v0, u1, v1) {
-  const m = $('div', 'mask', null);
-  this.el.insertBefore(m, this.dimEl);
-  const self = this;
-  return {
-    set(vTop) {
-      const top = Math.max(v0, vTop);
-      if (top >= v1) { m.style.display = 'none'; return; }
-      m.style.display = '';
-      m.style.left = u0 * self.w + 'px'; m.style.width = (u1 - u0) * self.w + 'px';
-      m.style.top = top * self.h + 'px'; m.style.height = (v1 - top) * self.h + 'px';
-    },
-  };
-};
+/* ------------------------------------------------------------------ calm helpers */
 const div = (parent, css, cls) => { const e = $('div', cls || null, parent); e.style.cssText = 'position:absolute;' + css; return e; };
-const lpan = sc => { const e = $('div', 'lpan', null); sc.root.insertBefore(e, sc.ov); e.style.opacity = '0'; return e; };
+const calm = (T, t, a, b, o = {}) => tshow(T, t, a, b, { st: 0.012, du: 1.2, dy: 38, fo: 0.9, oy: 0, ...o });
+const fade = (el, t, a, b, o = {}) => fshow(el, t, a, b, { fi: 1.1, fo: 0.9, dy: 16, ...o });
+const GREEN = '#007B61', GREEN_HI = '#0E9C79', BLUE = '#2A7FA6';
+function nameplate(parent, name, color, cx, y) {
+  const e = $('div', 'np', parent, `<span class="dot" style="background:${color}"></span><span>${name}</span>`);
+  e.style.left = (cx - 300) + 'px'; e.style.top = y + 'px';
+  return e;
+}
+// fades an element that tshow/fshow already shows, e.g. to dim context text
+function dimBy(el, f) {
+  if (el.style.display === 'none') return;
+  el.style.opacity = (parseFloat(el.style.opacity || '1') * f).toFixed(3);
+}
+// arrow drawn from (x0,y) to (x1,y)
+function arrow(sc, x0, x1, y, color) {
+  const p = svgPath(sc, color, 4);
+  const head = document.createElementNS(NS, 'path');
+  head.setAttribute('fill', color);
+  sc.svg.appendChild(head);
+  const dir = Math.sign(x1 - x0);
+  return q => {
+    if (q <= 0) { p.style.display = 'none'; head.style.display = 'none'; return; }
+    p.style.display = ''; head.style.display = '';
+    const xe = lerp(x0, x1, q);
+    p.setAttribute('d', `M${x0},${y} L${xe - dir * 10},${y}`);
+    head.setAttribute('d', `M${xe},${y} L${xe - dir * 22},${y - 12} L${xe - dir * 22},${y + 12} Z`);
+  };
+}
+const ident = { cx: 0, cy: 0, z: 1, rx: 0 };
 
 /* ------------------------------------------------------------------ build */
-let OV, TLG;
+let OV, TLG, PROG;
 function build() {
   OV = S('ov');
   TLG = S('tl').getContext('2d');
   makeGrain();
   sceneTitle();
-  sceneTilsyn();
-  sceneJanuar();
-  sceneMai();
-  sceneDokumenter();
-  sceneModell();
-  sceneSoknad();
+  sceneAvvik();
+  sceneStage();
+  sceneBrev();
+  sceneQA(Q(3), {
+    q: 'Kan bringeordning brukes hvis den gir god nok utsortering?',
+    ans: '«Plikten til henteordning gjelder uavhengig av målkravet for utsorteringsandel.»',
+    src: 'mai 2026',
+    mean: 'God utsortering fritar ikke fra kravet.',
+  });
+  sceneQA(Q(4), {
+    q: 'Må kommunen investere før finansieringen gjennom produsentansvaret er avklart?',
+    ans: '«Kommunenes plikter etter avfallsforskriften kapittel 10a gjelder uavhengig av pliktene til produsentansvaret.»',
+    src: 'mai 2026',
+    mean: 'Kravet gjelder – også uten avklart finansiering.',
+  });
+  sceneParagraf();
+  sceneGrunnlag();
+  sceneForutsetning();
+  sceneGeografi();
   sceneNytte();
-  sceneBoks();
-  scenePakke();
+  sceneBelastning();
+  sceneKonsekvens();
+  sceneSendt();
+  buildProgress();
   buildFinal();
 }
 function makeGrain() {
@@ -319,480 +346,332 @@ function makeGrain() {
   g.putImageData(id, 0, 0);
 }
 
-/* ================================================================== 0:00 Tittel */
+/* ================================================================== 0:00 Åpning */
 function sceneTitle() {
-  const sc = mkScene(0, 12.7, 0.01, 0.8);
+  const sc = mkScene(0, 20.6, 0.01, 1.1);
   [['v1', 1, -980, 60, -3], ['sok', 1, 0, 0, 0.6], ['v2', 1, 980, 40, 3]].forEach(([d, n, x, y, r]) => {
     const p = new Page(sc.world, d, n, { lo: true });
-    p.keys = [[0, { x, y: y + 180, s: 1, r, o: 1, shade: 0 }], [4.5, { x, y, s: 1, r, o: 1, shade: 0 }, E.o], [12.7, { x, y: y - 70, s: 1, r, o: 1, shade: 0 }, E.lin]];
+    p.keys = [[0, { x, y: y + 160, s: 1, r, o: 1, shade: 0 }], [6.0, { x, y, s: 1, r, o: 1, shade: 0 }, E.o], [20.6, { x, y: y - 90, s: 1, r, o: 1, shade: 0 }, E.lin]];
     sc.pages.push(p);
   });
-  const camK = [[0, { cx: 0, cy: -1120, z: 0.3 }], [12.7, { cx: 0, cy: -1120, z: 0.315 }, E.lin]];
-  const k = txt(sc.ov, 'k', 'SHMIL IKS · Søndre Helgeland Miljøverk', 0, 196, { center: true });
-  const ti = txt(sc.ov, 'dt', 'Grunnlaget for søknaden', 0, 238, { center: true, size: 124 });
-  const su = txt(sc.ov, 'sub', 'Hvordan SHMIL dokumenterte søknaden om unntak etter avfallsforskriften § 19-4', 0, 398, { center: true, w: 1400, size: 42 });
+  const camK = [[0, { cx: 0, cy: -1120, z: 0.3 }], [20.6, { cx: 0, cy: -1120, z: 0.318 }, E.lin]];
+  const k = txt(sc.ov, 'k', 'SHMIL IKS · Søndre Helgeland Miljøverk', 0, 200, { center: true });
+  const ti = txt(sc.ov, 'dt', 'Grunnlaget for søknaden', 0, 242, { center: true, size: 124 });
+  const su = txt(sc.ov, 'sub', 'Kravet om henteordning · november 2025 – august 2026', 0, 404, { center: true, size: 42 });
   sc.upd = t => {
     pagesApply(sc, t); camApply(sc, t, camK);
-    tshow(k, t, 0.8, 12.0, { st: 0.012 });
-    tshow(ti, t, 1.1, 12.1, { st: 0.11, du: 0.95 });
-    tshow(su, t, 2.5, 12.1, { st: 0.035 });
+    calm(k, t, 1.0, 19.6);
+    calm(ti, t, 1.4, 19.7, { st: 0.05, du: 1.4 });
+    calm(su, t, 3.2, 19.7);
   };
 }
 
-/* ================================================================== 0:12 Tilsynet */
-function sceneTilsyn() {
-  const sc = mkScene(12.0, 20.7, 0.6, 0.6);
-  const W = sc.world;
-  const X = d => (d - D(2025, 11, 6)) * 20;
-  div(W, 'left:-1400px;top:-2px;width:5200px;height:4px;border-radius:2px;background:#C3C8C4');
-  const prog = div(W, 'left:0;top:-4px;height:8px;width:10px;border-radius:4px;background:#0E9C79');
-  [[D(2025, 11, 1), 'NOV 2025'], [D(2025, 12, 1), 'DES'], [D(2026, 1, 1), 'JAN 2026'], [D(2026, 2, 1), 'FEB']].forEach(([d, lab]) => {
-    div(W, `left:${X(d) - 1}px;top:-12px;width:2px;height:24px;background:#AEB5B1`);
-    const l = div(W, `left:${X(d) + 12}px;top:-46px;font:600 22px/1 var(--sans);letter-spacing:.14em;color:#8A9599;white-space:nowrap`);
-    l.textContent = lab;
+/* ================================================================== 0:20 Avviket */
+function sceneAvvik() {
+  const a = Q(1), b = Q(2);
+  const sc = mkScene(a - 0.3, b + 0.6, 0.9, 0.9);
+  const ov = sc.ov;
+  const k = txt(ov, 'k g', 'Statsforvalteren i Nordland · 6. november 2025', 0, 268, { center: true });
+  const h = txt(ov, 'dt', 'Tilsynet fant avvik', 0, 310, { center: true, size: 120 });
+  const cards = ['Papp og papir', 'Glass- og metallemballasje'].map((ttl, i) => {
+    const c = $('div', 'card', ov, `<div class="bar" style="background:#9AA4A8"></div><div class="lb">Henteordning mangler</div><div class="tt">${ttl}</div>`);
+    return place(c, 300 + i * 680, 560, 640);
   });
-  const dot = div(W, 'left:-15px;top:-15px;width:30px;height:30px;border-radius:50%;background:#007B61;box-shadow:0 0 0 6px rgba(14,156,121,.18)');
-  const K1 = txt(W, 'k', 'Statsforvalteren i Nordland', -620, -318);
-  const D1 = txt(W, 'dt', '6. november 2025', -620, -278, { size: 96 });
-  const S1 = txt(W, 'sub', 'Tilsynsavvik – krav om henteordning for papp og papir og for glass- og metallemballasje', -620, 62, { w: 1160, size: 44 });
-  const camK = [[12.0, { cx: -760, cy: -40, z: 1 }], [14.0, { cx: 40, cy: -40, z: 1 }, E.io], [20.7, { cx: 180, cy: -40, z: 1 }, E.lin]];
   sc.upd = t => {
-    const c = camApply(sc, t, camK);
-    prog.style.width = Math.max(0, c.cx + 900) * pr(t, 13.4, 14.2) + 'px';
-    show(dot, pr(t, 13.3, 13.7), `scale(${E.oback(pr(t, 13.3, 13.9, E.lin))})`);
-    tshow(K1, t, 13.6, 20.5, { st: 0.015 });
-    tshow(D1, t, 13.7, 20.5, { st: 0.08, du: 0.85 });
-    tshow(S1, t, 14.3, 20.5, { st: 0.03 });
+    calm(k, t, a + 0.6, b);
+    calm(h, t, a + 1.0, b, { st: 0.05 });
+    cards.forEach((c, i) => fade(c, t, a + 5.0 + i * 1.2, b, { dy: 24 }));
   };
 }
 
-/* shared: a "lifted" quote layout over a veiled document -------------------- */
-function liftBlock(ov, o) {
-  const B = {};
-  if (o.ask) B.ask = txt(ov, 'src', o.ask, 200, o.askY ?? 196, { w: 1520, size: 30 });
-  B.k = txt(ov, 'k' + (o.kc ? ' ' + o.kc : ''), o.k, 200, o.kY ?? 250);
-  B.q = txt(ov, 'q', o.q, 200, (o.kY ?? 250) + 42, { w: 1520, size: o.size ?? 54 });
-  if (o.q2) B.q2 = txt(ov, 'q2', o.q2, 200, o.q2Y, { w: 1520, size: 44 });
-  B.src = txt(ov, 'src', o.src, 200, o.srcY ?? 660, { w: 1520 });
-  B.show = (t, a, b) => {
-    if (B.ask) tshow(B.ask, t, a, b, { st: 0.008 });
-    tshow(B.k, t, a + 0.1, b, { st: 0.02 });
-    tshow(B.q, t, a + 0.2, b, { st: 0.035 });
-    if (B.q2) tshow(B.q2, t, a + 1.6, b, { st: 0.03 });
-    tshow(B.src, t, a + 1.2, b, { st: 0.01 });
-  };
-  return B;
-}
-// camera path that leaves one close-up, rises a little, and lands on the next
-function flyKeys(keys, tA, camA, tB, camB, zMid = 0.5) {
-  const tm = (tA + tB) / 2;
-  keys.push([tA, camA], [tm, { cx: (camA.cx + camB.cx) / 2, cy: (camA.cy + camB.cy) / 2, z: zMid, rx: 0 }, E.io2], [tB, camB, E.io2]);
+/* ================================================================== 0:35–1:20 Dialogen: fast scene (navneskilt og skillelinje) */
+function sceneStage() {
+  const a = Q(2), b = Q(5);
+  const sc = mkScene(a - 0.1, b + 0.6, 1.0, 1.0);
+  nameplate(sc.ov, 'SHMIL', GREEN, 480, 170);
+  nameplate(sc.ov, 'Miljødirektoratet', BLUE, 1440, 170);
+  const line = div(sc.ov, 'left:959px;top:260px;width:2px;height:470px;background:#C9CEC9;transform-origin:50% 0');
+  sc.upd = t => { show(line, env(t, Q(3) + 0.2, b, 1.0, 0.9), `scaleY(${pr(t, Q(3) + 0.2, Q(3) + 1.4, E.io)})`); };
 }
 
-/* ================================================================== 0:20 Januar – SHMILs spørsmål */
-function sceneJanuar() {
-  const sc = mkScene(19.6, 50.5, 0.6, 0.5);
-  const W = sc.world, GAP = 1120, pg = [];
-  for (let i = 7; i >= 1; i--) { pg[i] = new Page(W, 'brev', i, { lo: ![4, 7].includes(i) }); sc.pages.push(pg[i]); }
-  const rot = [0, -0.4, 0.5, -0.3, 0.4, -0.5, 0.3, -0.4];
-  for (let i = 1; i <= 7; i++) {
-    const row = { x: (i - 1) * GAP, y: 0, s: 1, r: rot[i], o: 1, shade: 0 };
-    pg[i].rest = row;
-    pg[i].keys = [[19.7 + i * 0.09, { ...row, y: 900, o: 0 }], [20.8 + i * 0.09, row, E.o5]];
-  }
-  const QS = [[4, 'brev_q1a'], [4, 'brev_q1b'], [4, 'brev_q1c'], [6, 'brev_q2a'], [6, 'brev_q2b'], [7, 'brev_q3a']];
-  QS.forEach(([p, id], k) => H(sc, pg[p], id, 'boxL-g', 21.3 + k * 0.32, 21.7 + k * 0.32, 23.3));
-  H(sc, pg[4], 'brev_q1a', 'm-g', 24.3, 25.4);
-  H(sc, pg[4], 'brev_q1c', 'm-g', 34.9, 35.8);
-  H(sc, pg[7], 'brev_q3a', 'm-g', 43.2, 44.1);
-  const wide = { cx: 3 * GAP, cy: 260, z: 0.205, rx: 0 };
-  const c1a = look(pg[4], ['brev_q1a'], 1.25, 960, 520), c1c = look(pg[4], ['brev_q1c'], 1.25, 960, 520), c3a = look(pg[7], ['brev_q3a'], 1.25, 960, 520);
-  const camK = [[19.6, wide], [23.2, { ...wide, z: 0.21 }, E.lin]];
-  flyKeys(camK, 23.2, { ...wide, z: 0.21 }, 24.3, c1a, 0.4);
-  camK.push([34.0, { ...c1a, z: 1.28 }, E.lin]);
-  camK.push([34.9, c1c, E.io], [42.0, { ...c1c, z: 1.28 }, E.lin]);
-  flyKeys(camK, 42.0, { ...c1c, z: 1.28 }, 43.2, c3a, 0.5);
-  camK.push([50.5, { ...c3a, z: 1.3 }, E.lin]);
-  const ov = sc.ov;
-  const k0 = txt(ov, 'k', 'SHMIL → Miljødirektoratet · 15. januar 2026', 0, 108, { center: true });
-  const h0 = txt(ov, 'st', 'SHMIL ber om prinsipielle avklaringer', 0, 148, { center: true });
-  const s0 = txt(ov, 'st2', '7 sider · 3 tema · 6 spørsmål', 0, 800, { center: true, size: 58 });
-  const L1 = liftBlock(ov, { k: 'Spørsmål 1a – materialgjenvinning og innsatsfaktorer', size: 52,
-    q: '«Innebærer praktiseringen av avfallsforskriften kapittel 10a at hensynet til henteordning skal tillegges avgjørende vekt selv der dette skjer på bekostning av samlet miljøeffekt, økt ressursbruk, betydelige samfunnsøkonomiske kostnader, i strid med de overordnede prinsippene i forurensningsloven?»',
-    src: 'SHMILs brev til Miljødirektoratet 15.01.2026, side 4', srcY: 680 });
-  const L2 = liftBlock(ov, { k: 'Spørsmål 1c – bringeordning med dokumentert utsortering',
-    q: '«SHMIL ber om avklaring på hvorvidt forskriften åpner for bruk av bringeordning dersom det kan dokumenteres å gi tilfredsstillende utsortering (§ 10a-4), eller er det krav om henteordning uavhengig av måloppnåelse?»',
-    src: 'SHMILs brev til Miljødirektoratet 15.01.2026, side 4', srcY: 600 });
-  const L3 = liftBlock(ov, { k: 'Spørsmål 3a – finansiering og produsentansvar',
-    q: '«Mener Miljødirektoratet at kommunen har en ubetinget plikt til å foreta irreversible investeringer i henteordning, før det foreligger avtaler og garantier for at produsentansvarsordningen dekker nødvendige kostnader med en slik omlegging?»',
-    src: 'SHMILs brev til Miljødirektoratet 15.01.2026, side 7', srcY: 700 });
+/* ================================================================== 0:35 Brevvekslingen */
+function sceneBrev() {
+  const a = Q(2), b = Q(3);
+  const sc = mkScene(a - 0.1, b + 0.5, 0.6, 0.9);
+  camApply(sc, 0, [[0, ident]]);
+  const W = sc.world, SC = 0.27;
+  const bp = new Page(W, 'brev', 1, { lo: true }), sp = new Page(W, 'svar', 1, { lo: true });
+  bp.keys = [[a + 1.0, { x: -480, y: -50, s: SC, r: -1, o: 0, shade: 0 }], [a + 2.2, { x: -480, y: -80, s: SC, r: -1, o: 1, shade: 0 }, E.o]];
+  sp.keys = [[a + 6.4, { x: 480, y: -50, s: SC, r: 1, o: 0, shade: 0 }], [a + 7.6, { x: 480, y: -80, s: SC, r: 1, o: 1, shade: 0 }, E.o]];
+  sc.pages.push(bp, sp);
+  const d1 = txt(sc.ov, 'k', '15. januar 2026', 180, 672, { w: 600, align: 'center' });
+  const d2 = txt(sc.ov, 'k b', '7. mai 2026', 1140, 672, { w: 600, align: 'center' });
+  const a1 = arrow(sc, 650, 1270, 400, GREEN_HI), a2 = arrow(sc, 1270, 650, 520, BLUE);
+  const h = txt(sc.ov, 'st', 'SHMIL ba om prinsipielle avklaringer', 0, 790, { center: true, size: 60 });
   sc.upd = t => {
-    pagesApply(sc, t); hlsApply(sc, t); camApply(sc, t, camK);
-    veilSet(sc, Math.max(env(t, 25.5, 34.2, 0.5, 0.5), env(t, 35.9, 42.2, 0.5, 0.5), env(t, 44.2, 50.5, 0.5, 0.3)));
-    tshow(k0, t, 20.0, 23.6, { st: 0.015 });
-    tshow(h0, t, 20.1, 23.6, { st: 0.06 });
-    tshow(s0, t, 21.4, 23.6, { st: 0.06 });
-    L1.show(t, 25.7, 34.0);
-    L2.show(t, 36.1, 42.0);
-    L3.show(t, 44.4, 50.3);
+    pagesApply(sc, t);
+    calm(d1, t, a + 1.8, b);
+    a1(pr(t, a + 3.2, a + 5.2, E.io) * (1 - pr(t, b - 0.9, b)));
+    calm(d2, t, a + 7.2, b);
+    a2(pr(t, a + 8.4, a + 10.4, E.io) * (1 - pr(t, b - 0.9, b)));
+    calm(h, t, a + 3.6, b, { st: 0.03 });
   };
 }
 
-/* ================================================================== 0:50 Mai – svaret, ordrett */
-function sceneMai() {
-  const sc = mkScene(49.6, 95.3, 0.6, 0.5);
-  const W = sc.world, GAP = 1120, pg = [];
-  for (let i = 3; i >= 1; i--) { pg[i] = new Page(W, 'svar', i); sc.pages.push(pg[i]); }
-  for (let i = 1; i <= 3; i++) {
-    const row = { x: (i - 1) * GAP, y: 0, s: 1, r: [0, 0.4, -0.3, 0.3][i], o: 1, shade: 0 };
-    pg[i].rest = row;
-    pg[i].keys = [[49.8 + i * 0.12, { ...row, x: row.x + 2600, r: row.r + 5 }], [51.3 + i * 0.12, row, E.o5]];
-  }
-  const [s1, s2, s3] = [pg[1], pg[2], pg[3]];
-  H(sc, s1, 'svar_seks', 'boxL-g', 51.8, 52.3, 53.6);
-  H(sc, s2, 'svar_ingen', 'm-b', 55.0, 56.0);
-  H(sc, s2, 'svar_plikten', 'm-b', 55.8, 56.4);
-  H(sc, s2, 'svar_a2a', 'm-b', 64.6, 65.8);
-  H(sc, s3, 'svar_a3a', 'm-b', 73.8, 74.8);
-  H(sc, s3, 'svar_1994', 'box-g', 81.9, 82.3, 84.0);
-  H(sc, s3, 'svar_urimelig', 'm-b', 82.3, 83.1);
-  H(sc, s3, 'svar_myetil', 'm-b', 83.0, 83.8);
-  const wide = { cx: GAP, cy: 120, z: 0.36, rx: 0 };
-  const cA = look(s2, ['svar_ingen', 'svar_plikten'], 1.25, 960, 520), cB = look(s2, ['svar_a2a'], 1.3, 960, 520),
-    cC = look(s3, ['svar_a3a'], 1.35, 960, 520), cD = look(s3, ['svar_ventil', 'svar_myetil'], 1.35, 960, 540);
-  const camK = [[49.6, wide], [53.6, { ...wide, z: 0.37 }, E.lin]];
-  flyKeys(camK, 53.6, { ...wide, z: 0.37 }, 54.9, cA, 0.5);
-  camK.push([63.3, { ...cA, z: 1.28 }, E.lin], [64.5, cB, E.io], [72.5, { ...cB, z: 1.33 }, E.lin]);
-  flyKeys(camK, 72.5, { ...cB, z: 1.33 }, 73.7, cC, 0.55);
-  camK.push([80.5, { ...cC, z: 1.38 }, E.lin], [81.7, cD, E.io], [95.3, { ...cD, z: 1.5 }, E.lin]);
+/* ================================================================== 0:50 / 1:05 Spørsmål og svar */
+function sceneQA(a, o) {
+  const b = a + 15;
+  const sc = mkScene(a - 0.1, b + 0.6, 0.8, 0.9);
   const ov = sc.ov;
-  const k0 = txt(ov, 'k b', 'Miljødirektoratet → SHMIL · 7. mai 2026', 0, 108, { center: true });
-  const h0 = txt(ov, 'st', 'Svaret – punkt for punkt', 0, 148, { center: true });
-  const s0 = txt(ov, 'q2', '«I brevet ber dere om svar på seks spørsmål. Spørsmålene og våre vurderinger følger nedenfor.»', 0, 846, { center: true, w: 1500, size: 40 });
-  const P1 = liftBlock(ov, { kc: 'b', k: 'Miljødirektoratet svarte', kY: 330,
-    ask: 'SHMIL spurte (1c): «… åpner forskriften for bruk av bringeordning dersom det kan dokumenteres å gi tilfredsstillende utsortering …, eller er det krav om henteordning uavhengig av måloppnåelse?»',
-    q: '«Det foreligger ikke en unntaksmulighet for innføring av henteordning i forskriften for kommuner som oppnår minimumskravet for utsorteringsandel gjennom en bringeordning.»',
-    q2: '«Plikten til henteordning gjelder uavhengig av målkravet for utsorteringsandel.»', q2Y: 690,
-    src: 'Miljødirektoratets svar 07.05.2026, side 2', srcY: 850 });
-  const P2 = liftBlock(ov, { kc: 'b', k: 'Miljødirektoratet svarte', kY: 330,
-    ask: 'SHMIL spurte (2a): «… slik at regionen/området under ett kan unntas fra kravet om henteordning for å sikre en helhetlig og rasjonell drift?»',
-    q: '«Avfallsforskriften kapittel 10a inneholder ikke en hjemmel som åpner for et slikt unntak, men vi viser til den avsluttende omtalen av vår adgang til å gjøre unntak fra kravene (nederst i dette brevet).»',
-    src: 'Miljødirektoratets svar 07.05.2026, side 2', srcY: 680 });
-  const P3 = liftBlock(ov, { kc: 'b', k: 'Miljødirektoratet svarte', kY: 330,
-    ask: 'SHMIL spurte (3a): «Mener Miljødirektoratet at kommunen har en ubetinget plikt til å foreta irreversible investeringer i henteordning, før det foreligger avtaler og garantier …?»',
-    q: '«Kommunenes plikter etter avfallsforskriften kapittel 10a gjelder uavhengig av pliktene til produsentansvaret.»', size: 60,
-    src: 'Miljødirektoratets svar 07.05.2026, side 3', srcY: 600 });
-  // § 19-4
-  const para = $('div', 'ov', ov, '§ 19-4');
-  para.style.cssText += ';font:700 260px/1 var(--display);letter-spacing:-.03em;color:#007B61;transform-origin:0 0';
+  const kq = txt(ov, 'k', 'SHMIL spurte · januar 2026', 150, 300, { w: 720 });
+  const q = txt(ov, 'q', o.q, 150, 346, { w: 700, size: 48 });
+  const ka = txt(ov, 'k b', 'Miljødirektoratet svarte · ' + o.src, 1050, 300, { w: 720 });
+  const ans = txt(ov, 'q', o.ans, 1050, 346, { w: 720, size: 52 });
+  const mk = txt(ov, 'k g', 'Det betyr', 0, 800, { center: true });
+  const mean = txt(ov, 'st', o.mean, 0, 842, { center: true, size: 62 });
+  sc.upd = t => {
+    calm(kq, t, a + 0.5, b);
+    calm(q, t, a + 0.8, b, { st: 0.02 });
+    const dimQ = 1 - 0.62 * pr(t, a + 5.0, a + 6.2);
+    dimBy(kq.el, dimQ); dimBy(q.el, dimQ);
+    calm(ka, t, a + 5.0, b);
+    calm(ans, t, a + 5.3, b, { st: 0.025 });
+    calm(mk, t, a + 10.2, b);
+    calm(mean, t, a + 10.4, b, { st: 0.03 });
+  };
+}
+
+/* ================================================================== 1:20 Til slutt: § 19-4 */
+function sceneParagraf() {
+  const a = Q(5), b = Q(7);
+  const sc = mkScene(a - 0.2, b + 0.6, 1.0, 1.0);
+  const ov = sc.ov;
+  const k = txt(ov, 'sub', 'Men direktoratet pekte på én mulighet', 0, 196, { center: true, size: 44 });
+  const para = div(ov, 'left:0;top:258px;width:1920px;text-align:center;font:700 240px/1 var(--display);letter-spacing:-.03em;color:#007B61;white-space:nowrap', 'ov');
+  para.textContent = '§ 19-4';
   para.style.display = 'none';
-  const pk = txt(ov, 'k b', 'Avslutningsvis i svaret', 0, 140, { center: true });
-  const qa = txt(ov, 'q', '«Denne kan være aktuell å benytte hvis krav i avfallsforskriften slår urimelig ut i konkrete tilfeller.»', 0, 480, { center: true, w: 1560, size: 50 });
-  const qb = txt(ov, 'q2', '«Vi gjør oppmerksom på at det skal mye til for at det skal være aktuelt å benytte denne unntakshjemmelen.»', 0, 650, { center: true, w: 1500, size: 44 });
-  const sr = txt(ov, 'src', 'Miljødirektoratets svar 07.05.2026, side 3 – om den generelle sikkerhetsventilen i avfallsforskriften § 19-4', 0, 800, { center: true });
-  const q3 = txt(ov, 'q2', '«Vi har ikke tilstrekkelig informasjon til å vurdere om det kan være aktuelt å gjøre noen unntak for deres eierkommuner.»', 0, 300, { center: true, w: 1500, size: 48 });
-  const big = txt(ov, 'dt', 'Grunnlaget manglet.', 0, 510, { center: true, size: 132 });
+  const qa = txt(ov, 'q', '«… slår urimelig ut i konkrete tilfeller»', 0, 560, { center: true, size: 56 });
+  const qb = txt(ov, 'q', '«… det skal mye til»', 0, 652, { center: true, size: 56 });
+  const src = txt(ov, 'src', 'Miljødirektoratets svar 7. mai 2026, side 3 · avfallsforskriften § 19-4', 0, 790, { center: true });
+  const q3 = txt(ov, 'q2', '«Vi har ikke tilstrekkelig informasjon til å vurdere om det kan være aktuelt å gjøre noen unntak for deres eierkommuner.»', 0, 300, { center: true, w: 1480, size: 48 });
+  const big = txt(ov, 'dt', 'Grunnlaget manglet.', 0, 560, { center: true, size: 136 });
   sc.upd = t => {
-    pagesApply(sc, t); hlsApply(sc, t);
-    const c = camApply(sc, t, camK);
-    veilSet(sc, Math.max(env(t, 56.4, 63.4, 0.5, 0.5), env(t, 65.9, 72.6, 0.5, 0.5), env(t, 74.9, 80.6, 0.5, 0.5), env(t, 84.2, 95.3, 0.6, 0.3)));
-    tshow(k0, t, 50.0, 53.7, { st: 0.015 });
-    tshow(h0, t, 50.1, 53.7, { st: 0.06 });
-    tshow(s0, t, 51.6, 53.7, { st: 0.02 });
-    P1.show(t, 56.6, 63.2);
-    P2.show(t, 66.1, 72.4);
-    P3.show(t, 75.1, 80.4);
-    // § 19-4 lifts out of the letter
-    const r = hlScreen(c, s3, ['svar_1994'], s3.rest);
-    const ta = 84.0, tb = 85.4;
-    const p = pr(t, ta, tb, E.io5);
-    const srcH = (r.y1 - r.y0) * 1.1, s0s = srcH / 260 * 1.02;
-    const endW = 820, x = lerp(r.x0 - 6, 960 - endW / 2, p), y = lerp(r.y0 - srcH * 0.12, 190, p), s = lerp(s0s, 1, p);
-    show(para, env(t, ta, 89.5, 0.2, 0.5), `translate(${x}px,${y}px) scale(${s})`);
-    tshow(pk, t, 84.6, 89.5, { st: 0.02 });
-    tshow(qa, t, 85.4, 89.5, { st: 0.035 });
-    tshow(qb, t, 86.6, 89.5, { st: 0.03 });
-    tshow(sr, t, 87.2, 89.5, { st: 0.008 });
-    tshow(q3, t, 89.7, 95.0, { st: 0.03 });
-    tshow(big, t, 91.7, 95.0, { st: 0.12, du: 0.9 });
+    calm(k, t, a + 0.8, a + 16.6);
+    fade(para, t, a + 2.6, a + 16.6, { dy: 0, sc: 0.94, fi: 1.6 });
+    calm(qa, t, a + 6.0, a + 16.6, { st: 0.03 });
+    calm(src, t, a + 7.4, a + 16.6);
+    calm(qb, t, a + 10.8, a + 16.6, { st: 0.04 });
+    calm(q3, t, a + 17.4, b - 0.2, { st: 0.02 });
+    dimBy(q3.el, 1 - 0.45 * pr(t, a + 22.6, a + 23.6));
+    calm(big, t, a + 22.8, b - 0.2, { st: 0.1, du: 1.4 });
   };
 }
 
-/* ================================================================== 1:35 Dokumentasjonen i faktiske tekster */
-function sceneDokumenter() {
-  const sc = mkScene(94.6, 127.3, 0.6, 0.6);
-  const W = sc.world;
-  const sok = [], v1 = [], v2 = [];
-  let k = 0;
-  const add = (p, st, arr) => { const td = 95.0 + (k++) * 0.05; p.rest = st; p.keys = [[td, { ...st, y: st.y + 300, o: 0 }], [td + 0.7, st, E.o5]]; arr.push(p); sc.pages.push(p); return p; };
-  for (let i = 1; i <= 6; i++) add(new Page(W, 'sok', i, { lo: ![3, 4, 5].includes(i) }), { x: (i - 1) * 1100, y: 0, s: 1, r: [0, -0.3, 0.3, -0.2, 0.3, -0.3, 0.2][i], o: 1, shade: 0 }, sok);
-  for (let i = 1; i <= 4; i++) add(new Page(W, 'v1', i, { lo: i > 2 }), { x: (i - 1) * 1100, y: 1640, s: 1, r: [0, 0.3, -0.3, 0.2, -0.2][i], o: 1, shade: 0 }, v1);
-  for (let j = 0; j < 21; j++) add(new Page(W, 'v2', j + 1, { lo: true }), { x: -250 + (j % 11) * 560, y: 3180 + Math.floor(j / 11) * 790, s: 0.5, r: ((j * 7) % 5 - 2) * 0.4, o: 1, shade: 0 }, v2);
-  const [p3, p4, p5] = [sok[2], sok[3], sok[4]], [w1, w2] = [v1[0], v1[1]];
-  const STOPS = [
-    { t: 101.4, page: w1, ids: ['v1_datastatus_hdr', 'v1_kilde_hdr'], z: 1.15, hl: [['v1_datastatus_hdr', 'box-g'], ['v1_kilde_hdr', 'box-g']], lab: 'Hvert tall har verdi, datastatus og kilde', src: 'Vedlegg 1, side 1' },
-    { t: 105.5, page: w2, ids: ['v1_kval_hdr', 'v1_kval_txt'], z: 1.3, hl: [['v1_kval_hdr', 'u-g'], ['v1_kval_txt', 'm-g']], lab: 'Ulike kvalitetsindikatorer holdes adskilt', src: 'Vedlegg 1, side 2' },
-    { t: 109.7, page: p3, ids: ['sok_h23', 'sok_23_txt'], z: 1.2, hl: [['sok_h23', 'u-g'], ['sok_23_txt', 'm-g']], lab: 'Sensitivitet: kostnadsnivået består i hele det testede spennet', src: 'Søknaden 2.3' },
-    { t: 113.9, page: p4, ids: ['sok_h34', 'sok_34_txt'], z: 1.2, at: [0.5, 0.17], hl: [['sok_h34', 'u-g'], ['sok_34_txt', 'm-g']], lab: 'Alternativer vurdert: fellesbeholdere, bunntømte fellespunkter, samkjøring', src: 'Søknaden 3.4' },
-    { t: 118.1, page: p4, ids: ['sok_h42', 'sok_42_txt'], z: 1.3, hl: [['sok_h42', 'u-g'], ['sok_42_txt', 'm-g']], lab: 'Usikkerheten er synliggjort – meruttaket er et modellscenario', src: 'Søknaden 4.2' },
-    { t: 122.3, page: p5, ids: ['sok_h52', 'sok_52_txt'], z: 1.05, hl: [['sok_h52', 'u-g'], ['sok_52_txt', 'm-g']], lab: 'Nytte og belastning veid mot hverandre', src: 'Søknaden 5.2' },
-  ];
-  STOPS.forEach(s => {
-    s.cam = s.at ? (() => { const [wx, wy] = s.page.pt(s.at[0], s.at[1]); return { cx: wx, cy: wy - (400 - 540) / s.z, z: s.z, rx: 0 }; })() : look(s.page, s.ids, s.z, 960, 400);
-    s.hl.forEach(([id, kind], i) => H(sc, s.page, id, kind, s.t + 0.6 + i * 0.5, s.t + 1.3 + i * 0.5));
-  });
-  const wide = { cx: 2550, cy: 1310, z: 0.17, rx: 0 };
-  const camK = [[94.6, wide], [100.4, { ...wide, z: 0.178 }, E.lin]];
-  flyKeys(camK, 100.4, { ...wide, z: 0.178 }, STOPS[0].t, STOPS[0].cam, 0.35);
-  for (let i = 0; i < STOPS.length; i++) {
-    const s = STOPS[i], n = STOPS[i + 1];
-    const dwellEnd = (n ? n.t : 127.3) - (n ? 1.1 : 0);
-    camK.push([dwellEnd, { ...s.cam, z: s.cam.z * 1.03 }, E.lin]);
-    if (n) flyKeys(camK, dwellEnd, { ...s.cam, z: s.cam.z * 1.03 }, n.t, n.cam, 0.6);
-  }
-  const ov = sc.ov;
-  const k0 = txt(ov, 'k', 'Sommeren 2026 · grunnlaget bygges', 0, 40, { center: true });
-  const h0 = txt(ov, 'st', '31 sider dokumentasjon', 0, 78, { center: true, size: 72 });
-  const lab = (kk, nm, y) => { const e = $('div', 'ov', ov, `<div class="k" style="margin-bottom:10px">${kk}</div><div style="font:500 26px/1.3 var(--sans);color:var(--ink2)">${nm}</div>`); return place(e, 70, y, 360); };
-  const LB = [[lab('Søknaden', '6 sider'), sok[0]], [lab('Vedlegg 1', 'Nøkkeltall, kilder og datastatus · 4 sider'), v1[0]], [lab('Vedlegg 2', 'Plukkanalyse SHMIL 2025 · 21 sider'), v2[0]]];
-  LB.forEach(([e]) => (e.style.whiteSpace = 'normal'));
-  const band = div(sc.root, 'left:0;top:620px;width:1920px;height:460px;pointer-events:none;opacity:0;background:linear-gradient(to bottom,rgba(236,235,230,0) 0%,rgba(236,235,230,.93) 32%,rgba(236,235,230,.97) 100%)');
-  sc.root.insertBefore(band, sc.ov);
-  const labs = STOPS.map(s => ({ k: txt(ov, 'k', 'Vurdering · ' + s.src, 200, 800), h: txt(ov, 'st2', s.lab, 200, 840, { w: 1520, size: 56 }) }));
-  sc.upd = t => {
-    pagesApply(sc, t); hlsApply(sc, t);
-    const c = camApply(sc, t, camK);
-    tshow(k0, t, 95.2, 100.9, { st: 0.015 });
-    tshow(h0, t, 95.3, 100.9, { st: 0.07 });
-    LB.forEach(([e, page], i) => {
-      const [, y] = toScreen(c, 0, page.rest.y);
-      e.style.top = (y - 40) + 'px';
-      fshow(e, t, 96.0 + i * 0.3, 100.9, { dx: -20, dy: 0 });
-    });
-    band.style.opacity = env(t, STOPS[0].t - 0.4, 127.1, 0.6, 0.5).toFixed(3);
-    labs.forEach((L, i) => {
-      const a = STOPS[i].t + 0.5, b = (STOPS[i + 1] ? STOPS[i + 1].t - 0.6 : 127.0);
-      tshow(L.k, t, a, b, { st: 0.015 });
-      tshow(L.h, t, a + 0.1, b, { st: 0.04 });
-    });
-  };
-}
-
-/* ================================================================== 2:05 Beregningsmodellen (kort) */
-function sceneModell() {
-  const sc = mkScene(126.6, 140.3, 0.6, 0.6);
-  const ov = sc.ov;
-  const k = txt(ov, 'k', 'Beregningsmodellen', 150, 112);
-  const h1 = txt(ov, 'st', 'Hva ville henteordning i tettbygd strøk kreve?', 150, 150, { size: 66 });
-  const h2 = txt(ov, 'st', 'Hver forutsetning kan etterprøves', 150, 150, { size: 66 });
-  const N = [
-    ['8 959', 'avtaler i tettbygd strøk', 'e', 'Estimat'],
-    ['ca. 8 650', 'stoppesteder', 'e', 'Estimat'],
-    ['ca. 56 000', 'tømmestopp i året – tømming hver 8. uke', 's', 'Modell'],
-    ['225', 'kjøretøydager i året – 250 stopp per dag', 's', 'Modell'],
-    ['2,99 mill. kr', 'rutedrift i året – ca. 13 300 kr per dag', 's', 'Modell'],
-    ['0,40 mill. kr', 'i året for ca. 9 228 nye beholdere', 's', 'Modell'],
-  ];
-  const XS = [150, 720, 1290], YS = [292, 566];
-  const TA = [127.6, 128.6, 129.6, 130.6, 131.6, 132.3];
-  const nodes = N.map(([v, l, cls, st], i) => {
-    const e = $('div', 'node', ov, `<span class="stc ${cls}">${st}</span><div class="v">${v}</div><div class="l">${l}</div>`);
-    return place(e, XS[i % 3], YS[Math.floor(i / 3)]);
-  });
-  const ar = ['M650,394 L716,394', 'M1220,394 L1286,394', 'M1540,496 L1540,530 L400,530 L400,562', 'M650,668 L716,668']
-    .map(d => { const p = svgPath(sc, '#0E9C79', 4); p.setAttribute('d', d); return p; });
-  const plus = div(ov, 'left:1228px;top:632px;font:600 54px/1 var(--display);color:var(--ink3)', 'ov'); plus.textContent = '+';
-  const res = txt(ov, 'st', '= *3,39* *mill.* *kr* *i* *året*', 150, 818, { size: 76 });
-  const rsrc = txt(ov, 'src', 'Modellert merkostnad ved henteordning i tettbygd strøk (Modell A) · søknaden kap. 2.2 og Vedlegg 1', 150, 908, { w: 1620 });
-  sc.upd = t => {
-    tshow(k, t, 127.0, 140.0, { st: 0.02 });
-    tshow(h1, t, 127.1, 135.4, { st: 0.05 });
-    tshow(h2, t, 135.8, 140.0, { st: 0.06 });
-    nodes.forEach((e, i) => fshow(e, t, TA[i], 140.0, { dy: 30, fi: 0.7 }));
-    ar.forEach((p, i) => {
-      const tt = TA[i + 1];
-      const a = pr(t, tt - 0.6, tt - 0.1);
-      p.style.display = a > 0 ? '' : 'none';
-      p.style.opacity = (a * (1 - pr(t, 139.6, 140.2))).toFixed(3);
-    });
-    show(plus, env(t, TA[5], 140.0, 0.5, 0.5), 'none');
-    tshow(res, t, 133.4, 140.0, { st: 0.08, du: 0.9 });
-    tshow(rsrc, t, 134.2, 140.0, { st: 0.008 });
-  };
-}
-
-/* ================================================================== 2:20 Søknaden bygger på grunnlaget */
-function sceneSoknad() {
-  const sc = mkScene(139.6, 155.3, 0.5, 0.6);
-  const W = sc.world;
-  const L = { x: -700, y: 0 }, R = { x: 700, y: 0 };
-  const stack = (doc, ns, base, rot) => ns.forEach((n, k) => {
-    const nn = ns.length - 1 - k;
+/* ================================================================== 1:50 Grunnlaget */
+function sceneGrunnlag() {
+  const a = Q(7), b = Q(9);
+  const sc = mkScene(a - 0.2, b + 0.6, 1.0, 1.0);
+  camApply(sc, 0, [[0, ident]]);
+  const W = sc.world, ov = sc.ov;
+  const k = txt(ov, 'k', 'Sommeren 2026', 0, 110, { center: true });
+  const h1 = txt(ov, 'st', 'SHMIL bygget grunnlaget', 0, 150, { center: true, size: 72 });
+  const h2 = txt(ov, 'st', '31 sider – søknad og to vedlegg', 0, 150, { center: true, size: 68 });
+  const s2 = txt(ov, 'sub', 'Hvert tall med kilde og datastatus', 0, 246, { center: true, size: 40 });
+  const BL = [['Veide mengder', 'KOSTRA-rapporteringen 2025'], ['Faktiske driftsdata', 'Komtek og Retura'],
+    ['Uavhengig plukkanalyse', 'Iris Produksjon · Vedlegg 2'], ['Kostnadsmodell', 'Hver forutsetning kan etterprøves']];
+  const blocks = BL.map(([tt, ss], i) => place($('div', 'blk', ov, `<div class="t">${tt}</div><div class="s">${ss}</div>`), 170 + i * 400, 720));
+  const SC = 0.2, LIFT = 4;
+  const stacks = [['sok', [6, 5, 4, 3, 2, 1], -430], ['v1', [4, 3, 2, 1], 0], ['v2', Array.from({ length: 21 }, (_, i) => 21 - i), 430]];
+  const pagesBy = stacks.map(([doc, ns, x], si) => ns.map((n, k2) => {
     const p = new Page(W, doc, n, { lo: true });
-    p.set({ x: base.x + nn * 9, y: base.y + nn * 8, s: 1, r: rot - nn * 0.6, o: 1, shade: nn === 0 ? 0 : 0.1 });
+    const layer = ns.length - 1 - k2;            // 0 = top page
+    const top = 160 - 141.5 - (ns.length - 1) * LIFT - 8;   // all stacks rest on the foundation (screen y 700)
+    const rest = { x: x - layer * 1.5, y: top + layer * LIFT, s: SC, r: 0, o: 1, shade: layer === 0 ? 0 : 0.06 };
+    const tA = a + 15.0 + si * 0.9;
+    p.keys = [[tA, { ...rest, y: rest.y - 60, o: 0 }], [tA + 1.4, rest, E.o]];
     sc.pages.push(p);
+    return p;
+  }));
+  void pagesBy;
+  sc.upd = t => {
+    pagesApply(sc, t);
+    calm(k, t, a + 0.6, b);
+    calm(h1, t, a + 0.9, a + 14.6, { st: 0.04 });
+    blocks.forEach((e, i) => fade(e, t, a + 3.6 + i * 2.6, b, { dy: -26 }));
+    calm(h2, t, a + 15.4, b, { st: 0.04 });
+    calm(s2, t, a + 17.0, b);
+  };
+}
+
+/* ================================================================== 2:20 A – Forutsetningen */
+function sceneForutsetning() {
+  const a = Q(9), b = 148.4;
+  const sc = mkScene(a - 0.2, b + 0.5, 1.0, 0.9);
+  const ov = sc.ov;
+  const k = txt(ov, 'k b', 'Da kravet ble innført, regnet Miljødirektoratet med', 0, 300, { center: true });
+  const n = txt(ov, 'num', 'ca. 1 810 kr', 0, 352, { center: true, size: 180, color: BLUE });
+  const u = txt(ov, 'sub', 'per ekstra tonn utsortert', 0, 566, { center: true, size: 46 });
+  const s = txt(ov, 'src', 'Konsekvensutredningen for kapittel 10a (M-2021): ca. 1 475 kr i 2020-priser, omregnet til 2025-kroner', 0, 660, { center: true });
+  sc.upd = t => {
+    calm(k, t, a + 0.7, b);
+    calm(n, t, a + 1.2, b, { st: 0.04, du: 1.4 });
+    calm(u, t, a + 2.2, b);
+    calm(s, t, a + 3.2, b);
+  };
+}
+
+/* ================================================================== 2:28 B – SHMILs geografi */
+function sceneGeografi() {
+  const a = 148.4, b = 157.0;
+  const sc = mkScene(a - 0.2, b + 0.5, 0.9, 0.9);
+  const ov = sc.ov;
+  const k = txt(ov, 'k', 'SHMILs geografi', 150, 330);
+  const h = txt(ov, 'st', 'Tettbygd: ca. 20 km² av over 9 400 km²', 150, 372, { w: 860, size: 66 });
+  const s = txt(ov, 'sub', 'spredt på tre atskilte driftsregioner', 150, 560, { w: 860, size: 40 });
+  const SQ = 600, SX = 1170, SY = 220;
+  const sq = div(ov, `left:${SX}px;top:${SY}px;width:${SQ}px;height:${SQ}px;border-radius:8px;background:#E1E5DF;border:2px solid #C9CEC9;box-sizing:border-box`);
+  // total green area to scale: 20 / 9 400 of the square, split on three areas
+  const r = Math.sqrt((SQ * SQ * 20 / 9400) / 3 / Math.PI);
+  const dots = [[0.30, 0.28], [0.64, 0.46], [0.24, 0.76]].map(([u, v]) => {
+    const d = div(ov, `left:${SX + u * SQ - r}px;top:${SY + v * SQ - r}px;width:${2 * r}px;height:${2 * r}px;border-radius:50%;background:#007B61`);
+    const ring = div(ov, `left:${SX + u * SQ - r}px;top:${SY + v * SQ - r}px;width:${2 * r}px;height:${2 * r}px;border-radius:50%;border:2px solid #0E9C79;box-sizing:border-box`);
+    return { d, ring };
   });
-  stack('v1', [4, 3, 2, 1], L, -0.3);
-  stack('v2', [21, 17, 13, 5, 1], R, 0.8);
-  const sk = [];
-  for (let i = 6; i >= 1; i--) {
-    const p = new Page(W, 'sok', i, { lo: i > 1 });
-    const st = { x: i * 7, y: -40 + i * 6, s: 1, r: -0.4 + (i - 1) * 0.5, o: 1, shade: i === 1 ? 0 : 0.12 };
-    p.keys = [[139.9 + (6 - i) * 0.03, { ...st, y: st.y - 1700, r: st.r - 5 }], [141.5 + (6 - i) * 0.03, st, E.o5]];
-    p.rest = st; sk[i] = p; sc.pages.push(p);
-  }
-  const s1 = sk[1];
-  H(sc, s1, 'sok_grunnlaget', 'm-g', 143.7, 145.0);
-  const camK = [
-    [139.6, { cx: 0, cy: -100, z: 0.435, rx: 0 }],
-    [141.8, { cx: 0, cy: -100, z: 0.45, rx: 0 }, E.lin],
-    [143.5, look(s1, ['sok_grunnlaget'], 1.4, 960, 560), E.io],
-    [155.3, look(s1, ['sok_grunnlaget'], 1.46, 960, 560), E.lin],
-  ];
-  const ov = sc.ov;
-  const k0 = txt(ov, 'k', '31. august 2026', 0, 88, { center: true });
-  const h0 = txt(ov, 'st2', 'Søknaden legges på grunnlaget', 0, 128, { center: true, size: 58 });
-  const k = txt(ov, 'k', 'Søknaden, side 1', 200, 196);
-  const q = txt(ov, 'q', '«Denne søknaden gir det manglende grunnlaget:»', 200, 238, { w: 1520, size: 62 });
-  const ROWS = [['fysisk veide mengder', 'KOSTRA-rapporteringen 2025'], ['en uavhengig plukkanalyse', 'Iris Produksjon · Vedlegg 2'],
-    ['faktiske driftsdata', 'Komtek og Retura'], ['dokumenterte produksjons- og kostnadsforutsetninger', 'Beregningsmodellen · Vedlegg 1']];
-  const rows = ROWS.map(([a, b], i) => {
-    const e = $('div', 'ov', ov, `<div style="position:absolute;left:0;top:0;width:1520px;height:1px;background:rgba(27,35,38,.14)"></div>` +
-      `<div style="position:absolute;left:0;top:22px;width:900px;white-space:normal;font:600 42px/1.18 var(--display);color:var(--ink)">${a}</div>` +
-      `<div style="position:absolute;left:960px;top:26px;font:600 38px/1 var(--display);color:#0E9C79">→</div>` +
-      `<div style="position:absolute;left:1030px;top:30px;width:520px;white-space:normal;font:500 32px/1.25 var(--sans);color:var(--green)">${b}</div>`);
-    return place(e, 200, 354 + i * 118);
-  });
-  const tie = txt(ov, 'src', 'Svaret på direktoratets «ikke tilstrekkelig informasjon» fra mai 2026', 200, 900, { size: 27 });
+  const cap = txt(ov, 'src', 'Arealet vist i riktig målestokk – tettbygde områder i grønt', SX, SY + SQ + 22, { w: SQ });
   sc.upd = t => {
-    pagesApply(sc, t); hlsApply(sc, t); camApply(sc, t, camK);
-    veilSet(sc, pr(t, 145.3, 145.9), 8);
-    tshow(k0, t, 140.0, 143.3, { st: 0.02 });
-    tshow(h0, t, 140.1, 143.3, { st: 0.05 });
-    tshow(k, t, 145.7, 155.0, { st: 0.02 });
-    tshow(q, t, 145.8, 155.0, { st: 0.06 });
-    rows.forEach((e, i) => fshow(e, t, 147.0 + i * 0.95, 155.0, { dx: -30, dy: 0 }));
-    tshow(tie, t, 151.4, 155.0, { st: 0.02 });
-  };
-}
-
-/* ================================================================== 2:35 Nytte og belastning */
-function sceneNytte() {
-  const sc = mkScene(154.6, 162.8, 0.5, 0.5);
-  const ov = sc.ov;
-  const k = txt(ov, 'k', 'Nytte og belastning', 200, 222);
-  const h = txt(ov, 'st', 'Ni av ti kilo samles allerede inn i dag.', 200, 262, { w: 1560 });
-  const BX = 200, BY = 420, BW = 1520, BH = 92, f1 = 375.5 / 421.2;
-  const b1 = div(ov, `left:${BX}px;top:${BY}px;height:${BH}px;width:${BW * f1}px;background:#007B61;border-radius:10px 0 0 10px;transform-origin:0 50%`);
-  const b1t = div(ov, `left:${BX + 30}px;top:${BY + 27}px;font:600 36px/1 var(--display);color:#fff;white-space:nowrap`); b1t.textContent = '375,5 tonn samles inn i dag';
-  const b2 = div(ov, `left:${BX + BW * f1 + 6}px;top:${BY}px;height:${BH - 6}px;width:${BW * (1 - f1) - 12}px;border:3px dashed #2A7FA6;border-radius:0 10px 10px 0;background:repeating-linear-gradient(135deg,rgba(42,127,166,.16) 0 10px,rgba(42,127,166,.04) 10px 20px);transform-origin:0 50%`);
-  const b2t = div(ov, `left:${BX + BW - 420}px;top:${BY + BH + 18}px;width:420px;text-align:right;font:700 40px/1 var(--display);color:#2A7FA6;white-space:nowrap`); b2t.textContent = '+ 45,7 tonn modellert';
-  [b1, b1t, b2, b2t].forEach(e => (e.style.display = 'none'));
-  const h2 = txt(ov, 'st2', 'Den siste tidelen ville kreve ca. 56 000 tømmestopp i året – med ny tungtrafikk i boliggatene.', 200, 640, { w: 1520, size: 56 });
-  const src = txt(ov, 'src', 'Søknaden kap. 2 og 5.2 · Meruttaket er et modellscenario (50 % fangst), ikke en målt effekt.', 200, 830, { w: 1520 });
-  sc.upd = t => {
-    tshow(k, t, 155.0, 162.5, { st: 0.02 });
-    tshow(h, t, 155.1, 162.5, { st: 0.07 });
-    const ga = env(t, 155.8, 162.5, 0.3, 0.5);
-    show(b1, ga, `scaleX(${pr(t, 155.8, 156.9, E.io)})`);
-    show(b1t, ga * pr(t, 156.6, 157.1), 'none');
-    show(b2, ga * pr(t, 156.9, 157.2), `scaleX(${pr(t, 156.9, 157.5, E.o5)})`);
-    show(b2t, ga * pr(t, 157.3, 157.8), 'none');
-    tshow(h2, t, 157.9, 162.5, { st: 0.035 });
-    tshow(src, t, 159.0, 162.5, { st: 0.008 });
-  };
-}
-
-/* ================================================================== 2:42 Hovedfokus – boksen på side 1 */
-function sceneBoks() {
-  const sc = mkScene(162.1, 185.2, 0.5, 0.6);
-  const p1 = new Page(sc.world, 'sok', 1);
-  sc.pages.push(p1);
-  p1.rest = { x: 0, y: 0, s: 1, r: 0 };
-  p1.keys = [[162.1, { x: 0, y: 80, s: 0.98, r: 0, o: 0, shade: 0 }], [162.9, { x: 0, y: 0, s: 1, r: 0, o: 1, shade: 0 }, E.o5]];
-  H(sc, p1, 'sok_box', 'box-g', 163.9, 164.3);
-  const camK = [
-    [162.1, lookPage(p1, 0.58, 960, 540)],
-    [164.3, look(p1, ['sok_box'], 1.95, 960, 540), E.io],
-    [165.6, look(p1, ['sok_box'], 2.0, 960, 540), E.lin],
-  ];
-  const ov = sc.ov;
-  const k1 = txt(ov, 'k', 'Søknaden, side 1 – konklusjonen', 200, 150);
-  const st = txt(ov, 'st', 'Omlegging til henteordning koster *74 286 kroner* per ekstra tonn', 200, 190, { w: 1520, size: 74 });
-  const BX = 200, BW = 1520;
-  const l1 = txt(ov, 'pl', 'Miljødirektoratets eget anslag da kravet ble innført', BX, 424, { size: 32 });
-  const r1 = div(ov, `left:${BX}px;top:470px;height:52px;width:${BW / 41}px;background:#78848A;border-radius:6px;transform-origin:0 50%`);
-  const v1 = div(ov, `left:${BX + BW / 41 + 18}px;top:478px;font:600 36px/1 var(--display);color:var(--ink2);white-space:nowrap`); v1.textContent = 'ca. 1 810 kr';
-  const l2 = txt(ov, 'pl', 'SHMILs pliktområde', BX, 552, { size: 32 });
-  const r2 = div(ov, `left:${BX}px;top:598px;height:52px;width:${BW}px;background:#007B61;border-radius:6px;transform-origin:0 50%`);
-  const v2 = div(ov, `left:${BX + BW - 260}px;top:606px;width:236px;text-align:right;font:600 36px/1 var(--display);color:#fff;white-space:nowrap`); v2.textContent = '74 286 kr';
-  [r1, v1, r2, v2].forEach(e => (e.style.display = 'none'));
-  const x40 = txt(ov, 'dt', '*over* *40* *ganger*', BX, 694, { size: 124 });
-  const x40s = txt(ov, 'pl', 'det direktoratet selv la til grunn i sine beregninger', BX, 836, { size: 40 });
-  const foot = txt(ov, 'foot', 'Konsekvensutredningen (M-2021) la til grunn ca. 1 475 kr per ekstra tonn i 2020-priser, ca. 1 810 kr i 2025-priser. Tallene har ikke fullt ut samme systemgrense og sammenlignes som størrelsesorden (søknaden kap. 3.1).', BX, 960, { w: 1520 });
-  const k3 = txt(ov, 'k', 'Dette tilsvarer', 0, 330, { center: true });
-  const num = div(ov, 'left:0;top:376px;width:1920px;text-align:center', 'ov num'); num.style.display = 'none';
-  const pl3 = txt(ov, 'pl', 'i året – en økning i renovasjonsgebyret på 3–4 %', 0, 594, { center: true, size: 50 });
-  const src3 = txt(ov, 'src', 'Søknaden, side 1 · modellert merkostnad ved henteordning i tettbygd strøk', 0, 700, { center: true });
-  sc.upd = t => {
-    pagesApply(sc, t); hlsApply(sc, t); camApply(sc, t, camK);
-    p1.dim(['sok_box'], 0.85 * env(t, 163.6, 165.6, 0.5, 0.4), 40);
-    veilSet(sc, pr(t, 165.0, 165.6), 9);
-    tshow(k1, t, 165.2, 177.0, { st: 0.015 });
-    tshow(st, t, 165.3, 177.0, { st: 0.06 });
-    const ba = env(t, 166.4, 177.0, 0.4, 0.5);
-    tshow(l1, t, 166.4, 177.0, { st: 0.02 });
-    show(r1, ba, `scaleX(${pr(t, 166.6, 167.0, E.o5)})`);
-    show(v1, ba * pr(t, 166.9, 167.3), 'none');
-    tshow(l2, t, 167.0, 177.0, { st: 0.02 });
-    show(r2, ba * pr(t, 167.5, 167.7), `scaleX(${pr(t, 167.6, 169.6, E.io)})`);
-    show(v2, ba * pr(t, 169.3, 169.7), 'none');
-    tshow(x40, t, Q(11) + 0.05, 177.0, { st: 0.1, du: 0.9 });
-    tshow(x40s, t, 170.7, 177.0, { st: 0.03 });
-    tshow(foot, t, 171.4, 177.0, { st: 0.004 });
-    tshow(k3, t, 177.3, 184.9, { st: 0.02 });
-    const na = env(t, 177.4, 184.9, 0.5, 0.5);
-    if (show(num, na, `translateY(${(1 - pr(t, 177.4, 178.1, E.o5)) * 30}px)`)) {
-      num.innerHTML = nf(3.39 * pr(t, 177.5, 178.7, E.o5), 2) + '<span style="font-size:120px;letter-spacing:-.01em"> mill. kr</span>';
-    }
-    tshow(pl3, t, 178.4, 184.9, { st: 0.04 });
-    tshow(src3, t, 179.2, 184.9, { st: 0.01 });
-  };
-}
-
-/* ================================================================== 3:05 Oversendt */
-function scenePakke() {
-  const sc = mkScene(184.6, 191.7, 0.6, 0.6);
-  const W = sc.world;
-  const groups = [
-    { docs: [['sok', 4], ['sok', 3], ['sok', 2], ['sok', 1]], x: -1150 },
-    { docs: [['v1', 3], ['v1', 2], ['v1', 1]], x: 0 },
-    { docs: [['v2', 17], ['v2', 13], ['v2', 5], ['v2', 2], ['v2', 1]], x: 1150 },
-  ];
-  [2, 1, 0].forEach(gi => {
-    const g = groups[gi];
-    g.docs.forEach(([d, n], k) => {
-      const p = new Page(W, d, n, { lo: true });
-      const nn = g.docs.length - 1 - k;
-      const st = { x: g.x + nn * 8, y: nn * 7, s: 1, r: (nn - 1) * 0.6 - 0.4, o: 1, shade: nn === 0 ? 0 : 0.1 };
-      const merged = { ...st, x: (2 - gi) * 26 + nn * 6, y: (2 - gi) * 22 + nn * 5 - 40 };
-      const sent = { ...merged, x: merged.x + 2400, y: merged.y - 500, s: 0.6, r: merged.r + 6, o: 0 };
-      p.keys = [[184.7 + gi * 0.2, { ...st, y: st.y + 1500, r: st.r + 5 }], [186.0 + gi * 0.2, st, E.o5],
-        [186.4 + (2 - gi) * 0.12, st], [187.5 + (2 - gi) * 0.12, merged, E.io], [188.0, merged], [189.8, sent, E.i]];
-      sc.pages.push(p);
+    calm(k, t, a + 0.6, b);
+    calm(h, t, a + 0.9, b, { st: 0.03 });
+    calm(s, t, a + 2.2, b);
+    fade(sq, t, a + 0.8, b, { dy: 0, fi: 1.2 });
+    dots.forEach((o2, i) => {
+      const t0 = a + 2.6 + i * 0.7;
+      show(o2.d, env(t, t0, b, 0.6, 0.9), `scale(${E.oback(pr(t, t0, t0 + 0.6, E.lin))})`);
+      const p = pr(t, t0 + 0.2, t0 + 2.2, E.o);
+      show(o2.ring, (1 - p) * env(t, t0 + 0.2, b, 0.2, 0.5), `scale(${1 + p * 4})`);
     });
-  });
-  const camK = [[184.6, { cx: 0, cy: 60, z: 0.36, rx: 0 }], [187.5, { cx: 0, cy: 60, z: 0.38, rx: 0 }, E.lin], [191.7, { cx: 300, cy: 120, z: 0.4, rx: 0 }, E.io]];
-  const k = txt(sc.ov, 'k', '31. august 2026', 0, 812, { center: true });
-  const h = txt(sc.ov, 'st', 'Oversendt Miljødirektoratet', 0, 852, { center: true });
-  sc.upd = t => {
-    pagesApply(sc, t); camApply(sc, t, camK);
-    tshow(k, t, 186.6, 191.3, { st: 0.02 });
-    tshow(h, t, 186.7, 191.3, { st: 0.07 });
+    calm(cap, t, a + 4.4, b);
   };
 }
 
-/* ================================================================== 3:11 Avslutning */
+/* ================================================================== 2:37 C – Nytten */
+function sceneNytte() {
+  const a = 157.0, b = 165.4;
+  const sc = mkScene(a - 0.2, b + 0.5, 0.9, 0.9);
+  const ov = sc.ov;
+  const h = txt(ov, 'st', 'Ni av ti kilo samles allerede inn i dag.', 200, 300, { w: 1520, size: 72 });
+  const BX = 200, BY = 500, BW = 1520, BH = 110, f1 = 375.5 / 421.2;
+  const b1 = div(ov, `left:${BX}px;top:${BY}px;height:${BH}px;width:${BW * f1}px;background:#007B61;border-radius:12px 0 0 12px;transform-origin:0 50%`);
+  const b1t = div(ov, `left:${BX + 34}px;top:${BY + 34}px;font:600 40px/1 var(--display);color:#fff;white-space:nowrap`); b1t.textContent = 'samles inn i dag';
+  const b2 = div(ov, `left:${BX + BW * f1 + 6}px;top:${BY}px;height:${BH - 6}px;width:${BW * (1 - f1) - 12}px;border:3px dashed #2A7FA6;border-radius:0 12px 12px 0;background:repeating-linear-gradient(135deg,rgba(42,127,166,.16) 0 10px,rgba(42,127,166,.04) 10px 20px)`);
+  const b2t = div(ov, `left:${BX + BW - 420}px;top:${BY + BH + 22}px;width:420px;text-align:right;font:600 36px/1 var(--display);color:#2A7FA6;white-space:nowrap`); b2t.textContent = 'den siste tidelen';
+  [b1, b1t, b2, b2t].forEach(e => (e.style.display = 'none'));
+  const src = txt(ov, 'src', 'Søknaden kap. 2.1: 375,5 tonn i dag · modellert meruttak 45,7 tonn i året', 200, 760, { w: 1520 });
+  sc.upd = t => {
+    calm(h, t, a + 0.7, b, { st: 0.03 });
+    const ga = env(t, a + 1.8, b, 0.4, 0.9);
+    show(b1, ga, `scaleX(${pr(t, a + 1.8, a + 3.4, E.io)})`);
+    show(b1t, ga * pr(t, a + 3.0, a + 3.8), 'none');
+    show(b2, ga * pr(t, a + 3.8, a + 4.8), 'none');
+    show(b2t, ga * pr(t, a + 4.4, a + 5.2), 'none');
+    calm(src, t, a + 5.0, b);
+  };
+}
+
+/* ================================================================== 2:45 D – Belastningen */
+function sceneBelastning() {
+  const a = 165.4, b = 174.2;
+  const sc = mkScene(a - 0.2, b + 0.5, 0.9, 0.9);
+  const ov = sc.ov;
+  const h = txt(ov, 'st', 'Den siste tidelen ville kreve', 200, 250, { size: 68 });
+  const items = ['ca. 56 000 nye tømmestopp i året', 'ny tungtrafikk i boliggatene', 'utslipp, støy, veistøv og slitasje'].map((s, i) => {
+    const e = $('div', 'ov', ov, `<span style="display:inline-block;width:34px;height:6px;border-radius:3px;background:#0E9C79;vertical-align:middle;margin-right:26px;position:relative;top:-4px"></span>${s}`);
+    e.style.cssText += ';font:500 54px/1.2 var(--display);color:var(--ink)';
+    return place(e, 200, 410 + i * 110);
+  });
+  const src = txt(ov, 'src', 'Søknaden kap. 2.2 og 5.2', 200, 790);
+  sc.upd = t => {
+    calm(h, t, a + 0.7, b, { st: 0.03 });
+    items.forEach((e, i) => fade(e, t, a + 2.0 + i * 1.9, b, { dx: -24, dy: 0 }));
+    calm(src, t, a + 6.0, b);
+  };
+}
+
+/* ================================================================== 2:54 E – Konsekvensen (høydepunkt) */
+function sceneKonsekvens() {
+  const a = 174.2, b = Q(12);
+  const sc = mkScene(a - 0.2, b + 0.6, 0.9, 1.0);
+  const ov = sc.ov;
+  const BX = 200, BW = 1520;
+  const kk = txt(ov, 'k', 'Kostnad per ekstra tonn', BX, 196);
+  const l1 = txt(ov, 'pl', 'Miljødirektoratets anslag', BX, 250, { size: 34 });
+  const r1 = div(ov, `left:${BX}px;top:298px;height:58px;width:${BW / 41}px;background:${BLUE};border-radius:6px`);
+  const v1 = div(ov, `left:${BX + BW / 41 + 20}px;top:308px;font:600 40px/1 var(--display);color:${BLUE};white-space:nowrap`); v1.textContent = 'ca. 1 810 kr';
+  const l2 = txt(ov, 'pl', 'SHMILs pliktområde', BX, 392, { size: 34 });
+  const r2 = div(ov, `left:${BX}px;top:440px;height:58px;width:${BW}px;background:#007B61;border-radius:6px;transform-origin:0 50%`);
+  const v2 = div(ov, `left:${BX + BW - 300}px;top:450px;width:276px;text-align:right;font:600 40px/1 var(--display);color:#fff;white-space:nowrap`); v2.textContent = '74 286 kr';
+  [r1, v1, r2, v2].forEach(e => (e.style.display = 'none'));
+  const x40 = txt(ov, 'dt', '*Over* *40* *ganger* direktoratets anslag', BX, 586, { w: 1560, size: 96 });
+  const sub = txt(ov, 'sub', '3,39 mill. kr i året – 3–4 % høyere renovasjonsgebyr', BX, 804, { w: 1560, size: 38 });
+  const src = txt(ov, 'src', 'Søknaden side 1 og kap. 3.1. Tallene har ikke fullt ut samme systemgrense og sammenlignes som størrelsesorden.', BX, 880, { w: 1560, size: 23 });
+  sc.upd = t => {
+    const A = env(t, a + 0.6, b, 0.8, 0.9);
+    calm(kk, t, a + 0.4, b);
+    calm(l1, t, a + 0.6, b);
+    show(r1, A, 'none'); show(v1, A, 'none');
+    calm(l2, t, a + 1.4, b);
+    show(r2, A * pr(t, a + 1.6, a + 1.9), `scaleX(${pr(t, a + 1.8, a + 4.6, E.io)})`);
+    show(v2, A * pr(t, a + 4.2, a + 4.9), 'none');
+    calm(x40, t, a + 5.0, b, { st: 0.06, du: 1.4 });
+    calm(sub, t, a + 7.0, b);
+    calm(src, t, a + 7.8, b);
+  };
+}
+
+/* ================================================================== 3:05 Søknaden sendt */
+function sceneSendt() {
+  const a = Q(12), b = 194.6;
+  const sc = mkScene(a - 0.2, b + 0.6, 1.0, 1.0);
+  camApply(sc, 0, [[0, ident]]);
+  const W = sc.world, ov = sc.ov;
+  nameplate(ov, 'SHMIL', GREEN, 480, 170);
+  nameplate(ov, 'Miljødirektoratet', BLUE, 1440, 170);
+  const p = new Page(W, 'sok', 1, { lo: true });
+  p.keys = [[a + 0.9, { x: -480, y: -50, s: 0.27, r: -1, o: 0, shade: 0 }], [a + 2.1, { x: -480, y: -80, s: 0.27, r: -1, o: 1, shade: 0 }, E.o],
+    [a + 3.0, { x: -480, y: -80, s: 0.27, r: -1, o: 1, shade: 0 }], [a + 6.2, { x: 480, y: -80, s: 0.27, r: 1, o: 1, shade: 0 }, E.io]];
+  sc.pages.push(p);
+  const k = txt(ov, 'k', '31. august 2026', 0, 700, { center: true });
+  const h = txt(ov, 'st', 'Søknaden er sendt', 0, 742, { center: true, size: 66 });
+  const l1 = txt(ov, 'st2', 'Papp og papir: egen fiberdunk innføres', 0, 730, { center: true, size: 50 });
+  const l2 = txt(ov, 'st2', 'Glass og metall: søknad om tidsbegrenset unntak til 2030', 0, 808, { center: true, size: 50 });
+  sc.upd = t => {
+    pagesApply(sc, t);
+    calm(k, t, a + 1.0, a + 6.6);
+    calm(h, t, a + 1.3, a + 6.6, { st: 0.04 });
+    calm(l1, t, a + 7.0, b);
+    calm(l2, t, a + 8.4, b);
+  };
+}
+
+/* ================================================================== progress line (bottom) */
+const STEPS = [['Avviket', Q(1)], ['Spørsmål og svar', Q(2)], ['Grunnlaget', Q(7)], ['Konsekvensen', Q(9)], ['Søknaden', Q(12)]];
+function buildProgress() {
+  PROG = $('div', 'prog', OV);
+  PROG.items = STEPS.map(([lab], i) => {
+    if (i) $('span', 'sep', PROG);
+    return $('span', 'it', PROG, lab);
+  });
+}
+function progressUpdate(t) {
+  const A = env(t, Q(1) + 0.6, 194.4, 1.2, 1.0);
+  if (!show(PROG, A, 'none')) return;
+  let cur = 0;
+  STEPS.forEach(([, ts], i) => { if (t >= ts - 0.3) cur = i; });
+  PROG.items.forEach((e, i) => {
+    e.className = 'it' + (i === cur ? ' cur' : i < cur ? ' done' : '');
+  });
+}
+
+/* ================================================================== 3:15 Avslutning */
 const X0 = 200, DSTART = D(2025, 10, 25), PPD = 4.19;
 const XD = d => X0 + (d - DSTART) * PPD;
 const STN = [
@@ -803,39 +682,39 @@ const STN = [
   { d: D(2026, 8, 31), lab: 'Søknad', date: '31.08.2026' },
   { x: 1740, lab: 'Vedtak', date: 'venter på svar', open: true },
 ];
-function drawLine(t, A, Y) {
+function drawLine(t, A, Y, t0) {
   const g = TLG;
   if (A <= 0.002) return;
-  const cur = D(2026, 8, 31);
   g.save();
   g.globalAlpha = A;
-  const xEnd = XD(cur);
+  const xEnd = XD(D(2026, 8, 31));
   g.lineCap = 'round';
   g.strokeStyle = '#BFC5C1'; g.lineWidth = 3;
   g.beginPath(); g.moveTo(X0 - 40, Y); g.lineTo(xEnd, Y); g.stroke();
   g.setLineDash([10, 12]); g.beginPath(); g.moveTo(xEnd, Y); g.lineTo(1740, Y); g.stroke(); g.setLineDash([]);
-  g.font = '500 21px FM, "JetBrains Mono", monospace'; g.fillStyle = '#8A9599'; g.textAlign = 'center'; g.textBaseline = 'bottom';
-  for (const [d, lab] of [[D(2025, 11, 1), '2025'], [D(2026, 1, 1), '2026']]) { const x = XD(d); g.fillRect(x - 1, Y - 16, 2, 10); g.fillText(lab, x, Y - 22); }
   const band = STN[3];
   g.fillStyle = 'rgba(14,156,121,.22)';
   g.beginPath(); g.roundRect(XD(band.a), Y - 11, XD(band.b) - XD(band.a), 22, 11); g.fill();
+  // progress grows calmly from left to right
+  const reach = lerp(XD(STN[0].d), xEnd, pr(t, t0, t0 + 3.2, E.io));
   g.strokeStyle = '#0E9C79'; g.lineWidth = 6;
-  g.beginPath(); g.moveTo(XD(STN[0].d), Y); g.lineTo(xEnd, Y); g.stroke();
+  g.beginPath(); g.moveTo(XD(STN[0].d), Y); g.lineTo(reach, Y); g.stroke();
   STN.forEach(s => {
     const x = s.band ? (XD(s.a) + XD(s.b)) / 2 : s.open ? s.x : XD(s.d);
+    const lit = !s.open && x <= reach + 1;
     if (!s.band) {
       g.beginPath(); g.arc(x, Y, 12, 0, Math.PI * 2);
-      if (!s.open) { g.fillStyle = '#007B61'; g.fill(); }
-      else { g.fillStyle = '#ECEBE6'; g.fill(); g.strokeStyle = '#0E9C79'; g.lineWidth = 3; g.stroke(); }
+      if (lit) { g.fillStyle = '#007B61'; g.fill(); }
+      else { g.fillStyle = '#ECEBE6'; g.fill(); g.strokeStyle = s.open ? '#0E9C79' : '#AEB5B1'; g.lineWidth = 3; g.stroke(); }
     }
-    if (s.open && t > 192.6) {
-      const ph = ((t - 192.6) % 1.875) / 1.875;
+    if (s.open && t > t0 + 3.4) {
+      const ph = ((t - t0 - 3.4) % 1.875) / 1.875;
       g.strokeStyle = `rgba(14,156,121,${(1 - ph) * 0.75})`; g.lineWidth = 3;
       g.beginPath(); g.arc(x, Y, 12 + ph * 34, 0, Math.PI * 2); g.stroke();
     }
     const lx = x + (s.band ? -22 : s.lab === 'Søknad' ? 16 : 0);
     g.textAlign = 'center'; g.textBaseline = 'top';
-    g.font = '600 30px FS, Inter, system-ui, sans-serif'; g.fillStyle = s.open ? '#0B7A60' : '#1B2326';
+    g.font = '600 30px FS, Inter, system-ui, sans-serif'; g.fillStyle = s.open ? '#0B7A60' : lit ? '#1B2326' : '#8A9599';
     g.fillText(s.lab, lx, Y + 34);
     g.font = '500 22px FM, "JetBrains Mono", monospace'; g.fillStyle = '#78848A';
     g.fillText(s.date, lx, Y + 74);
@@ -843,21 +722,15 @@ function drawLine(t, A, Y) {
   g.restore();
 }
 let FIN;
-const FIN_A = 191.0;
+const FIN_A = 194.8;
 function buildFinal() {
-  const h = txt(OV, 'st', 'SHMIL søker om tidsbegrenset\nunntak etter § 19-4', 0, 112, { center: true, size: 80 });
-  const s = txt(OV, 'sub', 'Glass- og metallemballasje – frem til 31.12.2030', 0, 314, { center: true, size: 44 });
-  const f = txt(OV, 'src', 'Papp og papir: SHMIL innfører egen fiberdunk – uavhengig av søknaden.', 0, 384, { center: true, size: 27 });
-  const w = txt(OV, 'st', '*Vi* *venter* *fortsatt* *på* *svar.*', 0, 790, { center: true, size: 74 });
+  const w = txt(OV, 'st', '*Vi* *venter* *på* *svar.*', 0, 690, { center: true, size: 80 });
   const logo = $('img', 'ov', OV); logo.src = 'assets/shmil-logo-green.png'; logo.alt = 'SHMIL';
-  logo.style.cssText += ';left:893px;top:960px;height:50px;display:none';
+  logo.style.cssText += ';left:893px;top:930px;height:50px;display:none';
   IMGS.push(logo);
   FIN = t => {
-    tshow(h, t, FIN_A + 0.2, 205, { st: 0.08, du: 0.9 });
-    tshow(s, t, FIN_A + 1.1, 205, { st: 0.04 });
-    tshow(f, t, FIN_A + 2.0, 205, { st: 0.015 });
-    tshow(w, t, 195.0, 205, { st: 0.12, du: 0.9 });
-    fshow(logo, t, 197.4, null, { dy: 10, fi: 1.0 });
+    calm(w, t, FIN_A + 4.0, 205, { st: 0.1, du: 1.4 });
+    fade(logo, t, FIN_A + 5.4, null, { dy: 8, fi: 1.4 });
   };
 }
 
@@ -865,7 +738,7 @@ function buildFinal() {
 function renderAt(t) {
   t = clamp(t, 0, DUR);
   TLG.clearRect(0, 0, 1920, 1080);
-  drawLine(t, pr(t, FIN_A + 0.6, FIN_A + 1.6) * (1 - pr(t, 202.6, 204.4)), 610);
+  drawLine(t, pr(t, FIN_A, FIN_A + 1.2) * (1 - pr(t, 202.6, 204.4)), 470, FIN_A + 0.6);
   for (const sc of SCENES) {
     const on = t >= sc.a && t <= sc.b;
     if (!on) { if (sc.root.style.display !== 'none') sc.root.style.display = 'none'; continue; }
@@ -873,21 +746,22 @@ function renderAt(t) {
     sc.root.style.opacity = env(t, sc.a, sc.b, sc.fi, sc.fo, E.o, E.io).toFixed(3);
     sc.upd(t);
   }
+  progressUpdate(t);
   FIN(t);
-  S('black').style.opacity = Math.max(1 - pr(t, 0, 1.2, E.o), pr(t, 202.6, 204.6, E.io2)).toFixed(3);
+  S('black').style.opacity = Math.max(1 - pr(t, 0, 1.4, E.o), pr(t, 202.6, 204.6, E.io2)).toFixed(3);
 }
 
 async function ready() {
   await document.fonts.ready;
   await Promise.all(['400 20px FS', '500 20px FS', '600 20px FS', '700 20px FS', '500 20px FD', '600 20px FD', '700 20px FD', '500 20px FM']
-    .map(f => document.fonts.load(f, 'ÆØÅæøå§–«»→').catch(() => {})));
+    .map(f => document.fonts.load(f, 'ÆØÅæøå§–«»→²').catch(() => {})));
   await Promise.all(IMGS.map(i => (i.complete ? Promise.resolve() : new Promise(r => { i.onload = i.onerror = r; }))));
   await Promise.all(IMGS.map(i => (i.decode ? i.decode().catch(() => {}) : 0)));
   return true;
 }
 
 /* ------------------------------------------------------------------ preview UI */
-const POSTER = 4.0;
+const POSTER = 6.0;
 function fitStage() {
   const st = S('stage');
   if (document.body.classList.contains('render')) { st.style.transform = 'none'; return; }
@@ -900,11 +774,8 @@ function preview() {
   const fmt = x => `${Math.floor(x / 60)}:${(x % 60).toFixed(1).padStart(4, '0')}`;
   let scrubbing = false, started = false;
   btn.onclick = () => {
-    if (au.paused) {
-      started = true;
-      const p = au.play(); if (p && p.catch) p.catch(() => {});
-      btn.textContent = '❚❚ Pause';
-    } else { au.pause(); btn.textContent = '▶ Spill av'; }
+    if (au.paused) { started = true; const p = au.play(); if (p && p.catch) p.catch(() => {}); btn.textContent = '❚❚ Pause'; }
+    else { au.pause(); btn.textContent = '▶ Spill av'; }
   };
   sc.oninput = () => { scrubbing = true; started = true; au.currentTime = +sc.value; renderAt(+sc.value); };
   sc.onchange = () => { scrubbing = false; };
