@@ -406,21 +406,54 @@ function sceneBrev() {
   const sc = mkScene(a - 0.1, b + 0.5, 0.6, 0.9);
   camApply(sc, 0, [[0, ident]]);
   const W = sc.world, SC = 0.27;
-  const bp = new Page(W, 'brev', 1, { lo: true }), sp = new Page(W, 'svar', 1, { lo: true });
-  bp.keys = [[a + 1.0, { x: -480, y: -50, s: SC, r: -1, o: 0, shade: 0 }], [a + 2.2, { x: -480, y: -80, s: SC, r: -1, o: 1, shade: 0 }, E.o]];
-  sp.keys = [[a + 6.4, { x: 480, y: -50, s: SC, r: 1, o: 0, shade: 0 }], [a + 7.6, { x: 480, y: -80, s: SC, r: 1, o: 1, shade: 0 }, E.o]];
-  sc.pages.push(bp, sp);
-  const d1 = txt(sc.ov, 'k', '15. januar 2026', 180, 672, { w: 600, align: 'center' });
-  const d2 = txt(sc.ov, 'k b', '7. mai 2026', 1140, 672, { w: 600, align: 'center' });
-  const a1 = arrow(sc, 650, 1270, 400, GREEN_HI), a2 = arrow(sc, 1270, 650, 520, BLUE);
-  const h = txt(sc.ov, 'st', 'SHMIL ba om prinsipielle avklaringer', 0, 790, { center: true, size: 60 });
+  // the January letter as a stack of its 7 pages, the reply as its 3 pages
+  const stack = (doc, n, x, r0, tIn) => {
+    for (let k = n; k >= 1; k--) {
+      const p = new Page(W, doc, k, { lo: true }), d = k - 1;
+      const rest = { x: x + d * 5, y: -80 + d * 5, s: SC, r: r0 + (d % 3 - 1) * 0.8, o: 1, shade: k === 1 ? 0 : 0.08 };
+      p.keys = [[tIn + d * 0.05, { ...rest, y: rest.y + 30, o: 0 }], [tIn + 1.2 + d * 0.05, rest, E.o]];
+      sc.pages.push(p);
+    }
+  };
+  stack('brev', 7, -490, -1, a + 0.9);
+  stack('svar', 3, 470, 1, a + 7.4);
+  const d1 = txt(sc.ov, 'k', '15. januar 2026', 180, 680, { w: 600, align: 'center' });
+  const c1 = txt(sc.ov, 'st2', '7 sider · 6 spørsmål', 180, 718, { w: 600, align: 'center', size: 40 });
+  const d2 = txt(sc.ov, 'k b', '7. mai 2026', 1140, 680, { w: 600, align: 'center' });
+  const c2 = txt(sc.ov, 'st2', 'Svar punkt for punkt', 1140, 718, { w: 600, align: 'center', size: 40 });
+  const a1 = arrow(sc, 660, 1260, 372, GREEN_HI), a2 = arrow(sc, 1260, 660, 548, BLUE);
+  const h = txt(sc.ov, 'st', 'SHMIL ba om prinsipielle avklaringer', 0, 812, { center: true, size: 58 });
+  const h2 = txt(sc.ov, 'st', 'To av svarene var avgjørende', 0, 812, { center: true, size: 58 });
+  // six question markers travel with the letter; the answers come back; 1c and 3a stay lit
+  const LAB = ['1a', '1b', '1c', '2a', '2b', '3a'], FOCUS = [2, 5];
+  const qs = LAB.map((l, i) => {
+    const e = div(sc.ov, `left:${700 + i * 92}px;top:432px;width:64px;height:64px;border-radius:50%;box-sizing:border-box;border:3px solid ${GREEN_HI};background:#fff;
+      display:flex;align-items:center;justify-content:center;font:600 24px/1 var(--sans);color:${GREEN};opacity:0`, 'ov');
+    e.textContent = l;
+    return e;
+  });
   sc.upd = t => {
     pagesApply(sc, t);
-    calm(d1, t, a + 1.8, b);
-    a1(pr(t, a + 3.2, a + 5.2, E.io) * (1 - pr(t, b - 0.9, b)));
-    calm(d2, t, a + 7.2, b);
-    a2(pr(t, a + 8.4, a + 10.4, E.io) * (1 - pr(t, b - 0.9, b)));
-    calm(h, t, a + 3.6, b, { st: 0.03 });
+    calm(d1, t, a + 1.6, b);
+    calm(c1, t, a + 2.2, b, { st: 0.04 });
+    a1(pr(t, a + 3.0, a + 4.6, E.io) * (1 - pr(t, b - 0.9, b)));
+    calm(h, t, a + 3.2, a + 11.6, { st: 0.03 });
+    qs.forEach((e, i) => {
+      const ti = a + 4.0 + i * 0.32;
+      const p = pr(t, ti, ti + 0.6, E.o), ans = pr(t, a + 9.4 + i * 0.12, a + 9.9 + i * 0.12);
+      const foc = FOCUS.includes(i), f = pr(t, a + 11.4, a + 12.4);
+      const op = p * (1 - pr(t, b - 0.9, b)) * (foc ? 1 : 1 - 0.7 * f);
+      e.style.opacity = op.toFixed(3);
+      e.style.transform = `translateY(${((1 - p) * 18).toFixed(1)}px) scale(${(foc ? 1 + 0.18 * f : 1).toFixed(3)})`;
+      // answered: blue ring; the two decisive ones turn solid green
+      e.style.borderColor = foc && f > 0.5 ? GREEN : ans > 0.5 ? BLUE : GREEN_HI;
+      e.style.background = foc && f > 0.5 ? GREEN : '#fff';
+      e.style.color = foc && f > 0.5 ? '#fff' : ans > 0.5 ? BLUE : GREEN;
+    });
+    calm(d2, t, a + 8.0, b);
+    calm(c2, t, a + 8.5, b, { st: 0.04 });
+    a2(pr(t, a + 8.6, a + 10.2, E.io) * (1 - pr(t, b - 0.9, b)));
+    calm(h2, t, a + 11.8, b, { st: 0.04 });
   };
 }
 

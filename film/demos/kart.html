@@ -38,6 +38,10 @@ svg{position:absolute;left:0;top:0}
   <div class="t k" id="tk" style="left:150px;top:376px">SHMIL IKS · Søndre Helgeland Miljøverk</div>
   <div class="t h" id="th" style="left:150px;top:418px;font-size:112px">Grunnlaget for søknaden</div>
   <div class="t s" id="ts" style="left:150px;top:560px">Kravet om henteordning · november 2025 – august 2026</div>
+  <div class="t k" id="fk" style="left:150px;top:300px">Statsforvalteren i Nordland · saksnr. 2025/4779</div>
+  <div class="t h" id="fh" style="left:150px;top:342px;white-space:normal;width:900px;font-size:72px;line-height:1.08">Førte tilsyn med Brønnøy kommune</div>
+  <div class="t s" id="fs" style="left:150px;top:520px;white-space:normal;width:700px;font-size:34px;line-height:1.35">Avfallsforskriften kapittel 10a – utsortering og separat innsamling av husholdningsavfall</div>
+  <div class="t s" id="f2" style="left:150px;top:680px;white-space:normal;width:700px;font-size:40px;color:#007B61;font-weight:600;line-height:1.25">Samme ordning i alle SHMILs 11&nbsp;eierkommuner</div>
   <div class="t k" id="k1" style="left:150px;top:300px">SHMILs område</div>
   <div class="t h" id="h1" style="left:150px;top:342px">11 eierkommuner</div>
   <div class="t s" id="s1" style="left:150px;top:452px">over 9&#8239;400 km²</div>
@@ -77,7 +81,7 @@ const NB = bb(G.norway), RB = bb(G.own.flatMap(o => o.paths));
 const own = G.own.map(o => {
   const b = bb(o.paths);
   const p = mk('own', d(o.paths), '#CFE4D8', '#0E9C79', 1.4);
-  return { p, order: (b.cx - RB.x0) / RB.w };
+  return { p, order: (b.cx - RB.x0) / RB.w, nr: o.nr };
 });
 // three operating regions
 const towns = Object.entries(G.towns).map(([name, [x, y]]) => {
@@ -108,20 +112,29 @@ function text(id, t, a, b, dy = 30) {
 const FILM_MODE = /film=1/.test(location.search);
 function renderAt(T) {
   // film mode: a title over the national map first, then the demo timeline shifted by 6 s
-  const t = FILM_MODE ? T - 6.0 : T;
-  if (FILM_MODE) { text('tk', T, 0.9, 7.2); text('th', T, 1.2, 7.3); text('ts', T, 2.4, 7.3); }
+  const t = FILM_MODE ? T - 4.0 : T;
+  if (FILM_MODE) { text('tk', T, 0.7, 5.6); text('th', T, 0.9, 5.7); text('ts', T, 1.9, 5.7); }
   const c = cam(t);
   $('cam').setAttribute('transform', `translate(${c.sx},${c.sy}) scale(${c.s}) translate(${-c.cx},${-c.cy})`);
   $('norway').style.opacity = (FILM_MODE ? pr(T, 0.2, 1.6, o3) : pr(t, 0.2, 1.4, o3)).toFixed(3);
   $('ctx').style.opacity = pr(t, 3.0, 5.0).toFixed(3);
   // before the zoom, the region glows on the national map
   own.forEach(o => {
-    const t0 = 4.3 + o.order * 1.8;
-    const a = Math.max(0.6 * pr(t, 1.0, 1.9, o3), pr(t, t0, t0 + 1.1, o3));
+    let a;
+    if (FILM_MODE) {
+      // Brønnøy first (the inspected municipality), then the other ten
+      if (o.nr === '1813') a = Math.max(0.6 * pr(t, 1.0, 1.9, o3), pr(t, 4.4, 5.4, o3));
+      else { const t0 = 11.6 + o.order * 1.6; a = Math.max(0.35 * pr(t, 1.0, 1.9, o3) * (1 - pr(t, 3.6, 4.6)), pr(t, t0, t0 + 1.1, o3)); }
+      o.p.setAttribute('fill', o.nr === '1813' ? '#9FD0BA' : '#CFE4D8');
+      o.p.setAttribute('stroke-width', o.nr === '1813' ? 2.2 : 1.4);
+    } else {
+      const t0 = 4.3 + o.order * 1.8;
+      a = Math.max(0.6 * pr(t, 1.0, 1.9, o3), pr(t, t0, t0 + 1.1, o3));
+    }
     o.p.style.opacity = a.toFixed(3);
   });
   towns.forEach((w, i) => {
-    const t0 = 7.0 + i * 0.35;
+    const t0 = FILM_MODE ? (w.name === 'Brønnøysund' ? 5.0 : 1e9) : 7.0 + i * 0.35;
     const a = pr(t, t0, t0 + 0.6, o3);
     const k = 1 / c.s;
     w.dot.setAttribute('r', (7 * k * (0.6 + 0.4 * a)).toFixed(3));
@@ -135,10 +148,14 @@ function renderAt(T) {
     w.lab.style.left = (X + 16) + 'px'; w.lab.style.top = (Y - 34) + 'px';
     w.lab.style.opacity = pr(t, t0 + 0.3, t0 + 1.1, o3).toFixed(3);
   });
-  text('k1', t, 4.6, 99);
-  text('h1', t, 4.9, 99);
-  text('s1', t, 5.9, 99);
-  text('s2', t, 7.6, 99);
+  if (FILM_MODE) {
+    text('fk', t, 5.6, 99); text('fh', t, 5.8, 99); text('fs', t, 7.4, 99); text('f2', t, 11.8, 99);
+  } else {
+    text('k1', t, 4.6, 99);
+    text('h1', t, 4.9, 99);
+    text('s1', t, 5.9, 99);
+    text('s2', t, 7.6, 99);
+  }
   $('black').style.opacity = (FILM_MODE ? 1 - pr(T, 0, 1.2, o3) : Math.max(1 - pr(t, 0, 0.8, o3), pr(t, 9.3, 10))).toFixed(3);
 }
 async function ready() { await document.fonts.ready; return true; }
