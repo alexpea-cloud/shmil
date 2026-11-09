@@ -7,7 +7,7 @@
 'use strict';
 
 /* ------------------------------------------------------------------ timing (music: 128 bpm, 15 s phrases from 4.8 s) */
-const DUR = 204.7, FPS = 30;
+const DUR = 229.8, FPS = 30;   // v5: the opening map, the 3D foundation and sequence B are rendered from demos/ and cut in by tools/assemble.cjs
 const Q = k => 4.8 + 15 * k;   // 4.8, 19.8, 34.8, 49.8, 64.8, 79.8, 94.8, 109.8, 124.8, 139.8, 154.8, 169.8, 184.8, 199.8
 /* ------------------------------------------------------------------ math */
 const clamp = (x, a = 0, b = 1) => (x < a ? a : x > b ? b : x);
@@ -307,8 +307,7 @@ function build() {
   OV = S('ov');
   TLG = S('tl').getContext('2d');
   makeGrain();
-  sceneTitle();
-  sceneAvvik();
+  sceneAvvik();   // v5: the opening is demos/kart.html
   sceneStage();
   sceneBrev();
   sceneQA(Q(3), {
@@ -324,12 +323,8 @@ function build() {
     mean: 'Kravet gjelder – også uten avklart finansiering.',
   });
   sceneParagraf();
-  sceneGrunnlag();
   sceneForutsetning();
-  sceneGeografi();
-  sceneNytte();
-  sceneBelastning();
-  sceneKonsekvens();
+  sceneKonklusjon();
   sceneSendt();
   buildProgress();
   buildFinal();
@@ -478,45 +473,10 @@ function sceneParagraf() {
   };
 }
 
-/* ================================================================== 1:50 Grunnlaget */
-function sceneGrunnlag() {
-  const a = Q(7), b = Q(9);
-  const sc = mkScene(a - 0.2, b + 0.6, 1.0, 1.0);
-  camApply(sc, 0, [[0, ident]]);
-  const W = sc.world, ov = sc.ov;
-  const k = txt(ov, 'k', 'Sommeren 2026', 0, 110, { center: true });
-  const h1 = txt(ov, 'st', 'SHMIL bygget grunnlaget', 0, 150, { center: true, size: 72 });
-  const h2 = txt(ov, 'st', '31 sider – søknad og to vedlegg', 0, 150, { center: true, size: 68 });
-  const s2 = txt(ov, 'sub', 'Hvert tall med kilde og datastatus', 0, 246, { center: true, size: 40 });
-  const BL = [['Veide mengder', 'KOSTRA-rapporteringen 2025'], ['Faktiske driftsdata', 'Komtek og Retura'],
-    ['Uavhengig plukkanalyse', 'Iris Produksjon · Vedlegg 2'], ['Kostnadsmodell', 'Hver forutsetning kan etterprøves']];
-  const blocks = BL.map(([tt, ss], i) => place($('div', 'blk', ov, `<div class="t">${tt}</div><div class="s">${ss}</div>`), 170 + i * 400, 720));
-  const SC = 0.2, LIFT = 4;
-  const stacks = [['sok', [6, 5, 4, 3, 2, 1], -430], ['v1', [4, 3, 2, 1], 0], ['v2', Array.from({ length: 21 }, (_, i) => 21 - i), 430]];
-  const pagesBy = stacks.map(([doc, ns, x], si) => ns.map((n, k2) => {
-    const p = new Page(W, doc, n, { lo: true });
-    const layer = ns.length - 1 - k2;            // 0 = top page
-    const top = 160 - 141.5 - (ns.length - 1) * LIFT - 8;   // all stacks rest on the foundation (screen y 700)
-    const rest = { x: x - layer * 1.5, y: top + layer * LIFT, s: SC, r: 0, o: 1, shade: layer === 0 ? 0 : 0.06 };
-    const tA = a + 15.0 + si * 0.9;
-    p.keys = [[tA, { ...rest, y: rest.y - 60, o: 0 }], [tA + 1.4, rest, E.o]];
-    sc.pages.push(p);
-    return p;
-  }));
-  void pagesBy;
-  sc.upd = t => {
-    pagesApply(sc, t);
-    calm(k, t, a + 0.6, b);
-    calm(h1, t, a + 0.9, a + 14.6, { st: 0.04 });
-    blocks.forEach((e, i) => fade(e, t, a + 3.6 + i * 2.6, b, { dy: -26 }));
-    calm(h2, t, a + 15.4, b, { st: 0.04 });
-    calm(s2, t, a + 17.0, b);
-  };
-}
 
 /* ================================================================== 2:20 A – Forutsetningen */
 function sceneForutsetning() {
-  const a = Q(9), b = 148.4;
+  const a = 134.7, b = 145.2;
   const sc = mkScene(a - 0.2, b + 0.5, 1.0, 0.9);
   const ov = sc.ov;
   const k = txt(ov, 'k b', 'Da kravet ble innført, regnet Miljødirektoratet med', 0, 300, { center: true });
@@ -531,116 +491,53 @@ function sceneForutsetning() {
   };
 }
 
-/* ================================================================== 2:28 B – SHMILs geografi */
-function sceneGeografi() {
-  const a = 148.4, b = 157.0;
-  const sc = mkScene(a - 0.2, b + 0.5, 0.9, 0.9);
-  const ov = sc.ov;
-  const k = txt(ov, 'k', 'SHMILs geografi', 150, 330);
-  const h = txt(ov, 'st', 'Tettbygd: ca. 20 km² av over 9 400 km²', 150, 372, { w: 860, size: 66 });
-  const s = txt(ov, 'sub', 'spredt på tre atskilte driftsregioner', 150, 560, { w: 860, size: 40 });
-  const SQ = 600, SX = 1170, SY = 220;
-  const sq = div(ov, `left:${SX}px;top:${SY}px;width:${SQ}px;height:${SQ}px;border-radius:8px;background:#E1E5DF;border:2px solid #C9CEC9;box-sizing:border-box`);
-  // total green area to scale: 20 / 9 400 of the square, split on three areas
-  const r = Math.sqrt((SQ * SQ * 20 / 9400) / 3 / Math.PI);
-  const dots = [[0.30, 0.28], [0.64, 0.46], [0.24, 0.76]].map(([u, v]) => {
-    const d = div(ov, `left:${SX + u * SQ - r}px;top:${SY + v * SQ - r}px;width:${2 * r}px;height:${2 * r}px;border-radius:50%;background:#007B61`);
-    const ring = div(ov, `left:${SX + u * SQ - r}px;top:${SY + v * SQ - r}px;width:${2 * r}px;height:${2 * r}px;border-radius:50%;border:2px solid #0E9C79;box-sizing:border-box`);
-    return { d, ring };
-  });
-  const cap = txt(ov, 'src', 'Arealet vist i riktig målestokk – tettbygde områder i grønt', SX, SY + SQ + 22, { w: SQ });
-  sc.upd = t => {
-    calm(k, t, a + 0.6, b);
-    calm(h, t, a + 0.9, b, { st: 0.03 });
-    calm(s, t, a + 2.2, b);
-    fade(sq, t, a + 0.8, b, { dy: 0, fi: 1.2 });
-    dots.forEach((o2, i) => {
-      const t0 = a + 2.6 + i * 0.7;
-      show(o2.d, env(t, t0, b, 0.6, 0.9), `scale(${E.oback(pr(t, t0, t0 + 0.6, E.lin))})`);
-      const p = pr(t, t0 + 0.2, t0 + 2.2, E.o);
-      show(o2.ring, (1 - p) * env(t, t0 + 0.2, b, 0.2, 0.5), `scale(${1 + p * 4})`);
-    });
-    calm(cap, t, a + 4.4, b);
-  };
-}
 
-/* ================================================================== 2:37 C – Nytten */
-function sceneNytte() {
-  const a = 157.0, b = 165.4;
-  const sc = mkScene(a - 0.2, b + 0.5, 0.9, 0.9);
-  const ov = sc.ov;
-  const h = txt(ov, 'st', 'Ni av ti kilo samles allerede inn i dag.', 200, 300, { w: 1520, size: 72 });
-  const BX = 200, BY = 500, BW = 1520, BH = 110, f1 = 375.5 / 421.2;
-  const b1 = div(ov, `left:${BX}px;top:${BY}px;height:${BH}px;width:${BW * f1}px;background:#007B61;border-radius:12px 0 0 12px;transform-origin:0 50%`);
-  const b1t = div(ov, `left:${BX + 34}px;top:${BY + 34}px;font:600 40px/1 var(--display);color:#fff;white-space:nowrap`); b1t.textContent = 'samles inn i dag';
-  const b2 = div(ov, `left:${BX + BW * f1 + 6}px;top:${BY}px;height:${BH - 6}px;width:${BW * (1 - f1) - 12}px;border:3px dashed #2A7FA6;border-radius:0 12px 12px 0;background:repeating-linear-gradient(135deg,rgba(42,127,166,.16) 0 10px,rgba(42,127,166,.04) 10px 20px)`);
-  const b2t = div(ov, `left:${BX + BW - 420}px;top:${BY + BH + 22}px;width:420px;text-align:right;font:600 36px/1 var(--display);color:#2A7FA6;white-space:nowrap`); b2t.textContent = 'den siste tidelen';
-  [b1, b1t, b2, b2t].forEach(e => (e.style.display = 'none'));
-  const src = txt(ov, 'src', 'Søknaden kap. 2.1: 375,5 tonn i dag · modellert meruttak 45,7 tonn i året', 200, 760, { w: 1520 });
-  sc.upd = t => {
-    calm(h, t, a + 0.7, b, { st: 0.03 });
-    const ga = env(t, a + 1.8, b, 0.4, 0.9);
-    show(b1, ga, `scaleX(${pr(t, a + 1.8, a + 3.4, E.io)})`);
-    show(b1t, ga * pr(t, a + 3.0, a + 3.8), 'none');
-    show(b2, ga * pr(t, a + 3.8, a + 4.8), 'none');
-    show(b2t, ga * pr(t, a + 4.4, a + 5.2), 'none');
-    calm(src, t, a + 5.0, b);
-  };
-}
 
-/* ================================================================== 2:45 D – Belastningen */
-function sceneBelastning() {
-  const a = 165.4, b = 174.2;
-  const sc = mkScene(a - 0.2, b + 0.5, 0.9, 0.9);
-  const ov = sc.ov;
-  const h = txt(ov, 'st', 'Den siste tidelen ville kreve', 200, 250, { size: 68 });
-  const items = ['ca. 56 000 nye tømmestopp i året', 'ny tungtrafikk i boliggatene', 'utslipp, støy, veistøv og slitasje'].map((s, i) => {
-    const e = $('div', 'ov', ov, `<span style="display:inline-block;width:34px;height:6px;border-radius:3px;background:#0E9C79;vertical-align:middle;margin-right:26px;position:relative;top:-4px"></span>${s}`);
-    e.style.cssText += ';font:500 54px/1.2 var(--display);color:var(--ink)';
-    return place(e, 200, 410 + i * 110);
-  });
-  const src = txt(ov, 'src', 'Søknaden kap. 2.2 og 5.2', 200, 790);
-  sc.upd = t => {
-    calm(h, t, a + 0.7, b, { st: 0.03 });
-    items.forEach((e, i) => fade(e, t, a + 2.0 + i * 1.9, b, { dx: -24, dy: 0 }));
-    calm(src, t, a + 6.0, b);
-  };
-}
 
-/* ================================================================== 2:54 E – Konsekvensen (høydepunkt) */
-function sceneKonsekvens() {
-  const a = 174.2, b = Q(12);
-  const sc = mkScene(a - 0.2, b + 0.6, 0.9, 1.0);
-  const ov = sc.ov;
-  const BX = 200, BW = 1520;
-  const kk = txt(ov, 'k', 'Kostnad per ekstra tonn', BX, 196);
-  const l1 = txt(ov, 'pl', 'Miljødirektoratets anslag', BX, 250, { size: 34 });
-  const r1 = div(ov, `left:${BX}px;top:298px;height:58px;width:${BW / 41}px;background:${BLUE};border-radius:6px`);
-  const v1 = div(ov, `left:${BX + BW / 41 + 20}px;top:308px;font:600 40px/1 var(--display);color:${BLUE};white-space:nowrap`); v1.textContent = 'ca. 1 810 kr';
-  const l2 = txt(ov, 'pl', 'SHMILs pliktområde', BX, 392, { size: 34 });
-  const r2 = div(ov, `left:${BX}px;top:440px;height:58px;width:${BW}px;background:#007B61;border-radius:6px;transform-origin:0 50%`);
-  const v2 = div(ov, `left:${BX + BW - 300}px;top:450px;width:276px;text-align:right;font:600 40px/1 var(--display);color:#fff;white-space:nowrap`); v2.textContent = '74 286 kr';
+
+/* ================================================================== 3:15 Søknadens konklusjon – boksen på side 1 */
+function sceneKonklusjon() {
+  const a = 194.7, b = 208.9;
+  const sc = mkScene(a - 0.3, b + 0.5, 0.9, 0.9);
+  const p1 = new Page(sc.world, 'sok', 1);
+  sc.pages.push(p1);
+  p1.rest = { x: 0, y: 0, s: 1, r: 0 };
+  p1.keys = [[a, { x: 0, y: 60, s: 0.98, r: 0, o: 0, shade: 0 }], [a + 1.0, { x: 0, y: 0, s: 1, r: 0, o: 1, shade: 0 }, E.o5]];
+  H(sc, p1, 'sok_box', 'box-g', a + 2.4, a + 2.9);
+  const camK = [[a, lookPage(p1, 0.56, 960, 540)], [a + 1.0, lookPage(p1, 0.58, 960, 540), E.lin],
+    [a + 3.2, look(p1, ['sok_box'], 1.9, 960, 540), E.io], [a + 4.6, look(p1, ['sok_box'], 1.96, 960, 540), E.lin]];
+  const ov = sc.ov, BX = 200, BW = 1520;
+  const k1 = txt(ov, 'k', 'Søknaden, side 1 – konklusjonen', BX, 176);
+  const st = txt(ov, 'st', 'Omlegging til henteordning koster *74\u00A0286\u00A0kroner* per ekstra tonn', BX, 216, { w: 1560, size: 70 });
+  const l1 = txt(ov, 'pl', 'Miljødirektoratets eget anslag da kravet ble innført', BX, 404, { size: 32 });
+  const r1 = div(ov, `left:${BX}px;top:450px;height:56px;width:${BW / 41}px;background:${BLUE};border-radius:6px`);
+  const v1 = div(ov, `left:${BX + BW / 41 + 20}px;top:461px;font:600 38px/1 var(--display);color:${BLUE};white-space:nowrap`); v1.textContent = 'ca. 1\u00A0810 kr';
+  const l2 = txt(ov, 'pl', 'SHMILs pliktområde', BX, 540, { size: 32 });
+  const r2 = div(ov, `left:${BX}px;top:586px;height:56px;width:${BW}px;background:#007B61;border-radius:6px;transform-origin:0 50%`);
+  const v2 = div(ov, `left:${BX + BW - 300}px;top:597px;width:276px;text-align:right;font:600 38px/1 var(--display);color:#fff;white-space:nowrap`); v2.textContent = '74\u00A0286 kr';
   [r1, v1, r2, v2].forEach(e => (e.style.display = 'none'));
-  const x40 = txt(ov, 'dt', '*Over* *40* *ganger* direktoratets anslag', BX, 586, { w: 1560, size: 96 });
-  const sub = txt(ov, 'sub', '3,39 mill. kr i året – 3–4 % høyere renovasjonsgebyr', BX, 804, { w: 1560, size: 38 });
-  const src = txt(ov, 'src', 'Søknaden side 1 og kap. 3.1. Tallene har ikke fullt ut samme systemgrense og sammenlignes som størrelsesorden.', BX, 880, { w: 1560, size: 23 });
+  const x40 = txt(ov, 'dt', '*Over* *40* *ganger* direktoratets eget anslag', BX, 700, { w: 1600, size: 92 });
+  const src = txt(ov, 'src', 'Konsekvensutredningen (M-2021): ca. 1 475 kr per ekstra tonn i 2020-priser, ca. 1 810 kr i 2025-priser. Tallene har ikke fullt ut samme systemgrense og sammenlignes som størrelsesorden (søknaden kap. 3.1).', BX, 912, { w: 1560, size: 22 });
   sc.upd = t => {
-    const A = env(t, a + 0.6, b, 0.8, 0.9);
-    calm(kk, t, a + 0.4, b);
-    calm(l1, t, a + 0.6, b);
-    show(r1, A, 'none'); show(v1, A, 'none');
-    calm(l2, t, a + 1.4, b);
-    show(r2, A * pr(t, a + 1.6, a + 1.9), `scaleX(${pr(t, a + 1.8, a + 4.6, E.io)})`);
-    show(v2, A * pr(t, a + 4.2, a + 4.9), 'none');
-    calm(x40, t, a + 5.0, b, { st: 0.06, du: 1.4 });
-    calm(sub, t, a + 7.0, b);
-    calm(src, t, a + 7.8, b);
+    pagesApply(sc, t); hlsApply(sc, t); camApply(sc, t, camK);
+    p1.dim(['sok_box'], 0.85 * env(t, a + 1.6, a + 4.8, 0.6, 0.4), 40);
+    veilSet(sc, pr(t, a + 4.2, a + 4.9), 9);
+    calm(k1, t, a + 4.5, b);
+    calm(st, t, a + 4.7, b, { st: 0.04 });
+    const A = env(t, a + 6.0, b, 0.8, 0.9);
+    calm(l1, t, a + 6.0, b);
+    show(r1, A, 'none'); show(v1, A * pr(t, a + 6.4, a + 7.0), 'none');
+    calm(l2, t, a + 6.6, b);
+    show(r2, A * pr(t, a + 6.8, a + 7.1), `scaleX(${pr(t, a + 7.0, a + 9.4, E.io)})`);
+    show(v2, A * pr(t, a + 9.0, a + 9.6), 'none');
+    calm(x40, t, a + 9.6, b, { st: 0.06, du: 1.4 });
+    calm(src, t, a + 10.6, b);
   };
 }
 
 /* ================================================================== 3:05 Søknaden sendt */
 function sceneSendt() {
-  const a = Q(12), b = 194.6;
+  const a = 208.7, b = 219.9;
   const sc = mkScene(a - 0.2, b + 0.6, 1.0, 1.0);
   camApply(sc, 0, [[0, ident]]);
   const W = sc.world, ov = sc.ov;
@@ -664,7 +561,7 @@ function sceneSendt() {
 }
 
 /* ================================================================== progress line (bottom) */
-const STEPS = [['Avviket', Q(1)], ['Spørsmål og svar', Q(2)], ['Grunnlaget', Q(7)], ['Konsekvensen', Q(9)], ['Søknaden', Q(12)]];
+const STEPS = [['Avviket', Q(1)], ['Spørsmål og svar', Q(2)], ['Grunnlaget', 109.8], ['Konsekvensen', 134.7], ['Søknaden', 208.7]];
 function buildProgress() {
   PROG = $('div', 'prog', OV);
   PROG.items = STEPS.map(([lab], i) => {
@@ -673,7 +570,7 @@ function buildProgress() {
   });
 }
 function progressUpdate(t) {
-  const A = env(t, Q(1) + 0.6, 194.4, 1.2, 1.0);
+  const A = env(t, Q(1) + 0.6, 219.6, 1.2, 1.0) * (1 - env(t, 195.4, 199.6, 0.6, 0.6));
   if (!show(PROG, A, 'none')) return;
   let cur = 0;
   STEPS.forEach(([, ts], i) => { if (t >= ts - 0.3) cur = i; });
@@ -733,14 +630,14 @@ function drawLine(t, A, Y, t0) {
   g.restore();
 }
 let FIN;
-const FIN_A = 194.8;
+const FIN_A = 219.8;
 function buildFinal() {
   const w = txt(OV, 'st', '*Vi* *venter* *på* *svar.*', 0, 690, { center: true, size: 80 });
   const logo = $('img', 'ov', OV); logo.src = 'assets/shmil-logo-green.png'; logo.alt = 'SHMIL';
   logo.style.cssText += ';left:893px;top:930px;height:50px;display:none';
   IMGS.push(logo);
   FIN = t => {
-    calm(w, t, FIN_A + 4.0, 205, { st: 0.1, du: 1.4 });
+    calm(w, t, FIN_A + 4.0, DUR + 1, { st: 0.1, du: 1.4 });
     fade(logo, t, FIN_A + 5.4, null, { dy: 8, fi: 1.4 });
   };
 }
@@ -749,7 +646,7 @@ function buildFinal() {
 function renderAt(t) {
   t = clamp(t, 0, DUR);
   TLG.clearRect(0, 0, 1920, 1080);
-  drawLine(t, pr(t, FIN_A, FIN_A + 1.2) * (1 - pr(t, 202.6, 204.4)), 470, FIN_A + 0.6);
+  drawLine(t, pr(t, FIN_A, FIN_A + 1.2) * (1 - pr(t, DUR - 2.1, DUR - 0.3)), 470, FIN_A + 0.6);
   for (const sc of SCENES) {
     const on = t >= sc.a && t <= sc.b;
     if (!on) { if (sc.root.style.display !== 'none') sc.root.style.display = 'none'; continue; }
@@ -759,7 +656,7 @@ function renderAt(t) {
   }
   progressUpdate(t);
   FIN(t);
-  S('black').style.opacity = Math.max(1 - pr(t, 0, 1.4, E.o), pr(t, 202.6, 204.6, E.io2)).toFixed(3);
+  S('black').style.opacity = Math.max(1 - pr(t, 0, 1.4, E.o), pr(t, DUR - 2.1, DUR - 0.1, E.io2)).toFixed(3);
 }
 
 async function ready() {

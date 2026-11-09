@@ -6,6 +6,7 @@
  *   node render.cjs --stills 12.5,40,81   -> PNG stills in output/stills/
  *   options: --workers 3 --fps 30 --crf 22 --out <file.mp4> --from <s> --to <s> --keep
  *            --page demos/kart.html --audio-start <s> --fadein <s> --webgl   (short demo clips)
+ *            --query film=1 --frames-only   (render a segment's JPEG frames for tools/assemble.cjs)
  */
 const { chromium } = require('playwright');
 const { spawnSync } = require('child_process');
@@ -18,7 +19,7 @@ const has = name => args.includes('--' + name);
 
 const ROOT = __dirname;
 const PAGE = opt('page', 'index.html');
-const URL = 'file://' + path.join(ROOT, PAGE) + '?render=1';
+const URL = 'file://' + path.join(ROOT, PAGE) + '?render=1' + (opt('query') ? '&' + opt('query') : '');
 const OUTDIR = path.join(ROOT, '..', 'output');
 const FPS = +opt('fps', 30);
 const WORKERS = +opt('workers', 3);
@@ -80,6 +81,7 @@ async function full() {
     await page.close();
   }));
   await browser.close();
+  if (has('frames-only')) { console.log('\nframes in', frames); return; }
   console.log('\nencoding…');
   // soundtrack: whatever index.html plays
   const audioSrc = fs.readFileSync(path.join(ROOT, 'index.html'), 'utf8').match(/<audio[^>]*src="([^"]+)"/)[1];

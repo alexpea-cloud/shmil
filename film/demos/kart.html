@@ -35,6 +35,9 @@ svg{position:absolute;left:0;top:0}
       <g id="towns"></g>
     </g>
   </svg>
+  <div class="t k" id="tk" style="left:150px;top:376px">SHMIL IKS · Søndre Helgeland Miljøverk</div>
+  <div class="t h" id="th" style="left:150px;top:418px;font-size:112px">Grunnlaget for søknaden</div>
+  <div class="t s" id="ts" style="left:150px;top:560px">Kravet om henteordning · november 2025 – august 2026</div>
   <div class="t k" id="k1" style="left:150px;top:300px">SHMILs område</div>
   <div class="t h" id="h1" style="left:150px;top:342px">11 eierkommuner</div>
   <div class="t s" id="s1" style="left:150px;top:452px">over 9&#8239;400 km²</div>
@@ -102,10 +105,14 @@ function text(id, t, a, b, dy = 30) {
   e.style.opacity = A.toFixed(3);
   e.style.transform = `translateY(${(1 - pr(t, a, a + 1.0, o3)) * dy}px)`;
 }
-function renderAt(t) {
+const FILM_MODE = /film=1/.test(location.search);
+function renderAt(T) {
+  // film mode: a title over the national map first, then the demo timeline shifted by 6 s
+  const t = FILM_MODE ? T - 6.0 : T;
+  if (FILM_MODE) { text('tk', T, 0.9, 7.2); text('th', T, 1.2, 7.3); text('ts', T, 2.4, 7.3); }
   const c = cam(t);
   $('cam').setAttribute('transform', `translate(${c.sx},${c.sy}) scale(${c.s}) translate(${-c.cx},${-c.cy})`);
-  $('norway').style.opacity = pr(t, 0.2, 1.4, o3).toFixed(3);
+  $('norway').style.opacity = (FILM_MODE ? pr(T, 0.2, 1.6, o3) : pr(t, 0.2, 1.4, o3)).toFixed(3);
   $('ctx').style.opacity = pr(t, 3.0, 5.0).toFixed(3);
   // before the zoom, the region glows on the national map
   own.forEach(o => {
@@ -128,11 +135,11 @@ function renderAt(t) {
     w.lab.style.left = (X + 16) + 'px'; w.lab.style.top = (Y - 34) + 'px';
     w.lab.style.opacity = pr(t, t0 + 0.3, t0 + 1.1, o3).toFixed(3);
   });
-  text('k1', t, 4.6, 11);
-  text('h1', t, 4.9, 11);
-  text('s1', t, 5.9, 11);
-  text('s2', t, 7.6, 11);
-  $('black').style.opacity = Math.max(1 - pr(t, 0, 0.8, o3), pr(t, 9.3, 10)).toFixed(3);
+  text('k1', t, 4.6, 99);
+  text('h1', t, 4.9, 99);
+  text('s1', t, 5.9, 99);
+  text('s2', t, 7.6, 99);
+  $('black').style.opacity = (FILM_MODE ? 1 - pr(T, 0, 1.2, o3) : Math.max(1 - pr(t, 0, 0.8, o3), pr(t, 9.3, 10))).toFixed(3);
 }
 async function ready() { await document.fonts.ready; return true; }
 window.FILM = { renderAt, ready, DUR, FPS };
