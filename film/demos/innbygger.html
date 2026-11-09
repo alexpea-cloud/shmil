@@ -26,6 +26,7 @@ svg,canvas{position:absolute;left:0;top:0;overflow:visible}
 .ic svg{position:absolute;left:0;top:0}
 .rv{font:700 44px/1 FD;color:var(--ink)}
 .rl{font:400 24px/1.25 FS;color:var(--ink2);margin-top:8px}
+.town.isl{font:500 21px/1 FS;color:#465257}
 .town{position:absolute;font:600 24px/1 FS;color:var(--ink);white-space:nowrap;opacity:0;text-shadow:0 0 6px #EEEDE8,0 0 12px #EEEDE8}
 #banner{position:absolute;left:150px;top:868px;width:1620px;height:150px;box-sizing:border-box;padding:0 44px;border-radius:16px;background:#fff;
   box-shadow:0 24px 50px rgba(27,35,38,.12),0 3px 10px rgba(27,35,38,.06);display:flex;align-items:center;gap:56px;opacity:0}
@@ -68,6 +69,7 @@ svg,canvas{position:absolute;left:0;top:0;overflow:visible}
   <div class="ab k" id="kick2" style="left:150px;top:110px">For 22 gram i uka per innbygger</div>
   <div class="ab h" id="h3" style="left:150px;top:150px">Konsekvensen av henteordning</div>
   <div class="town" id="t0">Brønnøysund</div><div class="town" id="t1">Sandnessjøen</div><div class="town" id="t2">Mosjøen</div>
+  <div class="town isl" id="i0">Vega</div><div class="town isl" id="i1">Herøy</div><div class="town isl" id="i2">Dønna</div>
   <div class="ab row" id="r1" style="left:150px;top:330px">
     <div class="ic"><svg width="76" height="76" viewBox="0 0 78 78"><rect x="12" y="26" width="32" height="22" rx="3" fill="#2A7FA6"/><path d="M44 31 h10 l8 8 v9 h-18z" fill="#2A7FA6"/><path d="M47 34 h6 l5 5 h-11z" fill="#BFD9E6"/><circle cx="22" cy="51" r="6" fill="#1B2326"/><circle cx="52" cy="51" r="6" fill="#1B2326"/></svg></div>
     <div><div class="rv" id="n3">0 stopp</div><div class="rl">tømmestopp i året – 0,8 kg per stopp</div></div>
@@ -94,14 +96,15 @@ svg,canvas{position:absolute;left:0;top:0;overflow:visible}
   </div>
 
   <div class="ab foot" id="foot" style="left:150px;top:1036px">Beregnet fra søknaden og Vedlegg 1: 579,5 tonn i dag og modellert meruttak 45,7 tonn ÷ 40 827 innbyggere i de 11 eierkommunene. Ett glass i figuren = 0,5 kg.</div>
-  <div class="ab foot" id="foot2" style="left:150px;top:1036px">Illustrasjon av henteordning i tettbygd strøk i de tre driftsregionene. Tall fra søknaden kap. 2. Kart: Kartverket (CC BY 4.0).</div>
+  <div class="ab foot" id="foot2" style="left:150px;top:1036px">Illustrasjon: kjøreruter og ferjer er forenklet. Tall fra søknaden kap. 2. Kart: Kartverket (CC BY 4.0).</div>
   <div id="black"></div>
 </div>
 <script src="geo.js"></script>
+<script src="routes.js"></script>
 <script>
 (function () {
 'use strict';
-const DUR = 40, FPS = 30;
+const DUR = 50, FPS = 30;
 const NS = 'http://www.w3.org/2000/svg';
 const clamp = (x, a = 0, b = 1) => Math.min(b, Math.max(a, x));
 const lerp = (a, b, p) => a + (b - a) * p;
@@ -120,9 +123,9 @@ const T = {
   extraLab: 6.6, extra: [7.1, 7.9, 8.7], fillEnd: 9.8,
   head2: 10.1,                                              // music: climax starts here
   out1: 15.4,                                               // part 1 leaves
-  map: 15.4, h3: 16.2, towns: 17.4, trucks: 18.8,
-  items: [19.6, 22.6, 25.6, 28.6], count: [19.4, 30.6],
-  banner: 31.2, end: 40,
+  map: 15.4, h3: 16.2, towns: 17.4, trucks: 18.6,
+  items: [20.0, 24.0, 28.0, 32.0], count: [19.4, 35.0],
+  banner: 37.5, end: 50,
 };
 
 /* ================================================================ part 1: jars */
@@ -160,84 +163,109 @@ function mk(parent, d, fill, stroke, sw) {
 }
 G.ctx.forEach(c => mk('ctx', dpath(c.paths), '#F2F1EC', '#D6D9D4', 0.8));
 const ownP = G.own.map(o => mk('own', dpath(o.paths), '#D9EADF', '#7DBFA4', 1.1));
-const MC = { cx: -94.7, cy: -7286.3, s: 5.3, sx: 1330, sy: 630 };
+const MC = { cx: -94.7, cy: -7286.3, s: 5.8, sx: 1390, sy: 592 };
 const toS = (x, y, c = MC) => [c.sx + (x - c.cx) * c.s, c.sy + (y - c.cy) * c.s];
 const TOWNS = Object.entries(G.towns).map(([name, [x, y]], i) => ({ name, sp: toS(x, y), el: $('t' + i) }));
 
-/* trucks: each drives through a street grid in its town (illustration) and leaves a stop at each property */
+/* trucks: three illustrative tours across Helgeland (routes.js: road + ferry legs on the land mask) */
 const cv = $('trucks'), g2 = cv.getContext('2d');
-let rs = 11; const rnd = () => ((rs = (rs * 16807) % 2147483647) / 2147483647);
-const GRID = [{ cols: 6, rows: 4, cell: 19, off: [-30, -6] }, { cols: 5, rows: 4, cell: 19, off: [-38, 14] }, { cols: 6, rows: 3, cell: 19, off: [-6, 20] }];
-const TRUCKS = TOWNS.map((tw, i) => {
-  const gd = GRID[i];
-  // street nodes with a little irregularity, local coordinates
-  const N = [];
-  for (let r = 0; r <= gd.rows; r++) { N.push([]); for (let c = 0; c <= gd.cols; c++) N[r].push([c * gd.cell + (rnd() - 0.5) * 5, r * gd.cell + (rnd() - 0.5) * 5]); }
-  // route: serpentine along the horizontal streets, then back along the vertical ones
-  const pts = [];
-  for (let r = 0; r <= gd.rows; r++) { const row = N[r].slice(); if (r % 2) row.reverse(); pts.push(...row); }
-  const startCol = gd.rows % 2 ? 0 : gd.cols;
-  for (let k = 0; k <= gd.cols; k++) {
-    const c = startCol === 0 ? k : gd.cols - k;
-    const col = N.map(row => row[c]); if ((gd.rows + k) % 2 === 0) col.reverse(); pts.push(...col);
+const R = window.ROUTES;
+const HUBS = ['Brønnøysund', 'Sandnessjøen', 'Mosjøen'];
+const ISL = ['Vega', 'Herøy', 'Dønna'];
+const SPEED = [34, 30, 36], FERRY = 0.5;          // screen px/s on road at base zoom; ferries go at half speed
+const TOURS = R.tours.map((tr, k) => {
+  const P = tr.pts;
+  const segs = [];
+  let tcum = 0, dcum = 0;
+  for (let i = 0; i < P.length - 1; i++) {
+    const L = Math.hypot(P[i + 1][0] - P[i][0], P[i + 1][1] - P[i][1]) * MC.s;
+    const dt = L / (SPEED[k] * (P[i][2] ? FERRY : 1));
+    segs.push({ a: P[i], b: P[i + 1], sea: P[i][2], t0: tcum, t1: tcum + dt, d0: dcum, d1: dcum + L / MC.s });
+    tcum += dt; dcum += L / MC.s;
   }
-  const cum = [0];
-  for (let j = 1; j < pts.length; j++) cum.push(cum[j - 1] + Math.hypot(pts[j][0] - pts[j - 1][0], pts[j][1] - pts[j - 1][1]));
-  return { N, pts, cum, L: cum[cum.length - 1], off: gd.off, x0: 0, y0: 0, speed: [52, 48, 50][i], delay: [0, 0.5, 0.25][i] };
+  // stops: along roads, only inside the built-up pockets around each place (km)
+  const stops = [];
+  for (const sg of segs) {
+    if (sg.sea) continue;
+    const len = sg.d1 - sg.d0, n = Math.max(1, Math.round(len / 0.75));
+    for (let q = 0; q < n; q++) {
+      const f = (q + 0.5) / n, x = lerp(sg.a[0], sg.b[0], f), y = lerp(sg.a[1], sg.b[1], f);
+      let near = false;
+      for (const name of tr.stops) {
+        const [px, py] = R.places[name], rad = HUBS.includes(name) ? 5.5 : 3.2;
+        if ((x - px) ** 2 + (y - py) ** 2 < rad * rad) { near = true; break; }
+      }
+      if (!near) continue;
+      if (stops.some(s2 => (s2.x - x) ** 2 + (s2.y - y) ** 2 < 0.55 * 0.55)) continue;
+      stops.push({ x, y, t: sg.t0 + f * (sg.t1 - sg.t0) });
+    }
+  }
+  return { segs, T: tcum, stops, delay: [0, 0.4, 0.2][k] };
 });
-function along(tr, d) {
-  d = ((d % tr.L) + tr.L) % tr.L;
-  let j = 1; while (j < tr.cum.length - 1 && tr.cum[j] < d) j++;
-  const a = tr.pts[j - 1], b = tr.pts[j], f = (d - tr.cum[j - 1]) / Math.max(1e-6, tr.cum[j] - tr.cum[j - 1]);
-  return [tr.x0 + lerp(a[0], b[0], f), tr.y0 + lerp(a[1], b[1], f)];
+function posAt(tr, tt) {
+  tt = ((tt % tr.T) + tr.T) % tr.T;
+  let lo = 0, hi = tr.segs.length - 1;
+  while (lo < hi) { const m = (lo + hi) >> 1; if (tr.segs[m].t1 < tt) lo = m + 1; else hi = m; }
+  const sg = tr.segs[lo], f = (tt - sg.t0) / Math.max(1e-6, sg.t1 - sg.t0);
+  return { x: lerp(sg.a[0], sg.b[0], f), y: lerp(sg.a[1], sg.b[1], f), sea: sg.sea };
 }
-const STOP = 7.5;
-function drawTruckBadge(x, y, a) {
+function badge(x, y, a, sea) {
   g2.save(); g2.globalAlpha = a;
   g2.shadowColor = 'rgba(27,35,38,.25)'; g2.shadowBlur = 10; g2.shadowOffsetY = 3;
-  g2.fillStyle = '#fff'; g2.beginPath(); g2.arc(x, y, 19, 0, 6.283); g2.fill();
+  g2.fillStyle = sea ? '#EAF4F9' : '#fff'; g2.beginPath(); g2.arc(x, y, 20, 0, 6.283); g2.fill();
   g2.shadowColor = 'transparent';
-  g2.translate(x - 13, y - 12);
-  g2.fillStyle = '#2A7FA6'; g2.beginPath(); g2.roundRect(0, 4, 16, 12, 2); g2.fill();
-  g2.beginPath(); g2.moveTo(16, 7); g2.lineTo(22, 7); g2.lineTo(26, 11); g2.lineTo(26, 16); g2.lineTo(16, 16); g2.closePath(); g2.fill();
-  g2.fillStyle = '#1B2326'; g2.beginPath(); g2.arc(5, 18, 3.2, 0, 6.283); g2.arc(21, 18, 3.2, 0, 6.283); g2.fill();
+  if (!sea) {
+    g2.translate(x - 13, y - 12);
+    g2.fillStyle = '#2A7FA6'; g2.beginPath(); g2.roundRect(0, 4, 16, 12, 2); g2.fill();
+    g2.beginPath(); g2.moveTo(16, 7); g2.lineTo(22, 7); g2.lineTo(26, 11); g2.lineTo(26, 16); g2.lineTo(16, 16); g2.closePath(); g2.fill();
+    g2.fillStyle = '#1B2326'; g2.beginPath(); g2.arc(5, 18, 3.2, 0, 6.283); g2.arc(21, 18, 3.2, 0, 6.283); g2.fill();
+  } else {  // the truck on a ferry
+    g2.translate(x - 14, y - 12);
+    g2.fillStyle = '#2A7FA6'; g2.beginPath(); g2.roundRect(7, 2, 12, 8, 1.5); g2.fill();
+    g2.fillStyle = '#1F5C73'; g2.beginPath(); g2.moveTo(0, 12); g2.lineTo(28, 12); g2.lineTo(24, 20); g2.lineTo(4, 20); g2.closePath(); g2.fill();
+    g2.strokeStyle = '#2A7FA6'; g2.lineWidth = 1.6; g2.beginPath(); g2.moveTo(-1, 24); g2.quadraticCurveTo(4, 21, 9, 24); g2.quadraticCurveTo(14, 27, 19, 24); g2.quadraticCurveTo(24, 21, 29, 24); g2.stroke();
+  }
   g2.restore();
 }
-function drawTrucks(t, A, streetsA) {
+function drawTrucks(t, A, netA, mc) {
   g2.clearRect(0, 0, 1920, 1080);
-  if (A <= 0.002 && streetsA <= 0.002) return;
-  for (const tr of TRUCKS) {
-    // streets
-    g2.globalAlpha = streetsA; g2.strokeStyle = '#B9BEB8'; g2.lineWidth = 3; g2.lineCap = 'round';
-    g2.beginPath();
-    tr.N.forEach(row => { g2.moveTo(tr.x0 + row[0][0], tr.y0 + row[0][1]); row.forEach(p => g2.lineTo(tr.x0 + p[0], tr.y0 + p[1])); });
-    for (let c = 0; c < tr.N[0].length; c++) { g2.moveTo(tr.x0 + tr.N[0][c][0], tr.y0 + tr.N[0][c][1]); tr.N.forEach(row => g2.lineTo(tr.x0 + row[c][0], tr.y0 + row[c][1])); }
-    g2.stroke();
-    const run = Math.max(0, t - T.trucks - tr.delay), D = run * tr.speed;
-    if (A <= 0.002) continue;
-    // stops already made (first pass only; the route then repeats)
-    const done = Math.min(D, tr.L);
-    for (let d = STOP / 2; d < done; d += STOP) {
-      const [x, y] = along(tr, d);
+  if (A <= 0.002 && netA <= 0.002) return;
+  const S2 = (x, y) => toS(x, y, mc);
+  // network: roads and ferry crossings
+  g2.lineCap = 'round'; g2.lineJoin = 'round';
+  for (const tr of TOURS) {
+    for (const sg of tr.segs) {
+      const [ax, ay] = S2(sg.a[0], sg.a[1]), [bx, by] = S2(sg.b[0], sg.b[1]);
+      g2.globalAlpha = netA * (sg.sea ? 0.85 : 0.75);
+      g2.strokeStyle = sg.sea ? '#2A7FA6' : '#A3AAA3'; g2.lineWidth = sg.sea ? 2.8 : 3.6;
+      g2.setLineDash(sg.sea ? [6, 7] : []);
+      g2.beginPath(); g2.moveTo(ax, ay); g2.lineTo(bx, by); g2.stroke();
+    }
+  }
+  g2.setLineDash([]);
+  if (A <= 0.002) { g2.globalAlpha = 1; return; }
+  for (const tr of TOURS) {
+    const run = Math.max(0, t - T.trucks - tr.delay);
+    // stops made so far (first pass)
+    for (const st of tr.stops) {
+      if (st.t > run) continue;
+      const [x, y] = S2(st.x, st.y), age = run - st.t;
       g2.globalAlpha = A * 0.9; g2.fillStyle = '#0E9C79';
-      g2.beginPath(); g2.arc(x, y, 2.6, 0, 6.283); g2.fill();
+      g2.beginPath(); g2.arc(x, y, 3.6, 0, 6.283); g2.fill();
+      if (age < 0.9) { g2.globalAlpha = A * (1 - age / 0.9) * 0.8; g2.strokeStyle = '#0E9C79'; g2.lineWidth = 2; g2.beginPath(); g2.arc(x, y, 3 + age * 16, 0, 6.283); g2.stroke(); }
     }
-    // the newest stop pulses
-    if (run > 0.1) {
-      const lastD = Math.floor((D - STOP / 2) / STOP) * STOP + STOP / 2, pu = (D - lastD) / STOP;
-      const [px, py] = along(tr, lastD);
-      g2.globalAlpha = A * (1 - pu) * 0.8; g2.strokeStyle = '#0E9C79'; g2.lineWidth = 2;
-      g2.beginPath(); g2.arc(px, py, 3 + pu * 12, 0, 6.283); g2.stroke();
-    }
-    // exhaust trailing behind
-    for (let j = 1; j <= 4; j++) {
-      const [ex, ey] = along(tr, D - j * 9);
-      g2.globalAlpha = A * 0.15 * (1 - j / 5); g2.fillStyle = '#7E878A';
-      g2.beginPath(); g2.arc(ex, ey, 4 + j * 3.2, 0, 6.283); g2.fill();
+    const cur = posAt(tr, run);
+    // exhaust trailing the truck on land
+    if (!cur.sea && run > 0) {
+      for (let j = 1; j <= 4; j++) {
+        const pp = posAt(tr, run - j * 0.22), [ex, ey] = S2(pp.x, pp.y);
+        g2.globalAlpha = A * 0.15 * (1 - j / 5); g2.fillStyle = '#7E878A';
+        g2.beginPath(); g2.arc(ex, ey, 4 + j * 3.2, 0, 6.283); g2.fill();
+      }
     }
     g2.globalAlpha = 1;
-    const [x, y] = along(tr, D);
-    drawTruckBadge(x, y, A);
+    const [x, y] = S2(cur.x, cur.y);
+    badge(x, y, A, cur.sea);
   }
   g2.globalAlpha = 1;
 }
@@ -300,18 +328,19 @@ function renderAt(t) {
   $('mapcam').setAttribute('transform', `translate(${mc.sx},${mc.sy}) scale(${mc.s}) translate(${-mc.cx},${-mc.cy})`);
   $('map').setAttribute('opacity', (mapA * (1 - 0.25 * pr(t, T.banner, T.banner + 1.2))).toFixed(3));
   ownP.forEach((p, i) => p.setAttribute('opacity', pr(t, T.map + 0.3 + i * 0.09, T.map + 1.3 + i * 0.09, o3).toFixed(3)));
-  TOWNS.forEach((tw, i) => {
-    const [x, y] = toS(G.towns[tw.name][0], G.towns[tw.name][1], mc);
-    const tr = TRUCKS[i];
-    tw.el.style.left = (x + tr.off[0]) + 'px'; tw.el.style.top = (y + tr.off[1] - 38) + 'px';
-    tw.el.style.opacity = pr(t, T.towns + i * 0.3, T.towns + 0.9 + i * 0.3, o3).toFixed(3);
+  HUBS.forEach((name, i) => {
+    const [x, y] = toS(R.places[name][0], R.places[name][1], mc);
+    const e = $('t' + i);
+    e.style.left = (x + 16) + 'px'; e.style.top = (y - 38) + 'px';
+    e.style.opacity = pr(t, T.towns + i * 0.3, T.towns + 0.9 + i * 0.3, o3).toFixed(3);
   });
-  // the street grids follow the (very slowly zooming) map
-  TRUCKS.forEach((tr, i) => {
-    const [x, y] = toS(G.towns[TOWNS[i].name][0], G.towns[TOWNS[i].name][1], mc);
-    tr.x0 = x + tr.off[0]; tr.y0 = y + tr.off[1];
+  ISL.forEach((name, i) => {
+    const [x, y] = toS(R.places[name][0], R.places[name][1], mc);
+    const e = $('i' + i);
+    e.style.left = (x + [-34, -78, 16][i]) + 'px'; e.style.top = (y + [24, -10, -14][i]) + 'px';
+    e.style.opacity = (0.95 * pr(t, T.towns + 1.0 + i * 0.3, T.towns + 1.9 + i * 0.3, o3)).toFixed(3);
   });
-  drawTrucks(t, mapA * pr(t, T.trucks - 0.3, T.trucks + 0.5), mapA * 0.85 * pr(t, T.towns, T.towns + 1.2));
+  drawTrucks(t, mapA * pr(t, T.trucks - 0.3, T.trucks + 0.5), mapA * pr(t, T.towns, T.towns + 1.4), mc);
   fadeIn('kick2', t, T.h3 - 0.2);
   fadeIn('h3', t, T.h3, 99, 0, 30, 1.3);
   T.items.forEach((a, i) => {
@@ -334,7 +363,7 @@ function renderAt(t) {
     $('n4').textContent = nf(3.39 * pr(t, T.banner + 0.3, T.banner + 1.8, o5), 2) + ' mill. kr';
   }
 
-  $('black').style.opacity = Math.max(1 - pr(t, 0, 0.9, o3), pr(t, 39.0, 40)).toFixed(3);
+  $('black').style.opacity = Math.max(1 - pr(t, 0, 0.9, o3), pr(t, 48.8, 50)).toFixed(3);
 }
 async function ready() { await document.fonts.ready; return true; }
 window.FILM = { renderAt, ready, DUR, FPS };
