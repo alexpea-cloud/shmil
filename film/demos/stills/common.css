@@ -1,0 +1,17 @@
+@font-face{font-family:FS;src:url(../../assets/fonts/Inter-Regular.otf);font-weight:400}
+@font-face{font-family:FS;src:url(../../assets/fonts/Inter-Medium.otf);font-weight:500}
+@font-face{font-family:FS;src:url(../../assets/fonts/Inter-SemiBold.otf);font-weight:600}
+@font-face{font-family:FD;src:url(../../assets/fonts/InterDisplay-Medium.otf);font-weight:500}
+@font-face{font-family:FD;src:url(../../assets/fonts/InterDisplay-SemiBold.otf);font-weight:600}
+@font-face{font-family:FD;src:url(../../assets/fonts/InterDisplay-Bold.otf);font-weight:700}
+:root{--paper:#ECEBE6;--ink:#1B2326;--ink2:#465257;--ink3:#78848A;--green:#007B61;--green-hi:#0E9C79;--blue:#2A7FA6;--slate:#3A4A50}
+html,body{margin:0;background:#000}
+#stage{position:relative;width:1920px;height:1080px;overflow:hidden;font-family:FS,sans-serif;color:var(--ink);-webkit-font-smoothing:antialiased;
+  background:radial-gradient(ellipse 75% 70% at 50% 42%,#F6F5F1 0%,#ECEBE6 60%,#E3E2DC 100%)}
+.ab{position:absolute;white-space:nowrap}
+.k{font:600 25px/1 FS;letter-spacing:.16em;text-transform:uppercase;color:var(--green)}
+.h{font:700 76px/1.05 FD;letter-spacing:-.018em}
+.big{font:700 150px/.95 FD;letter-spacing:-.03em}
+.sub{font:400 36px/1.3 FS;color:var(--ink2)}
+.foot{font:400 20px/1.4 FS;color:var(--ink3);white-space:normal}
+svg{position:absolute;left:0;top:0}

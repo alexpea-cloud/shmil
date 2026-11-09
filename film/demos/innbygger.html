@@ -1,0 +1,377 @@
+<!doctype html>
+<html lang="no">
+<head>
+<meta charset="utf-8">
+<title>Sekvens – én innbygger og konsekvensen av henteordning</title>
+<style>
+@font-face{font-family:FS;src:url(../assets/fonts/Inter-Regular.otf);font-weight:400}
+@font-face{font-family:FS;src:url(../assets/fonts/Inter-Medium.otf);font-weight:500}
+@font-face{font-family:FS;src:url(../assets/fonts/Inter-SemiBold.otf);font-weight:600}
+@font-face{font-family:FD;src:url(../assets/fonts/InterDisplay-SemiBold.otf);font-weight:600}
+@font-face{font-family:FD;src:url(../assets/fonts/InterDisplay-Bold.otf);font-weight:700}
+:root{--ink:#1B2326;--ink2:#465257;--ink3:#78848A;--green:#007B61;--green-hi:#0E9C79;--blue:#2A7FA6}
+html,body{margin:0;background:#000;overflow:hidden}
+#stage{position:absolute;left:0;top:0;width:1920px;height:1080px;overflow:hidden;font-family:FS,sans-serif;color:var(--ink);-webkit-font-smoothing:antialiased;
+  font-feature-settings:"tnum" 1;background:radial-gradient(ellipse 75% 70% at 50% 42%,#F6F5F1 0%,#ECEBE6 60%,#E3E2DC 100%)}
+svg,canvas{position:absolute;left:0;top:0;overflow:visible}
+.ab{position:absolute;white-space:nowrap;opacity:0;will-change:transform,opacity}
+.k{font:600 25px/1 FS;letter-spacing:.16em;text-transform:uppercase;color:var(--green)}
+.h{font:700 82px/1.05 FD;letter-spacing:-.018em}
+.sub{font:400 34px/1.3 FS;color:var(--ink2)}
+.lab{font:600 27px/1.3 FS;color:var(--ink2)}
+.lab b{font-weight:700}
+.foot{font:400 20px/1.4 FS;color:var(--ink3)}
+.row{display:flex;align-items:center;gap:26px}
+.ic{position:relative;width:76px;height:76px;border-radius:20px;background:#fff;box-shadow:0 12px 26px rgba(27,35,38,.09);overflow:hidden;flex:none}
+.ic svg{position:absolute;left:0;top:0}
+.rv{font:700 44px/1 FD;color:var(--ink)}
+.rl{font:400 24px/1.25 FS;color:var(--ink2);margin-top:8px}
+.town.isl{font:500 21px/1 FS;color:#465257}
+.town{position:absolute;font:600 24px/1 FS;color:var(--ink);white-space:nowrap;opacity:0;text-shadow:0 0 6px #EEEDE8,0 0 12px #EEEDE8}
+#banner{position:absolute;left:150px;top:868px;width:1620px;height:150px;box-sizing:border-box;padding:0 44px;border-radius:16px;background:#fff;
+  box-shadow:0 24px 50px rgba(27,35,38,.12),0 3px 10px rgba(27,35,38,.06);display:flex;align-items:center;gap:56px;opacity:0}
+#banner .bar{position:absolute;left:0;top:22px;bottom:22px;width:8px;border-radius:0 5px 5px 0;background:var(--green-hi)}
+#black{position:absolute;inset:0;background:#000;opacity:1}
+</style>
+</head>
+<body>
+<div id="stage">
+  <!-- part 2: map (behind everything else) -->
+  <svg id="map" width="1920" height="1080" viewBox="0 0 1920 1080" opacity="0"><g id="mapcam"><g id="ctx"></g><g id="own"></g></g></svg>
+  <canvas id="trucks" width="1920" height="1080"></canvas>
+
+  <!-- part 1: one inhabitant -->
+  <svg id="art" width="1920" height="1080" viewBox="0 0 1920 1080">
+    <defs>
+      <symbol id="jar" viewBox="0 0 40 52"><rect x="10" y="1" width="20" height="8" rx="2.5" fill="#6E7F7A"/><path d="M8 11 h24 a4 4 0 0 1 4 4 v27 a8 8 0 0 1 -8 8 h-16 a8 8 0 0 1 -8 -8 v-27 a4 4 0 0 1 4 -4z" fill="currentColor"/><rect x="11" y="17" width="4.5" height="24" rx="2.2" fill="rgba(255,255,255,.55)"/></symbol>
+      <filter id="glow" x="-60%" y="-60%" width="220%" height="220%"><feGaussianBlur stdDeviation="9"/></filter>
+      <clipPath id="fillclip"><rect id="fillrect" x="0" y="0" width="0" height="0"/></clipPath>
+    </defs>
+    <g id="part1">
+      <g id="person" fill="#9AA4A8" opacity="0">
+        <circle cx="270" cy="430" r="56"/>
+        <path d="M190 510 h160 a40 40 0 0 1 40 40 v170 a18 18 0 0 1 -36 0 v-150 h-12 v330 a22 22 0 0 1 -44 0 v-190 h-16 v190 a22 22 0 0 1 -44 0 v-330 h-12 v150 a18 18 0 0 1 -36 0 v-170 a40 40 0 0 1 40 -40z"/>
+      </g>
+      <ellipse id="pshadow" cx="270" cy="944" rx="110" ry="12" fill="rgba(40,45,40,.12)" opacity="0"/>
+      <g id="glows"></g>
+      <g id="jars"></g>
+    </g>
+  </svg>
+
+  <div class="ab k" id="kick" style="left:150px;top:110px">Glass- og metallemballasje · ett år</div>
+  <div class="ab h" id="h1" style="left:150px;top:150px">Én innbygger i eierkommunene</div>
+  <div class="ab h" id="h2" style="left:150px;top:150px">22 gram i uka</div>
+  <div class="ab sub" id="s2" style="left:150px;top:252px">– det er den ekstra mengden henteordning er beregnet å gi</div>
+  <div class="ab lab" id="l1" style="left:470px;top:350px">Samles inn i dag: <b style="color:var(--green)" id="n1">ca. 0,0 kg</b></div>
+  <div class="ab lab" id="l2" style="left:470px;top:808px;white-space:normal;width:560px">Ekstra med henteordning: <b style="color:var(--green-hi)" id="n2">ca. 0,0 kg</b><br><span style="font-weight:400;color:var(--ink3)">modellert</span></div>
+
+  <!-- part 2: consequence -->
+  <div class="ab k" id="kick2" style="left:150px;top:110px">For 22 gram i uka per innbygger</div>
+  <div class="ab h" id="h3" style="left:150px;top:150px">Konsekvensen av henteordning</div>
+  <div class="town" id="t0">Brønnøysund</div><div class="town" id="t1">Sandnessjøen</div><div class="town" id="t2">Mosjøen</div>
+  <div class="town isl" id="i0">Vega</div><div class="town isl" id="i1">Herøy</div><div class="town isl" id="i2">Dønna</div>
+  <div class="ab row" id="r1" style="left:150px;top:330px">
+    <div class="ic"><svg width="76" height="76" viewBox="0 0 78 78"><rect x="12" y="26" width="32" height="22" rx="3" fill="#2A7FA6"/><path d="M44 31 h10 l8 8 v9 h-18z" fill="#2A7FA6"/><path d="M47 34 h6 l5 5 h-11z" fill="#BFD9E6"/><circle cx="22" cy="51" r="6" fill="#1B2326"/><circle cx="52" cy="51" r="6" fill="#1B2326"/></svg></div>
+    <div><div class="rv" id="n3">0 stopp</div><div class="rl">tømmestopp i året – 0,8 kg per stopp</div></div>
+  </div>
+  <div class="ab row" id="r2" style="left:150px;top:448px">
+    <div class="ic"><svg width="76" height="76" viewBox="0 0 78 78"><rect x="16" y="20" width="46" height="42" rx="6" fill="#fff" stroke="#5B686D" stroke-width="3.5"/><rect x="16" y="20" width="46" height="12" rx="4" fill="#5B686D"/><rect x="25" y="14" width="4" height="12" rx="2" fill="#5B686D"/><rect x="49" y="14" width="4" height="12" rx="2" fill="#5B686D"/><circle cx="29" cy="45" r="3.5" fill="#2A7FA6"/><circle cx="39" cy="45" r="3.5" fill="#2A7FA6"/><circle cx="49" cy="45" r="3.5" fill="#2A7FA6"/></svg></div>
+    <div><div class="rv">225 bildager</div><div class="rl">i året, fordelt på tre driftsregioner</div></div>
+  </div>
+  <div class="ab row" id="r3" style="left:150px;top:566px">
+    <div class="ic"><svg width="76" height="76" viewBox="0 0 78 78"><circle cx="28" cy="42" r="11" fill="#9AA4A8"/><circle cx="41" cy="35" r="14" fill="#B7BEBB"/><circle cx="52" cy="45" r="10" fill="#9AA4A8"/></svg></div>
+    <div><div class="rv">Utslipp og veistøv</div><div class="rl">ny tungtrafikk i boliggatene</div></div>
+  </div>
+  <div class="ab row" id="r4" style="left:150px;top:684px">
+    <div class="ic"><svg width="76" height="76" viewBox="0 0 78 78"><path d="M16 32 h9 l12 -10 v34 l-12 -10 h-9z" fill="#5B686D"/><path id="sw1" d="M44 30 q6 9 0 18" stroke="#5B686D" stroke-width="3.5" fill="none" stroke-linecap="round"/><path id="sw2" d="M50 24 q11 15 0 30" stroke="#5B686D" stroke-width="3.5" fill="none" stroke-linecap="round"/><path id="sw3" d="M56 18 q16 21 0 42" stroke="#5B686D" stroke-width="3.5" fill="none" stroke-linecap="round"/></svg></div>
+    <div><div class="rv">Støy</div><div class="rl">fra tømming og tungtransport</div></div>
+  </div>
+
+  <!-- part 3: cost -->
+  <div id="banner">
+    <div class="bar"></div>
+    <div style="font:600 24px/1.25 FS;letter-spacing:.14em;text-transform:uppercase;color:var(--green);width:250px;white-space:normal">Kostnaden ved henteordning</div>
+    <div style="font:700 88px/1 FD;letter-spacing:-.02em;color:var(--ink);white-space:nowrap" id="n4">3,39 mill. kr</div>
+    <div style="white-space:normal"><div style="font:600 34px/1.15 FD;color:var(--ink)">i året · 74 kr per ekstra kilo</div><div style="font:400 24px/1.3 FS;color:var(--ink2);margin-top:8px">mot 1,81 kr i Miljødirektoratets anslag</div></div>
+  </div>
+
+  <div class="ab foot" id="foot" style="left:150px;top:1036px">Beregnet fra søknaden og Vedlegg 1: 579,5 tonn i dag og modellert meruttak 45,7 tonn ÷ 40 827 innbyggere i de 11 eierkommunene. Ett glass i figuren = 0,5 kg.</div>
+  <div class="ab foot" id="foot2" style="left:150px;top:1036px">Illustrasjon: kjøreruter og ferjer er forenklet. Tall fra søknaden kap. 2. Kart: Kartverket (CC BY 4.0).</div>
+  <div id="black"></div>
+</div>
+<script src="geo.js"></script>
+<script src="routes.js"></script>
+<script src="progress.js"></script>
+<script>
+(function () {
+'use strict';
+const DUR = 50, FPS = 30;
+const FILM_MODE = /film=1/.test(location.search);
+if (FILM_MODE) { window.filmProgress(3); const bn = document.getElementById('banner'); bn.style.top = '842px'; bn.style.height = '140px'; }
+const NS = 'http://www.w3.org/2000/svg';
+const clamp = (x, a = 0, b = 1) => Math.min(b, Math.max(a, x));
+const lerp = (a, b, p) => a + (b - a) * p;
+const io = x => (x < 0.5 ? 4 * x * x * x : 1 - Math.pow(-2 * x + 2, 3) / 2);
+const o3 = x => 1 - Math.pow(1 - x, 3);
+const o5 = x => 1 - Math.pow(1 - x, 5);
+const back = x => { const c1 = 1.5, c3 = c1 + 1; return 1 + c3 * Math.pow(x - 1, 3) + c1 * Math.pow(x - 1, 2); };
+const pr = (t, a, b, e = io) => e(clamp((t - a) / (b - a)));
+const env = (t, a, b, fi, fo) => Math.min(pr(t, a, a + fi, o3), 1 - pr(t, b - fo, b));
+const $ = id => document.getElementById(id);
+const nf = (v, d) => v.toFixed(d).replace('.', ',').replace(/\B(?=(\d{3})+(?!\d))/g, ' ');
+
+/* ---------------------------------------------------------------- timeline (s) */
+const T = {
+  person: 0.9, today: 2.2, jar0: 2.6, jarStep: 0.1,          // 28 jars: 2.6 – 5.4
+  extraLab: 6.6, extra: [7.1, 7.9, 8.7], fillEnd: 9.8,
+  head2: 10.1,                                              // music: climax starts here
+  out1: 15.4,                                               // part 1 leaves
+  map: 15.4, h3: 16.2, towns: 17.4, trucks: 18.6,
+  items: [20.0, 24.0, 28.0, 32.0], count: [19.4, 35.0],
+  banner: 37.5, end: 50,
+};
+
+/* ================================================================ part 1: jars */
+const per = 8, W = 60, H = 78, X0 = 470, Y0 = 400;
+const jars = [];
+for (let i = 0; i < 31; i++) {          // 28 jars today (14,2 kg) + 2,24 extra (1,1 kg)
+  const extra = i >= 28;
+  const x = X0 + (i % per) * W, y = Y0 + Math.floor(i / per) * H + (extra ? 18 : 0);
+  const g = document.createElementNS(NS, 'g');
+  const u = document.createElementNS(NS, 'use');
+  u.setAttribute('href', '#jar'); u.setAttribute('width', 46); u.setAttribute('height', 60);
+  u.style.color = extra ? '#0E9C79' : '#8CC9A8';
+  g.appendChild(u); $('jars').appendChild(g);
+  const glow = document.createElementNS(NS, 'ellipse');
+  glow.setAttribute('cx', x + 23); glow.setAttribute('cy', y + 34); glow.setAttribute('rx', 26); glow.setAttribute('ry', 32);
+  glow.setAttribute('fill', '#0E9C79'); glow.setAttribute('filter', 'url(#glow)'); glow.setAttribute('opacity', 0);
+  if (extra) $('glows').appendChild(glow);
+  jars.push({ g, u, x, y, extra, ts: extra ? T.extra[i - 28] : T.jar0 + i * T.jarStep, glow });
+}
+const last = jars[30];
+last.u.style.opacity = 0.22;
+const fillUse = document.createElementNS(NS, 'use');
+fillUse.setAttribute('href', '#jar'); fillUse.setAttribute('width', 46); fillUse.setAttribute('height', 60);
+fillUse.style.color = '#0E9C79'; fillUse.setAttribute('clip-path', 'url(#fillclip)');
+last.g.appendChild(fillUse);
+
+/* ================================================================ part 2: map */
+const G = window.GEO;
+const dpath = rings => rings.map(r => 'M' + r.map(p => p[0] + ',' + p[1]).join('L') + 'Z').join('');
+function mk(parent, d, fill, stroke, sw) {
+  const p = document.createElementNS(NS, 'path');
+  p.setAttribute('d', d); p.setAttribute('fill', fill);
+  p.setAttribute('stroke', stroke); p.setAttribute('stroke-width', sw); p.setAttribute('vector-effect', 'non-scaling-stroke'); p.setAttribute('stroke-linejoin', 'round');
+  $(parent).appendChild(p); return p;
+}
+G.ctx.forEach(c => mk('ctx', dpath(c.paths), '#F2F1EC', '#D6D9D4', 0.8));
+const ownP = G.own.map(o => mk('own', dpath(o.paths), '#D9EADF', '#7DBFA4', 1.1));
+const MC = { cx: -94.7, cy: -7286.3, s: 5.8, sx: 1390, sy: 592 };
+const toS = (x, y, c = MC) => [c.sx + (x - c.cx) * c.s, c.sy + (y - c.cy) * c.s];
+const TOWNS = Object.entries(G.towns).map(([name, [x, y]], i) => ({ name, sp: toS(x, y), el: $('t' + i) }));
+
+/* trucks: three illustrative tours across Helgeland (routes.js: road + ferry legs on the land mask) */
+const cv = $('trucks'), g2 = cv.getContext('2d');
+const R = window.ROUTES;
+const HUBS = ['Brønnøysund', 'Sandnessjøen', 'Mosjøen'];
+const ISL = ['Vega', 'Herøy', 'Dønna'];
+const SPEED = [34, 30, 36], FERRY = 0.5;          // screen px/s on road at base zoom; ferries go at half speed
+const TOURS = R.tours.map((tr, k) => {
+  const P = tr.pts;
+  const segs = [];
+  let tcum = 0, dcum = 0;
+  for (let i = 0; i < P.length - 1; i++) {
+    const L = Math.hypot(P[i + 1][0] - P[i][0], P[i + 1][1] - P[i][1]) * MC.s;
+    const dt = L / (SPEED[k] * (P[i][2] ? FERRY : 1));
+    segs.push({ a: P[i], b: P[i + 1], sea: P[i][2], t0: tcum, t1: tcum + dt, d0: dcum, d1: dcum + L / MC.s });
+    tcum += dt; dcum += L / MC.s;
+  }
+  // stops: along roads, only inside the built-up pockets around each place (km)
+  const stops = [];
+  for (const sg of segs) {
+    if (sg.sea) continue;
+    const len = sg.d1 - sg.d0, n = Math.max(1, Math.round(len / 0.75));
+    for (let q = 0; q < n; q++) {
+      const f = (q + 0.5) / n, x = lerp(sg.a[0], sg.b[0], f), y = lerp(sg.a[1], sg.b[1], f);
+      let near = false;
+      for (const name of tr.stops) {
+        const [px, py] = R.places[name], rad = HUBS.includes(name) ? 5.5 : 3.2;
+        if ((x - px) ** 2 + (y - py) ** 2 < rad * rad) { near = true; break; }
+      }
+      if (!near) continue;
+      if (stops.some(s2 => (s2.x - x) ** 2 + (s2.y - y) ** 2 < 0.55 * 0.55)) continue;
+      stops.push({ x, y, t: sg.t0 + f * (sg.t1 - sg.t0) });
+    }
+  }
+  return { segs, T: tcum, stops, delay: [0, 0.4, 0.2][k] };
+});
+function posAt(tr, tt) {
+  tt = ((tt % tr.T) + tr.T) % tr.T;
+  let lo = 0, hi = tr.segs.length - 1;
+  while (lo < hi) { const m = (lo + hi) >> 1; if (tr.segs[m].t1 < tt) lo = m + 1; else hi = m; }
+  const sg = tr.segs[lo], f = (tt - sg.t0) / Math.max(1e-6, sg.t1 - sg.t0);
+  return { x: lerp(sg.a[0], sg.b[0], f), y: lerp(sg.a[1], sg.b[1], f), sea: sg.sea };
+}
+function badge(x, y, a, sea) {
+  g2.save(); g2.globalAlpha = a;
+  g2.shadowColor = 'rgba(27,35,38,.25)'; g2.shadowBlur = 10; g2.shadowOffsetY = 3;
+  g2.fillStyle = sea ? '#EAF4F9' : '#fff'; g2.beginPath(); g2.arc(x, y, 20, 0, 6.283); g2.fill();
+  g2.shadowColor = 'transparent';
+  if (!sea) {
+    g2.translate(x - 13, y - 12);
+    g2.fillStyle = '#2A7FA6'; g2.beginPath(); g2.roundRect(0, 4, 16, 12, 2); g2.fill();
+    g2.beginPath(); g2.moveTo(16, 7); g2.lineTo(22, 7); g2.lineTo(26, 11); g2.lineTo(26, 16); g2.lineTo(16, 16); g2.closePath(); g2.fill();
+    g2.fillStyle = '#1B2326'; g2.beginPath(); g2.arc(5, 18, 3.2, 0, 6.283); g2.arc(21, 18, 3.2, 0, 6.283); g2.fill();
+  } else {  // the truck on a ferry
+    g2.translate(x - 14, y - 12);
+    g2.fillStyle = '#2A7FA6'; g2.beginPath(); g2.roundRect(7, 2, 12, 8, 1.5); g2.fill();
+    g2.fillStyle = '#1F5C73'; g2.beginPath(); g2.moveTo(0, 12); g2.lineTo(28, 12); g2.lineTo(24, 20); g2.lineTo(4, 20); g2.closePath(); g2.fill();
+    g2.strokeStyle = '#2A7FA6'; g2.lineWidth = 1.6; g2.beginPath(); g2.moveTo(-1, 24); g2.quadraticCurveTo(4, 21, 9, 24); g2.quadraticCurveTo(14, 27, 19, 24); g2.quadraticCurveTo(24, 21, 29, 24); g2.stroke();
+  }
+  g2.restore();
+}
+function drawTrucks(t, A, netA, mc) {
+  g2.clearRect(0, 0, 1920, 1080);
+  if (A <= 0.002 && netA <= 0.002) return;
+  const S2 = (x, y) => toS(x, y, mc);
+  // network: roads and ferry crossings
+  g2.lineCap = 'round'; g2.lineJoin = 'round';
+  for (const tr of TOURS) {
+    for (const sg of tr.segs) {
+      const [ax, ay] = S2(sg.a[0], sg.a[1]), [bx, by] = S2(sg.b[0], sg.b[1]);
+      g2.globalAlpha = netA * (sg.sea ? 0.85 : 0.75);
+      g2.strokeStyle = sg.sea ? '#2A7FA6' : '#A3AAA3'; g2.lineWidth = sg.sea ? 2.8 : 3.6;
+      g2.setLineDash(sg.sea ? [6, 7] : []);
+      g2.beginPath(); g2.moveTo(ax, ay); g2.lineTo(bx, by); g2.stroke();
+    }
+  }
+  g2.setLineDash([]);
+  if (A <= 0.002) { g2.globalAlpha = 1; return; }
+  for (const tr of TOURS) {
+    const run = Math.max(0, t - T.trucks - tr.delay);
+    // stops made so far (first pass)
+    for (const st of tr.stops) {
+      if (st.t > run) continue;
+      const [x, y] = S2(st.x, st.y), age = run - st.t;
+      g2.globalAlpha = A * 0.9; g2.fillStyle = '#0E9C79';
+      g2.beginPath(); g2.arc(x, y, 3.6, 0, 6.283); g2.fill();
+      if (age < 0.9) { g2.globalAlpha = A * (1 - age / 0.9) * 0.8; g2.strokeStyle = '#0E9C79'; g2.lineWidth = 2; g2.beginPath(); g2.arc(x, y, 3 + age * 16, 0, 6.283); g2.stroke(); }
+    }
+    const cur = posAt(tr, run);
+    // exhaust trailing the truck on land
+    if (!cur.sea && run > 0) {
+      for (let j = 1; j <= 4; j++) {
+        const pp = posAt(tr, run - j * 0.22), [ex, ey] = S2(pp.x, pp.y);
+        g2.globalAlpha = A * 0.15 * (1 - j / 5); g2.fillStyle = '#7E878A';
+        g2.beginPath(); g2.arc(ex, ey, 4 + j * 3.2, 0, 6.283); g2.fill();
+      }
+    }
+    g2.globalAlpha = 1;
+    const [x, y] = S2(cur.x, cur.y);
+    badge(x, y, A, cur.sea);
+  }
+  g2.globalAlpha = 1;
+}
+
+/* ================================================================ helpers */
+function fadeIn(id, t, a, b = 99, dx = 0, dy = 24, fi = 1.0, fo = 0.8, ox = 0) {
+  const e = $(id);
+  const A = env(t, a, b, fi, fo);
+  e.style.opacity = A.toFixed(3);
+  const p = pr(t, a, a + fi, o5), q = pr(t, b - fo, b, io);
+  e.style.transform = `translate(${((1 - p) * dx + q * ox).toFixed(2)}px,${((1 - p) * dy).toFixed(2)}px)`;
+  return A;
+}
+
+/* ================================================================ render */
+function renderAt(t) {
+  /* ---- part 1 */
+  const out1 = T.out1, o1 = 1 - pr(t, out1, out1 + 1.0);
+  fadeIn('kick', t, 0.6, out1 + 1.0);
+  fadeIn('h1', t, 0.9, T.head2 + 0.2, 0, 30, 1.2, 0.8);
+  fadeIn('h2', t, T.head2, out1 + 1.0, 0, 30, 1.3, 1.0, -60);
+  fadeIn('s2', t, T.head2 + 0.9, out1 + 1.0, 0, 24, 1.0, 1.0, -60);
+  fadeIn('foot', t, 3.0, out1 + 1.0, 0, 0, 1.2);
+  fadeIn('l1', t, T.today, out1 + 1.0, 0, 24, 1.0, 1.0, -60);
+  fadeIn('l2', t, T.extraLab, out1 + 1.0, 0, 24, 1.0, 1.0, -60);
+  const shift = -60 * pr(t, out1, out1 + 1.0, io);
+  $('part1').setAttribute('transform', `translate(${shift.toFixed(2)} 0)`);
+  $('part1').setAttribute('opacity', o1.toFixed(3));
+
+  const pp = pr(t, T.person, T.person + 1.4, o5);
+  $('person').setAttribute('opacity', pp.toFixed(3));
+  $('person').setAttribute('transform', `translate(0 ${(1 - pp) * 30})`);
+  $('pshadow').setAttribute('opacity', pp.toFixed(3));
+  const dim = 1 - 0.45 * pr(t, T.head2 + 1.5, T.head2 + 2.7);
+  for (const j of jars) {
+    const u = clamp((t - j.ts) / 0.55);
+    if (u <= 0) { j.g.setAttribute('opacity', 0); continue; }
+    const yy = lerp(j.y - 46, j.y, back(u));
+    const rot = (1 - o3(u)) * (j.extra ? -10 : -6) * (j.x % 2 ? 1 : -1);
+    j.g.setAttribute('transform', `translate(${j.x} ${yy}) rotate(${rot.toFixed(2)} 23 30)`);
+    j.g.setAttribute('opacity', (Math.min(1, u * 3) * (j.extra ? 1 : dim)).toFixed(3));
+  }
+  {
+    const f = pr(t, T.extra[2] + 0.3, T.fillEnd, io) * 0.24;
+    const bodyBot = 57.7, h = 45 * f;
+    const r = $('fillrect');
+    r.setAttribute('y', (bodyBot - h).toFixed(2)); r.setAttribute('width', 46); r.setAttribute('height', h.toFixed(2));
+    fillUse.setAttribute('opacity', f > 0 ? 1 : 0);
+  }
+  for (const j of jars.filter(q => q.extra)) {
+    const a = 0.6 * Math.max(env(t, j.ts + 0.2, j.ts + 1.6, 0.3, 1.0), env(t, T.head2 + 0.2, out1 + 0.6, 0.5, 1.0));
+    j.glow.setAttribute('opacity', a.toFixed(3));
+  }
+  $('n1').textContent = 'ca. ' + nf(14.2 * pr(t, T.jar0 + 0.3, T.jar0 + 28 * T.jarStep + 0.5, x => x), 1) + ' kg';
+  $('n2').textContent = 'ca. ' + nf(1.1 * pr(t, T.extra[0] + 0.2, T.fillEnd, x => x), 1) + ' kg';
+
+  /* ---- part 2: map, trucks and consequences */
+  const mapA = pr(t, T.map, T.map + 1.6, o3);
+  const mc = { ...MC, s: MC.s * (1 + 0.03 * pr(t, T.map, T.end, x => x)) };
+  $('mapcam').setAttribute('transform', `translate(${mc.sx},${mc.sy}) scale(${mc.s}) translate(${-mc.cx},${-mc.cy})`);
+  $('map').setAttribute('opacity', (mapA * (1 - 0.25 * pr(t, T.banner, T.banner + 1.2))).toFixed(3));
+  ownP.forEach((p, i) => p.setAttribute('opacity', pr(t, T.map + 0.3 + i * 0.09, T.map + 1.3 + i * 0.09, o3).toFixed(3)));
+  HUBS.forEach((name, i) => {
+    const [x, y] = toS(R.places[name][0], R.places[name][1], mc);
+    const e = $('t' + i);
+    e.style.left = (x + 16) + 'px'; e.style.top = (y - 38) + 'px';
+    e.style.opacity = pr(t, T.towns + i * 0.3, T.towns + 0.9 + i * 0.3, o3).toFixed(3);
+  });
+  ISL.forEach((name, i) => {
+    const [x, y] = toS(R.places[name][0], R.places[name][1], mc);
+    const e = $('i' + i);
+    e.style.left = (x + [-34, -78, 16][i]) + 'px'; e.style.top = (y + [24, -10, -14][i]) + 'px';
+    e.style.opacity = (0.95 * pr(t, T.towns + 1.0 + i * 0.3, T.towns + 1.9 + i * 0.3, o3)).toFixed(3);
+  });
+  drawTrucks(t, mapA * pr(t, T.trucks - 0.3, T.trucks + 0.5), mapA * pr(t, T.towns, T.towns + 1.4), mc);
+  fadeIn('kick2', t, T.h3 - 0.2);
+  fadeIn('h3', t, T.h3, 99, 0, 30, 1.3);
+  T.items.forEach((a, i) => {
+    fadeIn('r' + (i + 1), t, a, 99, -40, 0, 1.1);
+    $('r' + (i + 1)).style.opacity = (parseFloat($('r' + (i + 1)).style.opacity) * (1 - 0.35 * pr(t, T.banner, T.banner + 1.2))).toFixed(3);
+  });
+  $('n3').textContent = nf(Math.round(56000 * pr(t, T.count[0], T.count[1], x => x) / 100) * 100, 0) + ' stopp';
+  ['sw1', 'sw2', 'sw3'].forEach((id, k) => {
+    const a = T.items[3];
+    const ph = t < a ? 0 : ((t - a - k * 0.22) / 1.3) % 1;
+    $(id).setAttribute('opacity', t > a + 0.2 + k * 0.22 ? (0.25 + 0.75 * Math.sin(Math.max(0, ph) * Math.PI)).toFixed(3) : 0);
+  });
+  fadeIn('foot2', t, T.map + 1.0, 99, 0, 0, 1.2);
+
+  /* ---- part 3: the cost */
+  {
+    const b = $('banner'), A = env(t, T.banner, 99, 1.2, 0.5);
+    b.style.opacity = A.toFixed(3);
+    b.style.transform = `translateY(${((1 - pr(t, T.banner, T.banner + 1.2, o5)) * 40).toFixed(2)}px)`;
+    $('n4').textContent = nf(3.39 * pr(t, T.banner + 0.3, T.banner + 1.8, o5), 2) + ' mill. kr';
+  }
+
+  $('black').style.opacity = FILM_MODE ? '0' : Math.max(1 - pr(t, 0, 0.9, o3), pr(t, 48.8, 50)).toFixed(3);
+}
+async function ready() { await document.fonts.ready; return true; }
+window.FILM = { renderAt, ready, DUR, FPS };
+ready().then(() => { renderAt(+(location.search.match(/t=([\d.]+)/) || [0, 34])[1]); window.FILM_READY = true; });
+})();
+</script>
+</body>
+</html>

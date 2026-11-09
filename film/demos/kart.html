@@ -1,0 +1,167 @@
+<!doctype html>
+<html lang="no">
+<head>
+<meta charset="utf-8">
+<title>Demo – kart over SHMILs område</title>
+<style>
+@font-face{font-family:FS;src:url(../assets/fonts/Inter-Regular.otf);font-weight:400}
+@font-face{font-family:FS;src:url(../assets/fonts/Inter-SemiBold.otf);font-weight:600}
+@font-face{font-family:FD;src:url(../assets/fonts/InterDisplay-SemiBold.otf);font-weight:600}
+@font-face{font-family:FD;src:url(../assets/fonts/InterDisplay-Bold.otf);font-weight:700}
+:root{--sea:#E8E7E1;--land:#F8F7F3;--ink:#1B2326;--ink2:#465257;--ink3:#78848A;--green:#007B61;--green-hi:#0E9C79}
+html,body{margin:0;background:#000;overflow:hidden}
+#stage{position:absolute;left:0;top:0;width:1920px;height:1080px;overflow:hidden;background:var(--sea);font-family:FS,sans-serif;color:var(--ink);-webkit-font-smoothing:antialiased}
+svg{position:absolute;left:0;top:0}
+.t{position:absolute;white-space:nowrap;opacity:0}
+.k{font:600 25px/1 FS;letter-spacing:.16em;text-transform:uppercase;color:var(--green)}
+.h{font:700 92px/1.02 FD;letter-spacing:-.02em;color:var(--ink)}
+.s{font:400 38px/1.3 FS;color:var(--ink2)}
+.tw{position:absolute;font:600 26px/1 FS;color:var(--ink);white-space:nowrap;opacity:0;text-shadow:0 0 6px var(--sea),0 0 12px var(--sea)}
+.attr{position:absolute;right:28px;bottom:22px;font:400 17px/1 FS;color:#8A9599}
+#vign{position:absolute;inset:0;background:radial-gradient(ellipse 80% 80% at 60% 50%,rgba(0,0,0,0) 60%,rgba(30,40,40,.12) 100%);pointer-events:none}
+#black{position:absolute;inset:0;background:#000;opacity:1}
+</style>
+</head>
+<body>
+<div id="stage">
+  <svg id="map" width="1920" height="1080" viewBox="0 0 1920 1080">
+    <defs>
+      <filter id="glow" x="-50%" y="-50%" width="200%" height="200%"><feGaussianBlur stdDeviation="6"/></filter>
+    </defs>
+    <g id="cam">
+      <g id="norway"></g>
+      <g id="ctx"></g>
+      <g id="own"></g>
+      <g id="towns"></g>
+    </g>
+  </svg>
+  <div class="t k" id="tk" style="left:150px;top:376px">SHMIL IKS · Søndre Helgeland Miljøverk</div>
+  <div class="t h" id="th" style="left:150px;top:418px;font-size:112px">Grunnlaget for søknaden</div>
+  <div class="t s" id="ts" style="left:150px;top:560px">Kravet om henteordning · november 2025 – august 2026</div>
+  <div class="t k" id="fk" style="left:150px;top:300px">Statsforvalteren i Nordland · saksnr. 2025/4779</div>
+  <div class="t h" id="fh" style="left:150px;top:342px;white-space:normal;width:900px;font-size:72px;line-height:1.08">Førte tilsyn med Brønnøy kommune</div>
+  <div class="t s" id="fs" style="left:150px;top:520px;white-space:normal;width:700px;font-size:34px;line-height:1.35">Avfallsforskriften kapittel 10a – utsortering og separat innsamling av husholdningsavfall</div>
+  <div class="t s" id="f2" style="left:150px;top:680px;white-space:normal;width:700px;font-size:40px;color:#007B61;font-weight:600;line-height:1.25">Samme ordning i alle SHMILs 11&nbsp;eierkommuner</div>
+  <div class="t k" id="k1" style="left:150px;top:300px">SHMILs område</div>
+  <div class="t h" id="h1" style="left:150px;top:342px">11 eierkommuner</div>
+  <div class="t s" id="s1" style="left:150px;top:452px">over 9&#8239;400 km²</div>
+  <div class="t s" id="s2" style="left:150px;top:560px;white-space:normal;width:640px">Tettbygd: ca. 20 km² –<br>fordelt på tre driftsregioner</div>
+  <div class="attr">Kartgrunnlag: Kartverket (CC BY 4.0)</div>
+  <div id="vign"></div>
+  <div id="black"></div>
+</div>
+<script src="geo.js"></script>
+<script>
+(function () {
+'use strict';
+const DUR = 10, FPS = 30;
+const clamp = (x, a = 0, b = 1) => Math.min(b, Math.max(a, x));
+const lerp = (a, b, p) => a + (b - a) * p;
+const io = x => (x < 0.5 ? 4 * x * x * x : 1 - Math.pow(-2 * x + 2, 3) / 2);
+const o3 = x => 1 - Math.pow(1 - x, 3);
+const pr = (t, a, b, e = io) => e(clamp((t - a) / (b - a)));
+const env = (t, a, b, fi, fo) => Math.min(pr(t, a, a + fi, o3), 1 - pr(t, b - fo, b));
+const NS = 'http://www.w3.org/2000/svg';
+const $ = id => document.getElementById(id);
+const G = window.GEO;
+const d = rings => rings.map(r => 'M' + r.map(p => p[0] + ',' + p[1]).join('L') + 'Z').join('');
+function mk(parent, dd, fill, stroke, sw) {
+  const p = document.createElementNS(NS, 'path');
+  p.setAttribute('d', dd); p.setAttribute('fill', fill);
+  if (stroke) { p.setAttribute('stroke', stroke); p.setAttribute('stroke-width', sw); p.setAttribute('vector-effect', 'non-scaling-stroke'); p.setAttribute('stroke-linejoin', 'round'); }
+  $(parent).appendChild(p);
+  return p;
+}
+mk('norway', d(G.norway), '#F8F7F3', '#C4C9C4', 1);
+G.ctx.forEach(c => mk('ctx', d(c.paths), '#EFEEE8', '#D3D7D2', 0.8));
+// bounding boxes
+const bb = rings => { let x0 = 1e9, y0 = 1e9, x1 = -1e9, y1 = -1e9; rings.forEach(r => r.forEach(([x, y]) => { x0 = Math.min(x0, x); y0 = Math.min(y0, y); x1 = Math.max(x1, x); y1 = Math.max(y1, y); })); return { x0, y0, x1, y1, cx: (x0 + x1) / 2, cy: (y0 + y1) / 2, w: x1 - x0, h: y1 - y0 }; };
+const NB = bb(G.norway), RB = bb(G.own.flatMap(o => o.paths));
+// kommuner fade in as a sweep from the coast (west) to the inland (east)
+const own = G.own.map(o => {
+  const b = bb(o.paths);
+  const p = mk('own', d(o.paths), '#CFE4D8', '#0E9C79', 1.4);
+  return { p, order: (b.cx - RB.x0) / RB.w, nr: o.nr };
+});
+// three operating regions
+const towns = Object.entries(G.towns).map(([name, [x, y]]) => {
+  const ring = document.createElementNS(NS, 'circle'), dot = document.createElementNS(NS, 'circle'), halo = document.createElementNS(NS, 'circle');
+  [halo, ring, dot].forEach(c => { c.setAttribute('cx', x); c.setAttribute('cy', y); $('towns').appendChild(c); });
+  halo.setAttribute('fill', 'rgba(14,156,121,.35)'); halo.setAttribute('filter', 'url(#glow)');
+  ring.setAttribute('fill', 'none'); ring.setAttribute('stroke', '#0E9C79'); ring.setAttribute('vector-effect', 'non-scaling-stroke'); ring.setAttribute('stroke-width', 2.5);
+  dot.setAttribute('fill', '#007B61');
+  const lab = document.createElement('div'); lab.className = 'tw'; lab.textContent = name; $('stage').appendChild(lab);
+  return { name, x, y, ring, dot, halo, lab };
+});
+// camera: whole of Norway → the region (placed right of the text)
+const camNor = { cx: NB.cx, cy: NB.cy, s: 1000 / NB.h, sx: 1150, sy: 540 };
+const camReg = { cx: RB.cx, cy: RB.cy, s: 860 / Math.max(RB.h, RB.w * 0.9), sx: 1390, sy: 540 };
+// the region centre travels in a straight line on screen while the scale changes logarithmically
+const T0x = camNor.sx + (RB.cx - camNor.cx) * camNor.s, T0y = camNor.sy + (RB.cy - camNor.cy) * camNor.s;
+function cam(t) {
+  const p = pr(t, 2.0, 5.6);
+  const s = Math.exp(lerp(Math.log(camNor.s), Math.log(camReg.s), p)) * (1 + 0.025 * pr(t, 5.6, 10, x => x));
+  const tx = lerp(T0x, camReg.sx, p), ty = lerp(T0y, camReg.sy, p);
+  return { s, cx: RB.cx, cy: RB.cy, sx: tx, sy: ty };
+}
+function text(id, t, a, b, dy = 30) {
+  const e = $(id), A = env(t, a, b, 1.0, 0.8);
+  e.style.opacity = A.toFixed(3);
+  e.style.transform = `translateY(${(1 - pr(t, a, a + 1.0, o3)) * dy}px)`;
+}
+const FILM_MODE = /film=1/.test(location.search);
+function renderAt(T) {
+  // film mode: a title over the national map first, then the demo timeline shifted by 6 s
+  const t = FILM_MODE ? T - 4.0 : T;
+  if (FILM_MODE) { text('tk', T, 0.7, 5.6); text('th', T, 0.9, 5.7); text('ts', T, 1.9, 5.7); }
+  const c = cam(t);
+  $('cam').setAttribute('transform', `translate(${c.sx},${c.sy}) scale(${c.s}) translate(${-c.cx},${-c.cy})`);
+  $('norway').style.opacity = (FILM_MODE ? pr(T, 0.2, 1.6, o3) : pr(t, 0.2, 1.4, o3)).toFixed(3);
+  $('ctx').style.opacity = pr(t, 3.0, 5.0).toFixed(3);
+  // before the zoom, the region glows on the national map
+  own.forEach(o => {
+    let a;
+    if (FILM_MODE) {
+      // Brønnøy first (the inspected municipality), then the other ten
+      if (o.nr === '1813') a = Math.max(0.6 * pr(t, 1.0, 1.9, o3), pr(t, 4.4, 5.4, o3));
+      else { const t0 = 11.6 + o.order * 1.6; a = Math.max(0.35 * pr(t, 1.0, 1.9, o3) * (1 - pr(t, 3.6, 4.6)), pr(t, t0, t0 + 1.1, o3)); }
+      o.p.setAttribute('fill', o.nr === '1813' ? '#9FD0BA' : '#CFE4D8');
+      o.p.setAttribute('stroke-width', o.nr === '1813' ? 2.2 : 1.4);
+    } else {
+      const t0 = 4.3 + o.order * 1.8;
+      a = Math.max(0.6 * pr(t, 1.0, 1.9, o3), pr(t, t0, t0 + 1.1, o3));
+    }
+    o.p.style.opacity = a.toFixed(3);
+  });
+  towns.forEach((w, i) => {
+    const t0 = FILM_MODE ? (w.name === 'Brønnøysund' ? 5.0 : 1e9) : 7.0 + i * 0.35;
+    const a = pr(t, t0, t0 + 0.6, o3);
+    const k = 1 / c.s;
+    w.dot.setAttribute('r', (7 * k * (0.6 + 0.4 * a)).toFixed(3));
+    w.dot.style.opacity = a;
+    const ph = pr(t, t0 + 0.1, t0 + 1.8, o3);
+    w.ring.setAttribute('r', ((8 + 34 * ph) * k).toFixed(3));
+    w.ring.style.opacity = ((1 - ph) * a).toFixed(3);
+    w.halo.setAttribute('r', (20 * k).toFixed(3));
+    w.halo.style.opacity = (0.8 * a).toFixed(3);
+    const X = c.sx + (w.x - c.cx) * c.s, Y = c.sy + (w.y - c.cy) * c.s;
+    w.lab.style.left = (X + 16) + 'px'; w.lab.style.top = (Y - 34) + 'px';
+    w.lab.style.opacity = pr(t, t0 + 0.3, t0 + 1.1, o3).toFixed(3);
+  });
+  if (FILM_MODE) {
+    text('fk', t, 5.6, 99); text('fh', t, 5.8, 99); text('fs', t, 7.4, 99); text('f2', t, 11.8, 99);
+  } else {
+    text('k1', t, 4.6, 99);
+    text('h1', t, 4.9, 99);
+    text('s1', t, 5.9, 99);
+    text('s2', t, 7.6, 99);
+  }
+  $('black').style.opacity = (FILM_MODE ? 1 - pr(T, 0, 1.2, o3) : Math.max(1 - pr(t, 0, 0.8, o3), pr(t, 9.3, 10))).toFixed(3);
+}
+async function ready() { await document.fonts.ready; return true; }
+window.FILM = { renderAt, ready, DUR, FPS };
+ready().then(() => { renderAt(+(location.search.match(/t=([\d.]+)/) || [0, 8])[1]); window.FILM_READY = true; });
+})();
+</script>
+</body>
+</html>

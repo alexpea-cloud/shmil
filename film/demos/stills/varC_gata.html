@@ -1,0 +1,91 @@
+<!doctype html>
+<html lang="no"><head><meta charset="utf-8"><title>Variant C – gata</title>
+<link rel="stylesheet" href="common.css">
+<style>.tag{font:600 22px/1 FS;fill:#465257}</style>
+</head>
+<body><div id="stage">
+<svg id="s" width="1920" height="1080" viewBox="0 0 1920 1080">
+  <defs>
+    <filter id="blur8"><feGaussianBlur stdDeviation="8"/></filter>
+    <filter id="blur3"><feGaussianBlur stdDeviation="2.5"/></filter>
+    <symbol id="jar" viewBox="0 0 40 52"><rect x="10" y="1" width="20" height="8" rx="2.5" fill="#6E7F7A"/><path d="M8 11 h24 a4 4 0 0 1 4 4 v27 a8 8 0 0 1 -8 8 h-16 a8 8 0 0 1 -8 -8 v-27 a4 4 0 0 1 4 -4z" fill="currentColor"/><rect x="11" y="17" width="4.5" height="24" rx="2.2" fill="rgba(255,255,255,.55)"/></symbol>
+  </defs>
+  <g id="scene"></g>
+</svg>
+<div class="ab k" style="left:150px;top:110px">Henteordning i tettbygd strøk · modellert</div>
+<div class="ab h" style="left:150px;top:150px">0,8 kg per stopp</div>
+<div class="ab" style="left:150px;top:640px;white-space:normal;width:560px">
+  <div style="font:400 34px/1.35 FS;color:var(--ink2)">Så lite ekstra glass og metall gir hvert stopp – i gjennomsnitt.</div>
+  <div style="margin-top:34px;font:700 64px/1 FD;color:var(--ink)">56 000 stopp</div>
+  <div style="font:400 26px/1.3 FS;color:var(--ink2);margin-top:8px">i året, med ny tungtrafikk i boliggatene</div>
+  <div style="margin-top:28px;display:inline-block;padding:14px 22px;border-radius:10px;background:#fff;box-shadow:0 14px 30px rgba(27,35,38,.10);border-left:7px solid var(--blue)">
+    <span style="font:700 46px/1 FD;color:var(--blue)">74 kr</span><span style="font:400 24px/1 FS;color:var(--ink2);margin-left:12px">per ekstra kilo</span>
+  </div>
+</div>
+<div class="ab foot" style="left:150px;top:1000px;width:1620px">Illustrasjon. Tall fra søknaden kap. 2.1–2.2: 45,7 tonn modellert meruttak fordelt på ca. 56 000 tømmestopp i året.</div>
+<script>
+const NS = 'http://www.w3.org/2000/svg';
+const sc = document.getElementById('scene');
+const S = 36, OX = 860, OY = 300;
+const P = (x, y, z = 0) => [OX + (x - y) * 0.866 * S, OY + (x + y) * 0.5 * S - z * S];
+const poly = (pts, fill, extra = {}) => { const p = document.createElementNS(NS, 'polygon'); p.setAttribute('points', pts.map(q => P(...q).join(',')).join(' ')); p.setAttribute('fill', fill); for (const k in extra) p.setAttribute(k, extra[k]); sc.appendChild(p); return p; };
+const el = (tag, attrs) => { const e = document.createElementNS(NS, tag); for (const k in attrs) e.setAttribute(k, attrs[k]); sc.appendChild(e); return e; };
+function box(x, y, z, w, d, h, top, fy, fx) {
+  poly([[x, y + d, z], [x + w, y + d, z], [x + w, y + d, z + h], [x, y + d, z + h]], fy);
+  poly([[x + w, y, z], [x + w, y + d, z], [x + w, y + d, z + h], [x + w, y, z + h]], fx);
+  poly([[x, y, z + h], [x + w, y, z + h], [x + w, y + d, z + h], [x, y + d, z + h]], top);
+}
+function house(x, y, w, d, h, rh, wall, roofA, roofB) {
+  box(x, y, 0, w, d, h, wall[0], wall[1], wall[2]);
+  // gable roof with ridge along x
+  poly([[x, y + d, h], [x + w, y + d, h], [x + w, y + d / 2, h + rh], [x, y + d / 2, h + rh]], roofA);
+  poly([[x + w, y, h], [x + w, y + d, h], [x + w, y + d / 2, h + rh]], wall[2]);
+  poly([[x, y, h], [x + w, y, h], [x + w, y + d / 2, h + rh], [x, y + d / 2, h + rh]], roofB);
+  // windows on the +y face
+  for (let i = 0; i < 2; i++) { const wx = x + 0.6 + i * (w - 1.8) / 1; poly([[wx, y + d, 0.9], [wx + 0.9, y + d, 0.9], [wx + 0.9, y + d, 1.6], [wx, y + d, 1.6]], '#C9D8DE'); }
+}
+// ground: lawn strip, sidewalk, street
+poly([[-6, -8, 0], [34, -8, 0], [34, -0.6, 0], [-6, -0.6, 0]], '#E2E6DC');
+poly([[-6, -0.6, 0], [34, -0.6, 0], [34, 0.2, 0], [-6, 0.2, 0]], '#D3D4CE');
+poly([[-6, 0.2, 0], [34, 0.2, 0], [34, 4.6, 0], [-6, 4.6, 0]], '#BFC3C0');
+for (let x = -5; x < 34; x += 2.4) poly([[x, 2.35, 0], [x + 1.2, 2.35, 0], [x + 1.2, 2.55, 0], [x, 2.55, 0]], '#E9EAE5');
+// houses (behind the street), drawn back to front
+const HX = [0, 5.5, 11, 16.5, 22, 27.5];
+const walls = [['#F1EFEA', '#E3E0D8', '#CFCBC1'], ['#F0EEE8', '#DEDBD2', '#C9C5BA'], ['#F2F0EB', '#E5E2DA', '#D1CDC3']];
+HX.forEach((x, i) => house(x, -6.6, 3.8, 3.8, 2.3, 1.5, walls[i % 3], i % 2 ? '#8D6E63' : '#7C8B8F', i % 2 ? '#A1887F' : '#95A3A7'));
+// bins at the curb; visited stops get a green ring
+const TRUCK_X = 6.6;  // truck body spans x 6.6–12.4; the next bin (x 12.6) is just ahead of the cab
+HX.forEach((x, i) => {
+  const bx = x + 1.6, by = -1.6;
+  const visited = bx < TRUCK_X + 5, here = bx > TRUCK_X + 5 && bx < TRUCK_X + 7;
+  box(bx, by, 0, 0.7, 0.7, 1.0, here ? '#2F8F6B' : '#5B6B66', here ? '#257356' : '#4A5853', here ? '#1D5C45' : '#3E4A46');
+  const hidden = bx > TRUCK_X - 0.6 && bx < TRUCK_X + 6;   // behind the truck
+  if (visited && !hidden) { const [cx, cy] = P(bx + 0.35, by + 0.35, 1.5); el('circle', { cx, cy, r: 13, fill: 'none', stroke: '#0E9C79', 'stroke-width': 3 }); el('path', { d: `M${cx - 6},${cy} l4,4 l7,-8`, fill: 'none', stroke: '#0E9C79', 'stroke-width': 3, 'stroke-linecap': 'round' }); }
+});
+// dotted path to the next stops
+for (let x = TRUCK_X + 6.6; x < 32; x += 0.7) { const [cx, cy] = P(x, 1.5, 0.02); el('circle', { cx, cy, r: 3, fill: '#2A7FA6', opacity: 0.45 }); }
+// exhaust (behind the truck) and dust
+[[TRUCK_X - 1.4, 1.2, 1.2, 46], [TRUCK_X - 2.6, 0.9, 1.9, 62], [TRUCK_X - 4.0, 0.7, 2.6, 78]].forEach(([x, y, z, r], i) => { const [cx, cy] = P(x, y, z); el('circle', { cx, cy, r, fill: '#9AA4A8', opacity: 0.35 - i * 0.08, filter: 'url(#blur8)' }); });
+for (let i = 0; i < 26; i++) { const x = TRUCK_X - 0.6 - (i * 0.37) % 3.2, y = 0.6 + ((i * 7) % 10) / 4, z = 0.1 + ((i * 3) % 5) / 10; const [cx, cy] = P(x, y, z); el('circle', { cx, cy, r: 1.6 + (i % 3), fill: '#A89F8C', opacity: 0.55, filter: 'url(#blur3)' }); }
+// truck: cargo body + cab, travelling in +x
+box(TRUCK_X, 0.6, 0.45, 4.2, 1.9, 2.0, '#E7ECEC', '#2A7FA6', '#1F6585');
+box(TRUCK_X + 4.3, 0.7, 0.45, 1.5, 1.7, 1.55, '#E7ECEC', '#2F86AE', '#226A8A');
+poly([[TRUCK_X + 5.8, 0.85, 1.25], [TRUCK_X + 5.8, 2.25, 1.25], [TRUCK_X + 5.8, 2.25, 1.85], [TRUCK_X + 5.8, 0.85, 1.85]], '#BFD9E6');
+[[TRUCK_X + 0.8], [TRUCK_X + 3.2], [TRUCK_X + 4.9]].forEach(([x]) => { const [cx, cy] = P(x, 2.5, 0.42); el('ellipse', { cx, cy, rx: 15, ry: 17, fill: '#1B2326' }); el('ellipse', { cx, cy, rx: 6, ry: 7, fill: '#6E7A7F' }); });
+// noise arcs around the truck
+{ const [cx, cy] = P(TRUCK_X + 3, 1.5, 2.9); [34, 52, 70].forEach((r, i) => el('path', { d: `M${cx - r * 0.7},${cy - r * 0.45} A${r},${r} 0 0 1 ${cx + r * 0.7},${cy - r * 0.45}`, fill: 'none', stroke: '#5B686D', 'stroke-width': 3, opacity: 0.5 - i * 0.12, 'stroke-linecap': 'round' })); }
+// labels
+{ const [x, y] = P(TRUCK_X - 3.6, 0.5, 3.4); el('text', { x, y, class: 'tag' }).textContent = 'Utslipp'; }
+{ const [x, y] = P(TRUCK_X + 3, 1.5, 4.9); const t = el('text', { x, y, class: 'tag', 'text-anchor': 'middle' }); t.textContent = 'Støy'; }
+{ const [x, y] = P(TRUCK_X - 1.6, 4.4, 0); const t = el('text', { x, y: y + 34, class: 'tag', 'text-anchor': 'middle' }); t.textContent = 'Veistøv og slitasje'; }
+// callout at the current bin: 0,8 kg
+{
+  const bx = HX[2] + 1.95, [cx, cy] = P(bx, -1.25, 1.1);
+  const X = cx + 40, Y = cy - 190;
+  el('path', { d: `M${cx},${cy - 6} L${X + 20},${Y + 92}`, stroke: '#0E9C79', 'stroke-width': 2.5 });
+  el('rect', { x: X, y: Y, width: 230, height: 96, rx: 12, fill: '#fff', filter: 'drop-shadow(0 10px 18px rgba(27,35,38,.14))' });
+  const u = el('use', { href: '#jar', x: X + 18, y: Y + 18, width: 46, height: 60 }); u.style.color = '#3FA37A';
+  const t = el('text', { x: X + 82, y: Y + 62, 'font-family': 'FD', 'font-weight': 700, 'font-size': 46, fill: '#007B61' }); t.textContent = '0,8 kg';
+}
+</script>
+</div></body></html>
