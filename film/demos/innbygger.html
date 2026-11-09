@@ -44,15 +44,15 @@ svg{position:absolute;left:0;top:0;overflow:visible}
     <ellipse id="pshadow" cx="270" cy="944" rx="110" ry="12" fill="rgba(40,45,40,.12)" opacity="0"/>
     <g id="glows"></g>
     <g id="jars"></g>
-    <path id="link" d="M960 700 C1010 700 1020 362 1110 362" fill="none" stroke="#0E9C79" stroke-width="2.5" stroke-linecap="round" opacity="0"/>
+    <path id="link" d="M905 700 C990 700 1020 362 1110 362" fill="none" stroke="#0E9C79" stroke-width="2.5" stroke-linecap="round" opacity="0"/>
     <circle id="pulseGlow" r="22" fill="#0E9C79" filter="url(#glow)" opacity="0"/>
     <circle id="pulse" r="7" fill="#007B61" opacity="0"/>
     <line id="divider" x1="1050" y1="330" x2="1050" y2="900" stroke="#CDD2CD" stroke-width="2" opacity="0"/>
   </svg>
 
   <div class="ab k" id="kick" style="left:150px;top:110px">Glass- og metallemballasje · ett år</div>
-  <div class="ab h" id="h1" style="left:150px;top:150px">Én innbygger i tettbygd strøk</div>
-  <div class="ab h" id="h2" style="left:150px;top:150px">33 gram i uka</div>
+  <div class="ab h" id="h1" style="left:150px;top:150px">Én innbygger i eierkommunene</div>
+  <div class="ab h" id="h2" style="left:150px;top:150px">22 gram i uka</div>
   <div class="ab sub" id="s2" style="left:150px;top:252px">– det er den ekstra mengden henteordning er beregnet å gi</div>
 
   <div class="ab lab" id="l1" style="left:470px;top:350px">Samles inn i dag: <b style="color:var(--green)" id="n1">ca. 0,0 kg</b></div>
@@ -76,7 +76,7 @@ svg{position:absolute;left:0;top:0;overflow:visible}
     <div><div class="rv">74 kr per ekstra kilo</div><div class="rl">mot 1,81 kr i Miljødirektoratets anslag</div></div>
   </div>
 
-  <div class="ab foot" id="foot" style="left:150px;top:1000px">Beregnet fra søknaden: 375,5 tonn og modellert meruttak 45,7 tonn ÷ 26 456 innbyggere i tettbygd strøk. Ett glass i figuren = 0,5 kg.</div>
+  <div class="ab foot" id="foot" style="left:150px;top:1000px">Beregnet fra søknaden og Vedlegg 1: 579,5 tonn i dag og modellert meruttak 45,7 tonn ÷ 40 827 innbyggere i de 11 eierkommunene. Ett glass i figuren = 0,5 kg.</div>
   <div id="black"></div>
 </div>
 <script>
@@ -98,7 +98,7 @@ const nf = (v, d) => v.toFixed(d).replace('.', ',').replace(/\B(?=(\d{3})+(?!\d)
 /* ---------------------------------------------------------------- timeline */
 const T = {
   person: 1.0, today: 2.6, jar0: 3.0, jarStep: 0.115,        // 28 jars: 3.0 – 6.2
-  extraLab: 8.2, extra: [8.7, 9.4, 10.1, 10.8], fillEnd: 11.8,
+  extraLab: 8.2, extra: [8.7, 9.5, 10.3], fillEnd: 11.4,
   head2: 12.4, dimToday: 14.8,
   link: 15.2, rh: 15.6, items: [16.4, 19.0, 21.6, 24.2],
   end: 30,
@@ -107,7 +107,7 @@ const T = {
 /* ---------------------------------------------------------------- jars */
 const per = 8, W = 60, H = 78, X0 = 470, Y0 = 400;
 const jars = [];
-for (let i = 0; i < 32; i++) {
+for (let i = 0; i < 31; i++) {   // 28 jars today (14,2 kg) + 2,24 extra (1,1 kg)
   const extra = i >= 28;
   const x = X0 + (i % per) * W, y = Y0 + Math.floor(i / per) * H + (extra ? 18 : 0);
   const g = document.createElementNS(NS, 'g');
@@ -121,10 +121,10 @@ for (let i = 0; i < 32; i++) {
   glow.setAttribute('fill', '#0E9C79'); glow.setAttribute('filter', 'url(#glow)'); glow.setAttribute('opacity', 0);
   if (extra) $('glows').appendChild(glow);
   const ts = extra ? T.extra[i - 28] : T.jar0 + i * T.jarStep;
-  jars.push({ g, u, x, y, extra, ts, glow, partial: i === 31 });
+  jars.push({ g, u, x, y, extra, ts, glow, partial: i === 30 });
 }
-// the last extra jar is only 0,4 full: a faint outline + a liquid fill rising inside a clip
-const last = jars[31];
+// the last extra jar is only 0,24 full: a faint outline + a liquid fill rising inside a clip
+const last = jars[30];
 last.u.style.opacity = 0.22;
 const fillUse = document.createElementNS(NS, 'use');
 fillUse.setAttribute('href', '#jar'); fillUse.setAttribute('width', 46); fillUse.setAttribute('height', 60);
@@ -182,7 +182,7 @@ function renderAt(t) {
   }
   // partial jar fill (0,4 of the body)
   {
-    const f = pr(t, T.extra[3] + 0.3, T.fillEnd, io) * 0.4;
+    const f = pr(t, T.extra[2] + 0.3, T.fillEnd, io) * 0.24;
     const bodyTop = 12.7, bodyBot = 57.7, h = (bodyBot - bodyTop) * f;
     const r = $('fillrect');
     r.setAttribute('x', 0); r.setAttribute('y', (bodyBot - h).toFixed(2)); r.setAttribute('width', 46); r.setAttribute('height', h.toFixed(2));
@@ -200,7 +200,7 @@ function renderAt(t) {
   $('l1').style.opacity = (parseFloat($('l1').style.opacity) * (1 - 0.35 * pr(t, T.dimToday, T.dimToday + 1.2))).toFixed(3);
   $('n1').textContent = 'ca. ' + nf(14.2 * pr(t, T.jar0 + 0.3, T.jar0 + 28 * T.jarStep + 0.5, x => x), 1) + ' kg';
   fadeIn('l2', t, T.extraLab);
-  $('n2').textContent = 'ca. ' + nf(1.7 * pr(t, T.extra[0] + 0.2, T.fillEnd, x => x), 1) + ' kg';
+  $('n2').textContent = 'ca. ' + nf(1.1 * pr(t, T.extra[0] + 0.2, T.fillEnd, x => x), 1) + ' kg';
 
   // link from the extra jars to the right column
   {
