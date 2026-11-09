@@ -2,7 +2,7 @@
 <html lang="no">
 <head>
 <meta charset="utf-8">
-<title>Sekvens – én innbygger</title>
+<title>Sekvens – én innbygger og konsekvensen av henteordning</title>
 <style>
 @font-face{font-family:FS;src:url(../assets/fonts/Inter-Regular.otf);font-weight:400}
 @font-face{font-family:FS;src:url(../assets/fonts/Inter-Medium.otf);font-weight:500}
@@ -13,7 +13,7 @@
 html,body{margin:0;background:#000;overflow:hidden}
 #stage{position:absolute;left:0;top:0;width:1920px;height:1080px;overflow:hidden;font-family:FS,sans-serif;color:var(--ink);-webkit-font-smoothing:antialiased;
   font-feature-settings:"tnum" 1;background:radial-gradient(ellipse 75% 70% at 50% 42%,#F6F5F1 0%,#ECEBE6 60%,#E3E2DC 100%)}
-svg{position:absolute;left:0;top:0;overflow:visible}
+svg,canvas{position:absolute;left:0;top:0;overflow:visible}
 .ab{position:absolute;white-space:nowrap;opacity:0;will-change:transform,opacity}
 .k{font:600 25px/1 FS;letter-spacing:.16em;text-transform:uppercase;color:var(--green)}
 .h{font:700 82px/1.05 FD;letter-spacing:-.018em}
@@ -21,68 +21,87 @@ svg{position:absolute;left:0;top:0;overflow:visible}
 .lab{font:600 27px/1.3 FS;color:var(--ink2)}
 .lab b{font-weight:700}
 .foot{font:400 20px/1.4 FS;color:var(--ink3)}
-.row{display:flex;align-items:center;gap:28px}
-.ic{position:relative;width:78px;height:78px;border-radius:20px;background:#fff;box-shadow:0 12px 26px rgba(27,35,38,.09);overflow:hidden;flex:none}
+.row{display:flex;align-items:center;gap:26px}
+.ic{position:relative;width:76px;height:76px;border-radius:20px;background:#fff;box-shadow:0 12px 26px rgba(27,35,38,.09);overflow:hidden;flex:none}
 .ic svg{position:absolute;left:0;top:0}
-.rv{font:700 46px/1 FD;color:var(--ink)}
-.rl{font:400 25px/1.25 FS;color:var(--ink2);margin-top:8px}
+.rv{font:700 44px/1 FD;color:var(--ink)}
+.rl{font:400 24px/1.25 FS;color:var(--ink2);margin-top:8px}
+.town{position:absolute;font:600 24px/1 FS;color:var(--ink);white-space:nowrap;opacity:0;text-shadow:0 0 6px #EEEDE8,0 0 12px #EEEDE8}
+#banner{position:absolute;left:150px;top:868px;width:1620px;height:150px;box-sizing:border-box;padding:0 44px;border-radius:16px;background:#fff;
+  box-shadow:0 24px 50px rgba(27,35,38,.12),0 3px 10px rgba(27,35,38,.06);display:flex;align-items:center;gap:56px;opacity:0}
+#banner .bar{position:absolute;left:0;top:22px;bottom:22px;width:8px;border-radius:0 5px 5px 0;background:var(--green-hi)}
 #black{position:absolute;inset:0;background:#000;opacity:1}
 </style>
 </head>
 <body>
 <div id="stage">
+  <!-- part 2: map (behind everything else) -->
+  <svg id="map" width="1920" height="1080" viewBox="0 0 1920 1080" opacity="0"><g id="mapcam"><g id="ctx"></g><g id="own"></g></g></svg>
+  <canvas id="trucks" width="1920" height="1080"></canvas>
+
+  <!-- part 1: one inhabitant -->
   <svg id="art" width="1920" height="1080" viewBox="0 0 1920 1080">
     <defs>
       <symbol id="jar" viewBox="0 0 40 52"><rect x="10" y="1" width="20" height="8" rx="2.5" fill="#6E7F7A"/><path d="M8 11 h24 a4 4 0 0 1 4 4 v27 a8 8 0 0 1 -8 8 h-16 a8 8 0 0 1 -8 -8 v-27 a4 4 0 0 1 4 -4z" fill="currentColor"/><rect x="11" y="17" width="4.5" height="24" rx="2.2" fill="rgba(255,255,255,.55)"/></symbol>
       <filter id="glow" x="-60%" y="-60%" width="220%" height="220%"><feGaussianBlur stdDeviation="9"/></filter>
       <clipPath id="fillclip"><rect id="fillrect" x="0" y="0" width="0" height="0"/></clipPath>
     </defs>
-    <g id="person" fill="#9AA4A8" opacity="0">
-      <circle cx="270" cy="430" r="56"/>
-      <path d="M190 510 h160 a40 40 0 0 1 40 40 v170 a18 18 0 0 1 -36 0 v-150 h-12 v330 a22 22 0 0 1 -44 0 v-190 h-16 v190 a22 22 0 0 1 -44 0 v-330 h-12 v150 a18 18 0 0 1 -36 0 v-170 a40 40 0 0 1 40 -40z"/>
+    <g id="part1">
+      <g id="person" fill="#9AA4A8" opacity="0">
+        <circle cx="270" cy="430" r="56"/>
+        <path d="M190 510 h160 a40 40 0 0 1 40 40 v170 a18 18 0 0 1 -36 0 v-150 h-12 v330 a22 22 0 0 1 -44 0 v-190 h-16 v190 a22 22 0 0 1 -44 0 v-330 h-12 v150 a18 18 0 0 1 -36 0 v-170 a40 40 0 0 1 40 -40z"/>
+      </g>
+      <ellipse id="pshadow" cx="270" cy="944" rx="110" ry="12" fill="rgba(40,45,40,.12)" opacity="0"/>
+      <g id="glows"></g>
+      <g id="jars"></g>
     </g>
-    <ellipse id="pshadow" cx="270" cy="944" rx="110" ry="12" fill="rgba(40,45,40,.12)" opacity="0"/>
-    <g id="glows"></g>
-    <g id="jars"></g>
-    <path id="link" d="M905 700 C990 700 1020 362 1110 362" fill="none" stroke="#0E9C79" stroke-width="2.5" stroke-linecap="round" opacity="0"/>
-    <circle id="pulseGlow" r="22" fill="#0E9C79" filter="url(#glow)" opacity="0"/>
-    <circle id="pulse" r="7" fill="#007B61" opacity="0"/>
-    <line id="divider" x1="1050" y1="330" x2="1050" y2="900" stroke="#CDD2CD" stroke-width="2" opacity="0"/>
   </svg>
 
   <div class="ab k" id="kick" style="left:150px;top:110px">Glass- og metallemballasje · ett år</div>
   <div class="ab h" id="h1" style="left:150px;top:150px">Én innbygger i eierkommunene</div>
   <div class="ab h" id="h2" style="left:150px;top:150px">22 gram i uka</div>
   <div class="ab sub" id="s2" style="left:150px;top:252px">– det er den ekstra mengden henteordning er beregnet å gi</div>
-
   <div class="ab lab" id="l1" style="left:470px;top:350px">Samles inn i dag: <b style="color:var(--green)" id="n1">ca. 0,0 kg</b></div>
   <div class="ab lab" id="l2" style="left:470px;top:808px;white-space:normal;width:560px">Ekstra med henteordning: <b style="color:var(--green-hi)" id="n2">ca. 0,0 kg</b><br><span style="font-weight:400;color:var(--ink3)">modellert</span></div>
 
-  <div class="ab lab" id="rh" style="left:1130px;top:350px">Det de ekstra grammene krever:</div>
-  <div class="ab row" id="r1" style="left:1130px;top:408px">
-    <div class="ic"><svg width="78" height="78" viewBox="0 0 78 78"><g id="truck"><rect x="12" y="26" width="32" height="22" rx="3" fill="#2A7FA6"/><path d="M44 31 h10 l8 8 v9 h-18z" fill="#2A7FA6"/><path d="M47 34 h6 l5 5 h-11z" fill="#BFD9E6"/><g id="w1"><circle cx="22" cy="51" r="6" fill="#1B2326"/><rect x="21" y="46" width="2" height="10" fill="#6E7A7F"/></g><g id="w2"><circle cx="52" cy="51" r="6" fill="#1B2326"/><rect x="51" y="46" width="2" height="10" fill="#6E7A7F"/></g></g></svg></div>
+  <!-- part 2: consequence -->
+  <div class="ab k" id="kick2" style="left:150px;top:110px">For 22 gram i uka per innbygger</div>
+  <div class="ab h" id="h3" style="left:150px;top:150px">Konsekvensen av henteordning</div>
+  <div class="town" id="t0">Brønnøysund</div><div class="town" id="t1">Sandnessjøen</div><div class="town" id="t2">Mosjøen</div>
+  <div class="ab row" id="r1" style="left:150px;top:330px">
+    <div class="ic"><svg width="76" height="76" viewBox="0 0 78 78"><rect x="12" y="26" width="32" height="22" rx="3" fill="#2A7FA6"/><path d="M44 31 h10 l8 8 v9 h-18z" fill="#2A7FA6"/><path d="M47 34 h6 l5 5 h-11z" fill="#BFD9E6"/><circle cx="22" cy="51" r="6" fill="#1B2326"/><circle cx="52" cy="51" r="6" fill="#1B2326"/></svg></div>
     <div><div class="rv" id="n3">0 stopp</div><div class="rl">tømmestopp i året – 0,8 kg per stopp</div></div>
   </div>
-  <div class="ab row" id="r2" style="left:1130px;top:520px">
-    <div class="ic"><svg width="78" height="78" viewBox="0 0 78 78"><g id="cloud"><circle id="c1" cx="28" cy="42" r="11" fill="#9AA4A8"/><circle id="c2" cx="41" cy="35" r="14" fill="#B7BEBB"/><circle id="c3" cx="52" cy="45" r="10" fill="#9AA4A8"/></g><g id="dust"></g></svg></div>
+  <div class="ab row" id="r2" style="left:150px;top:448px">
+    <div class="ic"><svg width="76" height="76" viewBox="0 0 78 78"><rect x="16" y="20" width="46" height="42" rx="6" fill="#fff" stroke="#5B686D" stroke-width="3.5"/><rect x="16" y="20" width="46" height="12" rx="4" fill="#5B686D"/><rect x="25" y="14" width="4" height="12" rx="2" fill="#5B686D"/><rect x="49" y="14" width="4" height="12" rx="2" fill="#5B686D"/><circle cx="29" cy="45" r="3.5" fill="#2A7FA6"/><circle cx="39" cy="45" r="3.5" fill="#2A7FA6"/><circle cx="49" cy="45" r="3.5" fill="#2A7FA6"/></svg></div>
+    <div><div class="rv">225 bildager</div><div class="rl">i året, fordelt på tre driftsregioner</div></div>
+  </div>
+  <div class="ab row" id="r3" style="left:150px;top:566px">
+    <div class="ic"><svg width="76" height="76" viewBox="0 0 78 78"><circle cx="28" cy="42" r="11" fill="#9AA4A8"/><circle cx="41" cy="35" r="14" fill="#B7BEBB"/><circle cx="52" cy="45" r="10" fill="#9AA4A8"/></svg></div>
     <div><div class="rv">Utslipp og veistøv</div><div class="rl">ny tungtrafikk i boliggatene</div></div>
   </div>
-  <div class="ab row" id="r3" style="left:1130px;top:632px">
-    <div class="ic"><svg width="78" height="78" viewBox="0 0 78 78"><path d="M16 32 h9 l12 -10 v34 l-12 -10 h-9z" fill="#5B686D"/><path id="sw1" d="M44 30 q6 9 0 18" stroke="#5B686D" stroke-width="3.5" fill="none" stroke-linecap="round"/><path id="sw2" d="M50 24 q11 15 0 30" stroke="#5B686D" stroke-width="3.5" fill="none" stroke-linecap="round"/><path id="sw3" d="M56 18 q16 21 0 42" stroke="#5B686D" stroke-width="3.5" fill="none" stroke-linecap="round"/></svg></div>
+  <div class="ab row" id="r4" style="left:150px;top:684px">
+    <div class="ic"><svg width="76" height="76" viewBox="0 0 78 78"><path d="M16 32 h9 l12 -10 v34 l-12 -10 h-9z" fill="#5B686D"/><path id="sw1" d="M44 30 q6 9 0 18" stroke="#5B686D" stroke-width="3.5" fill="none" stroke-linecap="round"/><path id="sw2" d="M50 24 q11 15 0 30" stroke="#5B686D" stroke-width="3.5" fill="none" stroke-linecap="round"/><path id="sw3" d="M56 18 q16 21 0 42" stroke="#5B686D" stroke-width="3.5" fill="none" stroke-linecap="round"/></svg></div>
     <div><div class="rv">Støy</div><div class="rl">fra tømming og tungtransport</div></div>
   </div>
-  <div class="ab row" id="r4" style="left:1130px;top:744px">
-    <div class="ic"><svg width="78" height="78" viewBox="0 0 78 78"><g id="tag" transform-origin="20 20"><path d="M16 14 h22 l22 22 -24 24 -22 -22z" fill="#007B61"/><circle cx="25" cy="23" r="5" fill="#fff"/></g></svg></div>
-    <div><div class="rv">74 kr per ekstra kilo</div><div class="rl">mot 1,81 kr i Miljødirektoratets anslag</div></div>
+
+  <!-- part 3: cost -->
+  <div id="banner">
+    <div class="bar"></div>
+    <div style="font:600 24px/1.25 FS;letter-spacing:.14em;text-transform:uppercase;color:var(--green);width:250px;white-space:normal">Kostnaden ved henteordning</div>
+    <div style="font:700 88px/1 FD;letter-spacing:-.02em;color:var(--ink);white-space:nowrap" id="n4">3,39 mill. kr</div>
+    <div style="white-space:normal"><div style="font:600 34px/1.15 FD;color:var(--ink)">i året · 74 kr per ekstra kilo</div><div style="font:400 24px/1.3 FS;color:var(--ink2);margin-top:8px">mot 1,81 kr i Miljødirektoratets anslag</div></div>
   </div>
 
-  <div class="ab foot" id="foot" style="left:150px;top:1000px">Beregnet fra søknaden og Vedlegg 1: 579,5 tonn i dag og modellert meruttak 45,7 tonn ÷ 40 827 innbyggere i de 11 eierkommunene. Ett glass i figuren = 0,5 kg.</div>
+  <div class="ab foot" id="foot" style="left:150px;top:1036px">Beregnet fra søknaden og Vedlegg 1: 579,5 tonn i dag og modellert meruttak 45,7 tonn ÷ 40 827 innbyggere i de 11 eierkommunene. Ett glass i figuren = 0,5 kg.</div>
+  <div class="ab foot" id="foot2" style="left:150px;top:1036px">Illustrasjon av henteordning i tettbygd strøk i de tre driftsregionene. Tall fra søknaden kap. 2. Kart: Kartverket (CC BY 4.0).</div>
   <div id="black"></div>
 </div>
+<script src="geo.js"></script>
 <script>
 (function () {
 'use strict';
-const DUR = 30, FPS = 30;
+const DUR = 40, FPS = 30;
 const NS = 'http://www.w3.org/2000/svg';
 const clamp = (x, a = 0, b = 1) => Math.min(b, Math.max(a, x));
 const lerp = (a, b, p) => a + (b - a) * p;
@@ -95,81 +114,164 @@ const env = (t, a, b, fi, fo) => Math.min(pr(t, a, a + fi, o3), 1 - pr(t, b - fo
 const $ = id => document.getElementById(id);
 const nf = (v, d) => v.toFixed(d).replace('.', ',').replace(/\B(?=(\d{3})+(?!\d))/g, ' ');
 
-/* ---------------------------------------------------------------- timeline */
+/* ---------------------------------------------------------------- timeline (s) */
 const T = {
-  person: 1.0, today: 2.6, jar0: 3.0, jarStep: 0.115,        // 28 jars: 3.0 – 6.2
-  extraLab: 8.2, extra: [8.7, 9.5, 10.3], fillEnd: 11.4,
-  head2: 12.4, dimToday: 14.8,
-  link: 15.2, rh: 15.6, items: [16.4, 19.0, 21.6, 24.2],
-  end: 30,
+  person: 0.9, today: 2.2, jar0: 2.6, jarStep: 0.1,          // 28 jars: 2.6 – 5.4
+  extraLab: 6.6, extra: [7.1, 7.9, 8.7], fillEnd: 9.8,
+  head2: 10.1,                                              // music: climax starts here
+  out1: 15.4,                                               // part 1 leaves
+  map: 15.4, h3: 16.2, towns: 17.4, trucks: 18.8,
+  items: [19.6, 22.6, 25.6, 28.6], count: [19.4, 30.6],
+  banner: 31.2, end: 40,
 };
 
-/* ---------------------------------------------------------------- jars */
+/* ================================================================ part 1: jars */
 const per = 8, W = 60, H = 78, X0 = 470, Y0 = 400;
 const jars = [];
-for (let i = 0; i < 31; i++) {   // 28 jars today (14,2 kg) + 2,24 extra (1,1 kg)
+for (let i = 0; i < 31; i++) {          // 28 jars today (14,2 kg) + 2,24 extra (1,1 kg)
   const extra = i >= 28;
   const x = X0 + (i % per) * W, y = Y0 + Math.floor(i / per) * H + (extra ? 18 : 0);
   const g = document.createElementNS(NS, 'g');
   const u = document.createElementNS(NS, 'use');
   u.setAttribute('href', '#jar'); u.setAttribute('width', 46); u.setAttribute('height', 60);
   u.style.color = extra ? '#0E9C79' : '#8CC9A8';
-  g.appendChild(u);
-  $('jars').appendChild(g);
+  g.appendChild(u); $('jars').appendChild(g);
   const glow = document.createElementNS(NS, 'ellipse');
   glow.setAttribute('cx', x + 23); glow.setAttribute('cy', y + 34); glow.setAttribute('rx', 26); glow.setAttribute('ry', 32);
   glow.setAttribute('fill', '#0E9C79'); glow.setAttribute('filter', 'url(#glow)'); glow.setAttribute('opacity', 0);
   if (extra) $('glows').appendChild(glow);
-  const ts = extra ? T.extra[i - 28] : T.jar0 + i * T.jarStep;
-  jars.push({ g, u, x, y, extra, ts, glow, partial: i === 30 });
+  jars.push({ g, u, x, y, extra, ts: extra ? T.extra[i - 28] : T.jar0 + i * T.jarStep, glow });
 }
-// the last extra jar is only 0,24 full: a faint outline + a liquid fill rising inside a clip
 const last = jars[30];
 last.u.style.opacity = 0.22;
 const fillUse = document.createElementNS(NS, 'use');
 fillUse.setAttribute('href', '#jar'); fillUse.setAttribute('width', 46); fillUse.setAttribute('height', 60);
-fillUse.style.color = '#0E9C79';
-fillUse.setAttribute('clip-path', 'url(#fillclip)');
+fillUse.style.color = '#0E9C79'; fillUse.setAttribute('clip-path', 'url(#fillclip)');
 last.g.appendChild(fillUse);
 
-/* ---------------------------------------------------------------- dust particles for the cloud icon */
-let seed = 3; const rnd = () => ((seed = (seed * 16807) % 2147483647) / 2147483647);
-const dust = [];
-for (let i = 0; i < 14; i++) {
-  const c = document.createElementNS(NS, 'circle');
-  c.setAttribute('r', 1.4 + rnd() * 1.6); c.setAttribute('fill', '#A89F8C');
-  $('dust').appendChild(c);
-  dust.push({ c, x0: 18 + rnd() * 40, y0: 60 + rnd() * 6, vx: (rnd() - 0.5) * 10, vy: -6 - rnd() * 10, ph: rnd() });
+/* ================================================================ part 2: map */
+const G = window.GEO;
+const dpath = rings => rings.map(r => 'M' + r.map(p => p[0] + ',' + p[1]).join('L') + 'Z').join('');
+function mk(parent, d, fill, stroke, sw) {
+  const p = document.createElementNS(NS, 'path');
+  p.setAttribute('d', d); p.setAttribute('fill', fill);
+  p.setAttribute('stroke', stroke); p.setAttribute('stroke-width', sw); p.setAttribute('vector-effect', 'non-scaling-stroke'); p.setAttribute('stroke-linejoin', 'round');
+  $(parent).appendChild(p); return p;
+}
+G.ctx.forEach(c => mk('ctx', dpath(c.paths), '#F2F1EC', '#D6D9D4', 0.8));
+const ownP = G.own.map(o => mk('own', dpath(o.paths), '#D9EADF', '#7DBFA4', 1.1));
+const MC = { cx: -94.7, cy: -7286.3, s: 5.3, sx: 1330, sy: 630 };
+const toS = (x, y, c = MC) => [c.sx + (x - c.cx) * c.s, c.sy + (y - c.cy) * c.s];
+const TOWNS = Object.entries(G.towns).map(([name, [x, y]], i) => ({ name, sp: toS(x, y), el: $('t' + i) }));
+
+/* trucks: each drives through a street grid in its town (illustration) and leaves a stop at each property */
+const cv = $('trucks'), g2 = cv.getContext('2d');
+let rs = 11; const rnd = () => ((rs = (rs * 16807) % 2147483647) / 2147483647);
+const GRID = [{ cols: 6, rows: 4, cell: 19, off: [-30, -6] }, { cols: 5, rows: 4, cell: 19, off: [-38, 14] }, { cols: 6, rows: 3, cell: 19, off: [-6, 20] }];
+const TRUCKS = TOWNS.map((tw, i) => {
+  const gd = GRID[i];
+  // street nodes with a little irregularity, local coordinates
+  const N = [];
+  for (let r = 0; r <= gd.rows; r++) { N.push([]); for (let c = 0; c <= gd.cols; c++) N[r].push([c * gd.cell + (rnd() - 0.5) * 5, r * gd.cell + (rnd() - 0.5) * 5]); }
+  // route: serpentine along the horizontal streets, then back along the vertical ones
+  const pts = [];
+  for (let r = 0; r <= gd.rows; r++) { const row = N[r].slice(); if (r % 2) row.reverse(); pts.push(...row); }
+  const startCol = gd.rows % 2 ? 0 : gd.cols;
+  for (let k = 0; k <= gd.cols; k++) {
+    const c = startCol === 0 ? k : gd.cols - k;
+    const col = N.map(row => row[c]); if ((gd.rows + k) % 2 === 0) col.reverse(); pts.push(...col);
+  }
+  const cum = [0];
+  for (let j = 1; j < pts.length; j++) cum.push(cum[j - 1] + Math.hypot(pts[j][0] - pts[j - 1][0], pts[j][1] - pts[j - 1][1]));
+  return { N, pts, cum, L: cum[cum.length - 1], off: gd.off, x0: 0, y0: 0, speed: [52, 48, 50][i], delay: [0, 0.5, 0.25][i] };
+});
+function along(tr, d) {
+  d = ((d % tr.L) + tr.L) % tr.L;
+  let j = 1; while (j < tr.cum.length - 1 && tr.cum[j] < d) j++;
+  const a = tr.pts[j - 1], b = tr.pts[j], f = (d - tr.cum[j - 1]) / Math.max(1e-6, tr.cum[j] - tr.cum[j - 1]);
+  return [tr.x0 + lerp(a[0], b[0], f), tr.y0 + lerp(a[1], b[1], f)];
+}
+const STOP = 7.5;
+function drawTruckBadge(x, y, a) {
+  g2.save(); g2.globalAlpha = a;
+  g2.shadowColor = 'rgba(27,35,38,.25)'; g2.shadowBlur = 10; g2.shadowOffsetY = 3;
+  g2.fillStyle = '#fff'; g2.beginPath(); g2.arc(x, y, 19, 0, 6.283); g2.fill();
+  g2.shadowColor = 'transparent';
+  g2.translate(x - 13, y - 12);
+  g2.fillStyle = '#2A7FA6'; g2.beginPath(); g2.roundRect(0, 4, 16, 12, 2); g2.fill();
+  g2.beginPath(); g2.moveTo(16, 7); g2.lineTo(22, 7); g2.lineTo(26, 11); g2.lineTo(26, 16); g2.lineTo(16, 16); g2.closePath(); g2.fill();
+  g2.fillStyle = '#1B2326'; g2.beginPath(); g2.arc(5, 18, 3.2, 0, 6.283); g2.arc(21, 18, 3.2, 0, 6.283); g2.fill();
+  g2.restore();
+}
+function drawTrucks(t, A, streetsA) {
+  g2.clearRect(0, 0, 1920, 1080);
+  if (A <= 0.002 && streetsA <= 0.002) return;
+  for (const tr of TRUCKS) {
+    // streets
+    g2.globalAlpha = streetsA; g2.strokeStyle = '#B9BEB8'; g2.lineWidth = 3; g2.lineCap = 'round';
+    g2.beginPath();
+    tr.N.forEach(row => { g2.moveTo(tr.x0 + row[0][0], tr.y0 + row[0][1]); row.forEach(p => g2.lineTo(tr.x0 + p[0], tr.y0 + p[1])); });
+    for (let c = 0; c < tr.N[0].length; c++) { g2.moveTo(tr.x0 + tr.N[0][c][0], tr.y0 + tr.N[0][c][1]); tr.N.forEach(row => g2.lineTo(tr.x0 + row[c][0], tr.y0 + row[c][1])); }
+    g2.stroke();
+    const run = Math.max(0, t - T.trucks - tr.delay), D = run * tr.speed;
+    if (A <= 0.002) continue;
+    // stops already made (first pass only; the route then repeats)
+    const done = Math.min(D, tr.L);
+    for (let d = STOP / 2; d < done; d += STOP) {
+      const [x, y] = along(tr, d);
+      g2.globalAlpha = A * 0.9; g2.fillStyle = '#0E9C79';
+      g2.beginPath(); g2.arc(x, y, 2.6, 0, 6.283); g2.fill();
+    }
+    // the newest stop pulses
+    if (run > 0.1) {
+      const lastD = Math.floor((D - STOP / 2) / STOP) * STOP + STOP / 2, pu = (D - lastD) / STOP;
+      const [px, py] = along(tr, lastD);
+      g2.globalAlpha = A * (1 - pu) * 0.8; g2.strokeStyle = '#0E9C79'; g2.lineWidth = 2;
+      g2.beginPath(); g2.arc(px, py, 3 + pu * 12, 0, 6.283); g2.stroke();
+    }
+    // exhaust trailing behind
+    for (let j = 1; j <= 4; j++) {
+      const [ex, ey] = along(tr, D - j * 9);
+      g2.globalAlpha = A * 0.15 * (1 - j / 5); g2.fillStyle = '#7E878A';
+      g2.beginPath(); g2.arc(ex, ey, 4 + j * 3.2, 0, 6.283); g2.fill();
+    }
+    g2.globalAlpha = 1;
+    const [x, y] = along(tr, D);
+    drawTruckBadge(x, y, A);
+  }
+  g2.globalAlpha = 1;
 }
 
-/* ---------------------------------------------------------------- helpers */
-function fadeIn(id, t, a, b = 99, dx = 0, dy = 24, fi = 1.0, fo = 0.8) {
+/* ================================================================ helpers */
+function fadeIn(id, t, a, b = 99, dx = 0, dy = 24, fi = 1.0, fo = 0.8, ox = 0) {
   const e = $(id);
   const A = env(t, a, b, fi, fo);
   e.style.opacity = A.toFixed(3);
-  const p = pr(t, a, a + fi, o5);
-  e.style.transform = `translate(${(1 - p) * dx}px,${(1 - p) * dy}px)`;
+  const p = pr(t, a, a + fi, o5), q = pr(t, b - fo, b, io);
+  e.style.transform = `translate(${((1 - p) * dx + q * ox).toFixed(2)}px,${((1 - p) * dy).toFixed(2)}px)`;
   return A;
 }
 
-/* ---------------------------------------------------------------- render */
+/* ================================================================ render */
 function renderAt(t) {
-  // heading
-  fadeIn('kick', t, 0.6);
+  /* ---- part 1 */
+  const out1 = T.out1, o1 = 1 - pr(t, out1, out1 + 1.0);
+  fadeIn('kick', t, 0.6, out1 + 1.0);
   fadeIn('h1', t, 0.9, T.head2 + 0.2, 0, 30, 1.2, 0.8);
-  fadeIn('h2', t, T.head2, 99, 0, 30, 1.3);
-  fadeIn('s2', t, T.head2 + 0.9);
-  fadeIn('foot', t, 3.4, 99, 0, 0, 1.2);
+  fadeIn('h2', t, T.head2, out1 + 1.0, 0, 30, 1.3, 1.0, -60);
+  fadeIn('s2', t, T.head2 + 0.9, out1 + 1.0, 0, 24, 1.0, 1.0, -60);
+  fadeIn('foot', t, 3.0, out1 + 1.0, 0, 0, 1.2);
+  fadeIn('l1', t, T.today, out1 + 1.0, 0, 24, 1.0, 1.0, -60);
+  fadeIn('l2', t, T.extraLab, out1 + 1.0, 0, 24, 1.0, 1.0, -60);
+  const shift = -60 * pr(t, out1, out1 + 1.0, io);
+  $('part1').setAttribute('transform', `translate(${shift.toFixed(2)} 0)`);
+  $('part1').setAttribute('opacity', o1.toFixed(3));
 
-  // person
   const pp = pr(t, T.person, T.person + 1.4, o5);
   $('person').setAttribute('opacity', pp.toFixed(3));
   $('person').setAttribute('transform', `translate(0 ${(1 - pp) * 30})`);
   $('pshadow').setAttribute('opacity', pp.toFixed(3));
-
-  // jars
-  const dim = 1 - 0.5 * pr(t, T.dimToday, T.dimToday + 1.2);
-  let landed = 0;
+  const dim = 1 - 0.45 * pr(t, T.head2 + 1.5, T.head2 + 2.7);
   for (const j of jars) {
     const u = clamp((t - j.ts) / 0.55);
     if (u <= 0) { j.g.setAttribute('opacity', 0); continue; }
@@ -177,104 +279,66 @@ function renderAt(t) {
     const rot = (1 - o3(u)) * (j.extra ? -10 : -6) * (j.x % 2 ? 1 : -1);
     j.g.setAttribute('transform', `translate(${j.x} ${yy}) rotate(${rot.toFixed(2)} 23 30)`);
     j.g.setAttribute('opacity', (Math.min(1, u * 3) * (j.extra ? 1 : dim)).toFixed(3));
-    j.u.setAttribute('x', 0); j.u.setAttribute('y', 0);
-    if (!j.extra && u >= 1) landed++;
   }
-  // partial jar fill (0,4 of the body)
   {
     const f = pr(t, T.extra[2] + 0.3, T.fillEnd, io) * 0.24;
-    const bodyTop = 12.7, bodyBot = 57.7, h = (bodyBot - bodyTop) * f;
+    const bodyBot = 57.7, h = 45 * f;
     const r = $('fillrect');
-    r.setAttribute('x', 0); r.setAttribute('y', (bodyBot - h).toFixed(2)); r.setAttribute('width', 46); r.setAttribute('height', h.toFixed(2));
+    r.setAttribute('y', (bodyBot - h).toFixed(2)); r.setAttribute('width', 46); r.setAttribute('height', h.toFixed(2));
     fillUse.setAttribute('opacity', f > 0 ? 1 : 0);
   }
-  // glows on the extra jars: when they land and when the headline arrives
   for (const j of jars.filter(q => q.extra)) {
-    const a = 0.55 * Math.max(env(t, j.ts + 0.2, j.ts + 1.6, 0.3, 1.0), env(t, T.head2 + 0.2, T.head2 + 2.6, 0.5, 1.6),
-      0.45 * env(t, T.link, T.end, 1.0, 0.1));
+    const a = 0.6 * Math.max(env(t, j.ts + 0.2, j.ts + 1.6, 0.3, 1.0), env(t, T.head2 + 0.2, out1 + 0.6, 0.5, 1.0));
     j.glow.setAttribute('opacity', a.toFixed(3));
   }
-
-  // labels with counting numbers
-  fadeIn('l1', t, T.today);
-  $('l1').style.opacity = (parseFloat($('l1').style.opacity) * (1 - 0.35 * pr(t, T.dimToday, T.dimToday + 1.2))).toFixed(3);
   $('n1').textContent = 'ca. ' + nf(14.2 * pr(t, T.jar0 + 0.3, T.jar0 + 28 * T.jarStep + 0.5, x => x), 1) + ' kg';
-  fadeIn('l2', t, T.extraLab);
   $('n2').textContent = 'ca. ' + nf(1.1 * pr(t, T.extra[0] + 0.2, T.fillEnd, x => x), 1) + ' kg';
 
-  // link from the extra jars to the right column
-  {
-    const p = pr(t, T.link, T.link + 1.4, io);
-    const L = $('link').getTotalLength();
-    const e = $('link');
-    e.setAttribute('opacity', p > 0 ? 0.75 : 0);
-    e.setAttribute('stroke-dasharray', `${(L * p).toFixed(1)} ${L}`);
-    $('divider').setAttribute('opacity', (0.9 * pr(t, T.link - 0.4, T.link + 0.6)).toFixed(3));
-  }
-  fadeIn('rh', t, T.rh);
-  // closing beat: a calm pulse travels from the extra grams to what they require
-  {
-    const path = $('link'), L = path.getTotalLength();
-    const u = pr(t, 26.2, 27.8, io);
-    const a = env(t, 26.2, 28.4, 0.3, 0.6);
-    const pt = path.getPointAtLength(L * u);
-    ['pulse', 'pulseGlow'].forEach(id => { $(id).setAttribute('cx', pt.x.toFixed(1)); $(id).setAttribute('cy', pt.y.toFixed(1)); });
-    $('pulse').setAttribute('opacity', a.toFixed(3));
-    $('pulseGlow').setAttribute('opacity', (0.7 * a).toFixed(3));
-  }
-
-  // requirement rows
-  T.items.forEach((a, i) => fadeIn('r' + (i + 1), t, a, 99, 40, 0, 1.1));
-  // 1: counter + truck rolling in
-  {
-    const a = T.items[0];
-    $('n3').textContent = nf(Math.round(56000 * pr(t, a + 0.3, a + 2.0, o3) / 100) * 100, 0) + ' stopp';
-    const p = pr(t, a, a + 1.6, o5);
-    $('truck').setAttribute('transform', `translate(${(-60 * (1 - p)).toFixed(2)} 0)`);
-    const ang = -360 * 2.2 * (1 - p);
-    $('w1').setAttribute('transform', `rotate(${ang.toFixed(1)} 22 51)`);
-    $('w2').setAttribute('transform', `rotate(${ang.toFixed(1)} 52 51)`);
-  }
-  // 2: cloud puffs and drifting dust
-  {
-    const a = T.items[1];
-    ['c1', 'c2', 'c3'].forEach((id, k) => {
-      const s = back(pr(t, a + 0.2 + k * 0.18, a + 0.9 + k * 0.18, x => x));
-      const drift = Math.sin((t - a) * 1.3 + k) * 1.5;
-      $(id).setAttribute('transform', `translate(${drift.toFixed(2)} 0) scale(${s.toFixed(3)})`);
-      $(id).style.transformOrigin = `${[28, 41, 52][k]}px ${[42, 35, 45][k]}px`;
-      $(id).style.transformBox = 'view-box';
-    });
-    dust.forEach(d => {
-      const u = ((t - a) * 0.5 + d.ph) % 1;
-      const on = t > a + 0.6;
-      d.c.setAttribute('cx', (d.x0 + d.vx * u * 3).toFixed(2));
-      d.c.setAttribute('cy', (d.y0 + d.vy * u * 3).toFixed(2));
-      d.c.setAttribute('opacity', on ? (0.7 * Math.sin(u * Math.PI)).toFixed(3) : 0);
-    });
-  }
-  // 3: sound waves pulse outwards
-  {
-    const a = T.items[2];
-    ['sw1', 'sw2', 'sw3'].forEach((id, k) => {
-      const ph = t < a ? 0 : ((t - a - k * 0.22) / 1.3) % 1;
-      const on = t > a + 0.2 + k * 0.22;
-      $(id).setAttribute('opacity', on ? (0.25 + 0.75 * Math.sin(Math.max(0, ph) * Math.PI)).toFixed(3) : 0);
-    });
-  }
-  // 4: price tag swings in and settles
-  {
+  /* ---- part 2: map, trucks and consequences */
+  const mapA = pr(t, T.map, T.map + 1.6, o3);
+  const mc = { ...MC, s: MC.s * (1 + 0.03 * pr(t, T.map, T.end, x => x)) };
+  $('mapcam').setAttribute('transform', `translate(${mc.sx},${mc.sy}) scale(${mc.s}) translate(${-mc.cx},${-mc.cy})`);
+  $('map').setAttribute('opacity', (mapA * (1 - 0.25 * pr(t, T.banner, T.banner + 1.2))).toFixed(3));
+  ownP.forEach((p, i) => p.setAttribute('opacity', pr(t, T.map + 0.3 + i * 0.09, T.map + 1.3 + i * 0.09, o3).toFixed(3)));
+  TOWNS.forEach((tw, i) => {
+    const [x, y] = toS(G.towns[tw.name][0], G.towns[tw.name][1], mc);
+    const tr = TRUCKS[i];
+    tw.el.style.left = (x + tr.off[0]) + 'px'; tw.el.style.top = (y + tr.off[1] - 38) + 'px';
+    tw.el.style.opacity = pr(t, T.towns + i * 0.3, T.towns + 0.9 + i * 0.3, o3).toFixed(3);
+  });
+  // the street grids follow the (very slowly zooming) map
+  TRUCKS.forEach((tr, i) => {
+    const [x, y] = toS(G.towns[TOWNS[i].name][0], G.towns[TOWNS[i].name][1], mc);
+    tr.x0 = x + tr.off[0]; tr.y0 = y + tr.off[1];
+  });
+  drawTrucks(t, mapA * pr(t, T.trucks - 0.3, T.trucks + 0.5), mapA * 0.85 * pr(t, T.towns, T.towns + 1.2));
+  fadeIn('kick2', t, T.h3 - 0.2);
+  fadeIn('h3', t, T.h3, 99, 0, 30, 1.3);
+  T.items.forEach((a, i) => {
+    fadeIn('r' + (i + 1), t, a, 99, -40, 0, 1.1);
+    $('r' + (i + 1)).style.opacity = (parseFloat($('r' + (i + 1)).style.opacity) * (1 - 0.35 * pr(t, T.banner, T.banner + 1.2))).toFixed(3);
+  });
+  $('n3').textContent = nf(Math.round(56000 * pr(t, T.count[0], T.count[1], x => x) / 100) * 100, 0) + ' stopp';
+  ['sw1', 'sw2', 'sw3'].forEach((id, k) => {
     const a = T.items[3];
-    const u = clamp((t - a) / 2.2);
-    const ang = -32 * Math.exp(-4.2 * u) * Math.cos(u * 11);
-    $('tag').setAttribute('transform', `rotate(${(u > 0 ? ang : -32).toFixed(2)} 20 20)`);
+    const ph = t < a ? 0 : ((t - a - k * 0.22) / 1.3) % 1;
+    $(id).setAttribute('opacity', t > a + 0.2 + k * 0.22 ? (0.25 + 0.75 * Math.sin(Math.max(0, ph) * Math.PI)).toFixed(3) : 0);
+  });
+  fadeIn('foot2', t, T.map + 1.0, 99, 0, 0, 1.2);
+
+  /* ---- part 3: the cost */
+  {
+    const b = $('banner'), A = env(t, T.banner, 99, 1.2, 0.5);
+    b.style.opacity = A.toFixed(3);
+    b.style.transform = `translateY(${((1 - pr(t, T.banner, T.banner + 1.2, o5)) * 40).toFixed(2)}px)`;
+    $('n4').textContent = nf(3.39 * pr(t, T.banner + 0.3, T.banner + 1.8, o5), 2) + ' mill. kr';
   }
 
-  $('black').style.opacity = Math.max(1 - pr(t, 0, 0.9, o3), pr(t, 29.0, 30)).toFixed(3);
+  $('black').style.opacity = Math.max(1 - pr(t, 0, 0.9, o3), pr(t, 39.0, 40)).toFixed(3);
 }
 async function ready() { await document.fonts.ready; return true; }
 window.FILM = { renderAt, ready, DUR, FPS };
-ready().then(() => { renderAt(+(location.search.match(/t=([\d.]+)/) || [0, 26])[1]); window.FILM_READY = true; });
+ready().then(() => { renderAt(+(location.search.match(/t=([\d.]+)/) || [0, 34])[1]); window.FILM_READY = true; });
 })();
 </script>
 </body>
