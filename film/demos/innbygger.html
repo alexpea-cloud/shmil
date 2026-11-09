@@ -1,0 +1,281 @@
+<!doctype html>
+<html lang="no">
+<head>
+<meta charset="utf-8">
+<title>Sekvens – én innbygger</title>
+<style>
+@font-face{font-family:FS;src:url(../assets/fonts/Inter-Regular.otf);font-weight:400}
+@font-face{font-family:FS;src:url(../assets/fonts/Inter-Medium.otf);font-weight:500}
+@font-face{font-family:FS;src:url(../assets/fonts/Inter-SemiBold.otf);font-weight:600}
+@font-face{font-family:FD;src:url(../assets/fonts/InterDisplay-SemiBold.otf);font-weight:600}
+@font-face{font-family:FD;src:url(../assets/fonts/InterDisplay-Bold.otf);font-weight:700}
+:root{--ink:#1B2326;--ink2:#465257;--ink3:#78848A;--green:#007B61;--green-hi:#0E9C79;--blue:#2A7FA6}
+html,body{margin:0;background:#000;overflow:hidden}
+#stage{position:absolute;left:0;top:0;width:1920px;height:1080px;overflow:hidden;font-family:FS,sans-serif;color:var(--ink);-webkit-font-smoothing:antialiased;
+  font-feature-settings:"tnum" 1;background:radial-gradient(ellipse 75% 70% at 50% 42%,#F6F5F1 0%,#ECEBE6 60%,#E3E2DC 100%)}
+svg{position:absolute;left:0;top:0;overflow:visible}
+.ab{position:absolute;white-space:nowrap;opacity:0;will-change:transform,opacity}
+.k{font:600 25px/1 FS;letter-spacing:.16em;text-transform:uppercase;color:var(--green)}
+.h{font:700 82px/1.05 FD;letter-spacing:-.018em}
+.sub{font:400 34px/1.3 FS;color:var(--ink2)}
+.lab{font:600 27px/1.3 FS;color:var(--ink2)}
+.lab b{font-weight:700}
+.foot{font:400 20px/1.4 FS;color:var(--ink3)}
+.row{display:flex;align-items:center;gap:28px}
+.ic{position:relative;width:78px;height:78px;border-radius:20px;background:#fff;box-shadow:0 12px 26px rgba(27,35,38,.09);overflow:hidden;flex:none}
+.ic svg{position:absolute;left:0;top:0}
+.rv{font:700 46px/1 FD;color:var(--ink)}
+.rl{font:400 25px/1.25 FS;color:var(--ink2);margin-top:8px}
+#black{position:absolute;inset:0;background:#000;opacity:1}
+</style>
+</head>
+<body>
+<div id="stage">
+  <svg id="art" width="1920" height="1080" viewBox="0 0 1920 1080">
+    <defs>
+      <symbol id="jar" viewBox="0 0 40 52"><rect x="10" y="1" width="20" height="8" rx="2.5" fill="#6E7F7A"/><path d="M8 11 h24 a4 4 0 0 1 4 4 v27 a8 8 0 0 1 -8 8 h-16 a8 8 0 0 1 -8 -8 v-27 a4 4 0 0 1 4 -4z" fill="currentColor"/><rect x="11" y="17" width="4.5" height="24" rx="2.2" fill="rgba(255,255,255,.55)"/></symbol>
+      <filter id="glow" x="-60%" y="-60%" width="220%" height="220%"><feGaussianBlur stdDeviation="9"/></filter>
+      <clipPath id="fillclip"><rect id="fillrect" x="0" y="0" width="0" height="0"/></clipPath>
+    </defs>
+    <g id="person" fill="#9AA4A8" opacity="0">
+      <circle cx="270" cy="430" r="56"/>
+      <path d="M190 510 h160 a40 40 0 0 1 40 40 v170 a18 18 0 0 1 -36 0 v-150 h-12 v330 a22 22 0 0 1 -44 0 v-190 h-16 v190 a22 22 0 0 1 -44 0 v-330 h-12 v150 a18 18 0 0 1 -36 0 v-170 a40 40 0 0 1 40 -40z"/>
+    </g>
+    <ellipse id="pshadow" cx="270" cy="944" rx="110" ry="12" fill="rgba(40,45,40,.12)" opacity="0"/>
+    <g id="glows"></g>
+    <g id="jars"></g>
+    <path id="link" d="M960 700 C1010 700 1020 362 1110 362" fill="none" stroke="#0E9C79" stroke-width="2.5" stroke-linecap="round" opacity="0"/>
+    <circle id="pulseGlow" r="22" fill="#0E9C79" filter="url(#glow)" opacity="0"/>
+    <circle id="pulse" r="7" fill="#007B61" opacity="0"/>
+    <line id="divider" x1="1050" y1="330" x2="1050" y2="900" stroke="#CDD2CD" stroke-width="2" opacity="0"/>
+  </svg>
+
+  <div class="ab k" id="kick" style="left:150px;top:110px">Glass- og metallemballasje · ett år</div>
+  <div class="ab h" id="h1" style="left:150px;top:150px">Én innbygger i tettbygd strøk</div>
+  <div class="ab h" id="h2" style="left:150px;top:150px">33 gram i uka</div>
+  <div class="ab sub" id="s2" style="left:150px;top:252px">– det er den ekstra mengden henteordning er beregnet å gi</div>
+
+  <div class="ab lab" id="l1" style="left:470px;top:350px">Samles inn i dag: <b style="color:var(--green)" id="n1">ca. 0,0 kg</b></div>
+  <div class="ab lab" id="l2" style="left:470px;top:808px;white-space:normal;width:560px">Ekstra med henteordning: <b style="color:var(--green-hi)" id="n2">ca. 0,0 kg</b><br><span style="font-weight:400;color:var(--ink3)">modellert</span></div>
+
+  <div class="ab lab" id="rh" style="left:1130px;top:350px">Det de ekstra grammene krever:</div>
+  <div class="ab row" id="r1" style="left:1130px;top:408px">
+    <div class="ic"><svg width="78" height="78" viewBox="0 0 78 78"><g id="truck"><rect x="12" y="26" width="32" height="22" rx="3" fill="#2A7FA6"/><path d="M44 31 h10 l8 8 v9 h-18z" fill="#2A7FA6"/><path d="M47 34 h6 l5 5 h-11z" fill="#BFD9E6"/><g id="w1"><circle cx="22" cy="51" r="6" fill="#1B2326"/><rect x="21" y="46" width="2" height="10" fill="#6E7A7F"/></g><g id="w2"><circle cx="52" cy="51" r="6" fill="#1B2326"/><rect x="51" y="46" width="2" height="10" fill="#6E7A7F"/></g></g></svg></div>
+    <div><div class="rv" id="n3">0 stopp</div><div class="rl">tømmestopp i året – 0,8 kg per stopp</div></div>
+  </div>
+  <div class="ab row" id="r2" style="left:1130px;top:520px">
+    <div class="ic"><svg width="78" height="78" viewBox="0 0 78 78"><g id="cloud"><circle id="c1" cx="28" cy="42" r="11" fill="#9AA4A8"/><circle id="c2" cx="41" cy="35" r="14" fill="#B7BEBB"/><circle id="c3" cx="52" cy="45" r="10" fill="#9AA4A8"/></g><g id="dust"></g></svg></div>
+    <div><div class="rv">Utslipp og veistøv</div><div class="rl">ny tungtrafikk i boliggatene</div></div>
+  </div>
+  <div class="ab row" id="r3" style="left:1130px;top:632px">
+    <div class="ic"><svg width="78" height="78" viewBox="0 0 78 78"><path d="M16 32 h9 l12 -10 v34 l-12 -10 h-9z" fill="#5B686D"/><path id="sw1" d="M44 30 q6 9 0 18" stroke="#5B686D" stroke-width="3.5" fill="none" stroke-linecap="round"/><path id="sw2" d="M50 24 q11 15 0 30" stroke="#5B686D" stroke-width="3.5" fill="none" stroke-linecap="round"/><path id="sw3" d="M56 18 q16 21 0 42" stroke="#5B686D" stroke-width="3.5" fill="none" stroke-linecap="round"/></svg></div>
+    <div><div class="rv">Støy</div><div class="rl">fra tømming og tungtransport</div></div>
+  </div>
+  <div class="ab row" id="r4" style="left:1130px;top:744px">
+    <div class="ic"><svg width="78" height="78" viewBox="0 0 78 78"><g id="tag" transform-origin="20 20"><path d="M16 14 h22 l22 22 -24 24 -22 -22z" fill="#007B61"/><circle cx="25" cy="23" r="5" fill="#fff"/></g></svg></div>
+    <div><div class="rv">74 kr per ekstra kilo</div><div class="rl">mot 1,81 kr i Miljødirektoratets anslag</div></div>
+  </div>
+
+  <div class="ab foot" id="foot" style="left:150px;top:1000px">Beregnet fra søknaden: 375,5 tonn og modellert meruttak 45,7 tonn ÷ 26 456 innbyggere i tettbygd strøk. Ett glass i figuren = 0,5 kg.</div>
+  <div id="black"></div>
+</div>
+<script>
+(function () {
+'use strict';
+const DUR = 30, FPS = 30;
+const NS = 'http://www.w3.org/2000/svg';
+const clamp = (x, a = 0, b = 1) => Math.min(b, Math.max(a, x));
+const lerp = (a, b, p) => a + (b - a) * p;
+const io = x => (x < 0.5 ? 4 * x * x * x : 1 - Math.pow(-2 * x + 2, 3) / 2);
+const o3 = x => 1 - Math.pow(1 - x, 3);
+const o5 = x => 1 - Math.pow(1 - x, 5);
+const back = x => { const c1 = 1.5, c3 = c1 + 1; return 1 + c3 * Math.pow(x - 1, 3) + c1 * Math.pow(x - 1, 2); };
+const pr = (t, a, b, e = io) => e(clamp((t - a) / (b - a)));
+const env = (t, a, b, fi, fo) => Math.min(pr(t, a, a + fi, o3), 1 - pr(t, b - fo, b));
+const $ = id => document.getElementById(id);
+const nf = (v, d) => v.toFixed(d).replace('.', ',').replace(/\B(?=(\d{3})+(?!\d))/g, ' ');
+
+/* ---------------------------------------------------------------- timeline */
+const T = {
+  person: 1.0, today: 2.6, jar0: 3.0, jarStep: 0.115,        // 28 jars: 3.0 – 6.2
+  extraLab: 8.2, extra: [8.7, 9.4, 10.1, 10.8], fillEnd: 11.8,
+  head2: 12.4, dimToday: 14.8,
+  link: 15.2, rh: 15.6, items: [16.4, 19.0, 21.6, 24.2],
+  end: 30,
+};
+
+/* ---------------------------------------------------------------- jars */
+const per = 8, W = 60, H = 78, X0 = 470, Y0 = 400;
+const jars = [];
+for (let i = 0; i < 32; i++) {
+  const extra = i >= 28;
+  const x = X0 + (i % per) * W, y = Y0 + Math.floor(i / per) * H + (extra ? 18 : 0);
+  const g = document.createElementNS(NS, 'g');
+  const u = document.createElementNS(NS, 'use');
+  u.setAttribute('href', '#jar'); u.setAttribute('width', 46); u.setAttribute('height', 60);
+  u.style.color = extra ? '#0E9C79' : '#8CC9A8';
+  g.appendChild(u);
+  $('jars').appendChild(g);
+  const glow = document.createElementNS(NS, 'ellipse');
+  glow.setAttribute('cx', x + 23); glow.setAttribute('cy', y + 34); glow.setAttribute('rx', 26); glow.setAttribute('ry', 32);
+  glow.setAttribute('fill', '#0E9C79'); glow.setAttribute('filter', 'url(#glow)'); glow.setAttribute('opacity', 0);
+  if (extra) $('glows').appendChild(glow);
+  const ts = extra ? T.extra[i - 28] : T.jar0 + i * T.jarStep;
+  jars.push({ g, u, x, y, extra, ts, glow, partial: i === 31 });
+}
+// the last extra jar is only 0,4 full: a faint outline + a liquid fill rising inside a clip
+const last = jars[31];
+last.u.style.opacity = 0.22;
+const fillUse = document.createElementNS(NS, 'use');
+fillUse.setAttribute('href', '#jar'); fillUse.setAttribute('width', 46); fillUse.setAttribute('height', 60);
+fillUse.style.color = '#0E9C79';
+fillUse.setAttribute('clip-path', 'url(#fillclip)');
+last.g.appendChild(fillUse);
+
+/* ---------------------------------------------------------------- dust particles for the cloud icon */
+let seed = 3; const rnd = () => ((seed = (seed * 16807) % 2147483647) / 2147483647);
+const dust = [];
+for (let i = 0; i < 14; i++) {
+  const c = document.createElementNS(NS, 'circle');
+  c.setAttribute('r', 1.4 + rnd() * 1.6); c.setAttribute('fill', '#A89F8C');
+  $('dust').appendChild(c);
+  dust.push({ c, x0: 18 + rnd() * 40, y0: 60 + rnd() * 6, vx: (rnd() - 0.5) * 10, vy: -6 - rnd() * 10, ph: rnd() });
+}
+
+/* ---------------------------------------------------------------- helpers */
+function fadeIn(id, t, a, b = 99, dx = 0, dy = 24, fi = 1.0, fo = 0.8) {
+  const e = $(id);
+  const A = env(t, a, b, fi, fo);
+  e.style.opacity = A.toFixed(3);
+  const p = pr(t, a, a + fi, o5);
+  e.style.transform = `translate(${(1 - p) * dx}px,${(1 - p) * dy}px)`;
+  return A;
+}
+
+/* ---------------------------------------------------------------- render */
+function renderAt(t) {
+  // heading
+  fadeIn('kick', t, 0.6);
+  fadeIn('h1', t, 0.9, T.head2 + 0.2, 0, 30, 1.2, 0.8);
+  fadeIn('h2', t, T.head2, 99, 0, 30, 1.3);
+  fadeIn('s2', t, T.head2 + 0.9);
+  fadeIn('foot', t, 3.4, 99, 0, 0, 1.2);
+
+  // person
+  const pp = pr(t, T.person, T.person + 1.4, o5);
+  $('person').setAttribute('opacity', pp.toFixed(3));
+  $('person').setAttribute('transform', `translate(0 ${(1 - pp) * 30})`);
+  $('pshadow').setAttribute('opacity', pp.toFixed(3));
+
+  // jars
+  const dim = 1 - 0.5 * pr(t, T.dimToday, T.dimToday + 1.2);
+  let landed = 0;
+  for (const j of jars) {
+    const u = clamp((t - j.ts) / 0.55);
+    if (u <= 0) { j.g.setAttribute('opacity', 0); continue; }
+    const yy = lerp(j.y - 46, j.y, back(u));
+    const rot = (1 - o3(u)) * (j.extra ? -10 : -6) * (j.x % 2 ? 1 : -1);
+    j.g.setAttribute('transform', `translate(${j.x} ${yy}) rotate(${rot.toFixed(2)} 23 30)`);
+    j.g.setAttribute('opacity', (Math.min(1, u * 3) * (j.extra ? 1 : dim)).toFixed(3));
+    j.u.setAttribute('x', 0); j.u.setAttribute('y', 0);
+    if (!j.extra && u >= 1) landed++;
+  }
+  // partial jar fill (0,4 of the body)
+  {
+    const f = pr(t, T.extra[3] + 0.3, T.fillEnd, io) * 0.4;
+    const bodyTop = 12.7, bodyBot = 57.7, h = (bodyBot - bodyTop) * f;
+    const r = $('fillrect');
+    r.setAttribute('x', 0); r.setAttribute('y', (bodyBot - h).toFixed(2)); r.setAttribute('width', 46); r.setAttribute('height', h.toFixed(2));
+    fillUse.setAttribute('opacity', f > 0 ? 1 : 0);
+  }
+  // glows on the extra jars: when they land and when the headline arrives
+  for (const j of jars.filter(q => q.extra)) {
+    const a = 0.55 * Math.max(env(t, j.ts + 0.2, j.ts + 1.6, 0.3, 1.0), env(t, T.head2 + 0.2, T.head2 + 2.6, 0.5, 1.6),
+      0.45 * env(t, T.link, T.end, 1.0, 0.1));
+    j.glow.setAttribute('opacity', a.toFixed(3));
+  }
+
+  // labels with counting numbers
+  fadeIn('l1', t, T.today);
+  $('l1').style.opacity = (parseFloat($('l1').style.opacity) * (1 - 0.35 * pr(t, T.dimToday, T.dimToday + 1.2))).toFixed(3);
+  $('n1').textContent = 'ca. ' + nf(14.2 * pr(t, T.jar0 + 0.3, T.jar0 + 28 * T.jarStep + 0.5, x => x), 1) + ' kg';
+  fadeIn('l2', t, T.extraLab);
+  $('n2').textContent = 'ca. ' + nf(1.7 * pr(t, T.extra[0] + 0.2, T.fillEnd, x => x), 1) + ' kg';
+
+  // link from the extra jars to the right column
+  {
+    const p = pr(t, T.link, T.link + 1.4, io);
+    const L = $('link').getTotalLength();
+    const e = $('link');
+    e.setAttribute('opacity', p > 0 ? 0.75 : 0);
+    e.setAttribute('stroke-dasharray', `${(L * p).toFixed(1)} ${L}`);
+    $('divider').setAttribute('opacity', (0.9 * pr(t, T.link - 0.4, T.link + 0.6)).toFixed(3));
+  }
+  fadeIn('rh', t, T.rh);
+  // closing beat: a calm pulse travels from the extra grams to what they require
+  {
+    const path = $('link'), L = path.getTotalLength();
+    const u = pr(t, 26.2, 27.8, io);
+    const a = env(t, 26.2, 28.4, 0.3, 0.6);
+    const pt = path.getPointAtLength(L * u);
+    ['pulse', 'pulseGlow'].forEach(id => { $(id).setAttribute('cx', pt.x.toFixed(1)); $(id).setAttribute('cy', pt.y.toFixed(1)); });
+    $('pulse').setAttribute('opacity', a.toFixed(3));
+    $('pulseGlow').setAttribute('opacity', (0.7 * a).toFixed(3));
+  }
+
+  // requirement rows
+  T.items.forEach((a, i) => fadeIn('r' + (i + 1), t, a, 99, 40, 0, 1.1));
+  // 1: counter + truck rolling in
+  {
+    const a = T.items[0];
+    $('n3').textContent = nf(Math.round(56000 * pr(t, a + 0.3, a + 2.0, o3) / 100) * 100, 0) + ' stopp';
+    const p = pr(t, a, a + 1.6, o5);
+    $('truck').setAttribute('transform', `translate(${(-60 * (1 - p)).toFixed(2)} 0)`);
+    const ang = -360 * 2.2 * (1 - p);
+    $('w1').setAttribute('transform', `rotate(${ang.toFixed(1)} 22 51)`);
+    $('w2').setAttribute('transform', `rotate(${ang.toFixed(1)} 52 51)`);
+  }
+  // 2: cloud puffs and drifting dust
+  {
+    const a = T.items[1];
+    ['c1', 'c2', 'c3'].forEach((id, k) => {
+      const s = back(pr(t, a + 0.2 + k * 0.18, a + 0.9 + k * 0.18, x => x));
+      const drift = Math.sin((t - a) * 1.3 + k) * 1.5;
+      $(id).setAttribute('transform', `translate(${drift.toFixed(2)} 0) scale(${s.toFixed(3)})`);
+      $(id).style.transformOrigin = `${[28, 41, 52][k]}px ${[42, 35, 45][k]}px`;
+      $(id).style.transformBox = 'view-box';
+    });
+    dust.forEach(d => {
+      const u = ((t - a) * 0.5 + d.ph) % 1;
+      const on = t > a + 0.6;
+      d.c.setAttribute('cx', (d.x0 + d.vx * u * 3).toFixed(2));
+      d.c.setAttribute('cy', (d.y0 + d.vy * u * 3).toFixed(2));
+      d.c.setAttribute('opacity', on ? (0.7 * Math.sin(u * Math.PI)).toFixed(3) : 0);
+    });
+  }
+  // 3: sound waves pulse outwards
+  {
+    const a = T.items[2];
+    ['sw1', 'sw2', 'sw3'].forEach((id, k) => {
+      const ph = t < a ? 0 : ((t - a - k * 0.22) / 1.3) % 1;
+      const on = t > a + 0.2 + k * 0.22;
+      $(id).setAttribute('opacity', on ? (0.25 + 0.75 * Math.sin(Math.max(0, ph) * Math.PI)).toFixed(3) : 0);
+    });
+  }
+  // 4: price tag swings in and settles
+  {
+    const a = T.items[3];
+    const u = clamp((t - a) / 2.2);
+    const ang = -32 * Math.exp(-4.2 * u) * Math.cos(u * 11);
+    $('tag').setAttribute('transform', `rotate(${(u > 0 ? ang : -32).toFixed(2)} 20 20)`);
+  }
+
+  $('black').style.opacity = Math.max(1 - pr(t, 0, 0.9, o3), pr(t, 29.0, 30)).toFixed(3);
+}
+async function ready() { await document.fonts.ready; return true; }
+window.FILM = { renderAt, ready, DUR, FPS };
+ready().then(() => { renderAt(+(location.search.match(/t=([\d.]+)/) || [0, 26])[1]); window.FILM_READY = true; });
+})();
+</script>
+</body>
+</html>
