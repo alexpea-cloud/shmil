@@ -1,0 +1,184 @@
+<!doctype html>
+<html lang="no">
+<head>
+<meta charset="utf-8">
+<title>Demo – ni av ti kilo</title>
+<style>
+@font-face{font-family:FS;src:url(../assets/fonts/Inter-Regular.otf);font-weight:400}
+@font-face{font-family:FS;src:url(../assets/fonts/Inter-SemiBold.otf);font-weight:600}
+@font-face{font-family:FD;src:url(../assets/fonts/InterDisplay-SemiBold.otf);font-weight:600}
+@font-face{font-family:FD;src:url(../assets/fonts/InterDisplay-Bold.otf);font-weight:700}
+html,body{margin:0;background:#000;overflow:hidden}
+#stage{position:absolute;left:0;top:0;width:1920px;height:1080px;overflow:hidden;background:#ECEBE6;font-family:FS,sans-serif;color:#1B2326;-webkit-font-smoothing:antialiased}
+canvas{position:absolute;left:0;top:0}
+.t{position:absolute;white-space:nowrap;opacity:0}
+.h{font:700 66px/1.05 FD;letter-spacing:-.015em}
+.big{font:700 132px/1 FD;letter-spacing:-.025em;color:#1B2326;font-variant-numeric:tabular-nums}
+.lab{font:400 34px/1.2 FS;color:#465257}
+.v{font:700 46px/1 FD;color:#007B61}
+.src{font:400 19px/1 FS;color:#8A9599}
+#black{position:absolute;inset:0;background:#000;opacity:1}
+</style>
+</head>
+<body>
+<div id="stage">
+  <canvas id="c" width="1920" height="1080"></canvas>
+  <div class="t h" id="h1" style="left:150px;top:110px">Ni av ti kilo samles allerede inn i dag.</div>
+  <div class="t h" id="h2" style="left:150px;top:110px">Den siste tidelen ligger spredt.</div>
+  <div class="t v" id="v1" style="left:400px;top:930px;width:320px;text-align:center">375,5 tonn</div>
+  <div class="t lab" id="v1b" style="left:330px;top:988px;width:460px;text-align:center;font-size:26px">samles inn ved returpunktene</div>
+  <div class="t big" id="cnt" style="left:1000px;top:110px;width:770px;text-align:right">0</div>
+  <div class="t lab" id="cntl" style="left:1000px;top:250px;width:770px;text-align:right">tømmestopp i året</div>
+  <div class="t src" id="src" style="right:28px;bottom:22px;left:auto">Illustrasjon · tall fra søknaden kap. 2.1–2.2</div>
+  <div id="black"></div>
+</div>
+<script>
+(function () {
+'use strict';
+const DUR = 10, FPS = 30;
+const clamp = (x, a = 0, b = 1) => Math.min(b, Math.max(a, x));
+const lerp = (a, b, p) => a + (b - a) * p;
+const io = x => (x < 0.5 ? 4 * x * x * x : 1 - Math.pow(-2 * x + 2, 3) / 2);
+const o3 = x => 1 - Math.pow(1 - x, 3);
+const i2 = x => x * x;
+const pr = (t, a, b, e = io) => e(clamp((t - a) / (b - a)));
+const env = (t, a, b, fi, fo) => Math.min(pr(t, a, a + fi, o3), 1 - pr(t, b - fo, b));
+const $ = id => document.getElementById(id);
+const g = $('c').getContext('2d');
+let seed = 20260831; const rnd = () => ((seed = (seed * 16807) % 2147483647) / 2147483647);
+const gauss = () => { let u = 0; for (let i = 0; i < 6; i++) u += rnd(); return (u - 3) / 3; };
+
+// container (returpunkt)
+const CX = 560, CW = 360, CT = 610, CB = 900, SLOT = 130;
+// palette: glass (green, clear, brown) and metal
+const PAL = ['#2F8F6B', '#3FA37A', '#7FC4A2', '#CDE6DA', '#A9D7C0', '#8A5A3B', '#9AA4A8', '#C3CACD', '#77828A'];
+const N = 1300, NIN = Math.round(N * 0.9);
+const P = [];
+const cols = Math.floor((CW - 30) / 10);
+for (let i = 0; i < N; i++) {
+  const inside = i % 10 !== 9;          // every tenth piece does not reach the container
+  const ts = 1.0 + (i / N) * 3.4 + rnd() * 0.25;
+  const p = { inside, ts, c: PAL[Math.floor(rnd() * PAL.length)], s: 5 + rnd() * 5, r0: rnd() * 6.28, rv: (rnd() - 0.5) * 8,
+    xs: 150 + rnd() * 1620, ys: -30 - rnd() * 120 };
+  if (inside) {
+    const k = P.filter(q => q.inside).length;           // pile position, filled from the bottom
+    const row = Math.floor(k / cols), col = k % cols;
+    p.xe = CX - CW / 2 + 20 + col * 10 + (row % 2) * 5 + (rnd() - 0.5) * 4;
+    p.ye = CB - 14 - row * 7.4 + (rnd() - 0.5) * 3;
+    p.xm = CX + (rnd() - 0.5) * (SLOT - 30); p.ym = CT - 6;
+    p.dA = 1.1 + rnd() * 0.4; p.dB = 0.35 + (p.ye - CT) / 900;
+  } else {
+    p.xe = 1000 + rnd() * 780; p.ye = 880 + rnd() * 90;
+    p.dA = 1.6 + rnd() * 0.5;
+  }
+  P.push(p);
+}
+// households in three operating regions (illustration)
+const REG = [[1180, 520, 120, 90], [1500, 400, 110, 80], [1620, 700, 120, 85]];
+const HOUSES = [];
+REG.forEach(([x, y, sx, sy], ri) => { for (let i = 0; i < 150; i++) HOUSES.push([x + gauss() * sx, y + gauss() * sy, ri]); });
+for (let i = 0; i < 60; i++) HOUSES.push([1060 + rnd() * 720, 330 + rnd() * 540, 3]);
+// the scattered tenth ends up at households
+P.filter(p => !p.inside).forEach((p, k) => { p.h = HOUSES[(k * 37) % HOUSES.length]; });
+// route: nearest-neighbour tour through all households
+const route = [];
+{
+  const left = HOUSES.map((h, i) => i);
+  let cur = left.reduce((b, i) => (HOUSES[i][0] < HOUSES[b][0] ? i : b), 0);
+  while (left.length) {
+    left.splice(left.indexOf(cur), 1); route.push(cur);
+    let best = -1, bd = 1e18;
+    for (const i of left) { const d = (HOUSES[i][0] - HOUSES[cur][0]) ** 2 + (HOUSES[i][1] - HOUSES[cur][1]) ** 2; if (d < bd) { bd = d; best = i; } }
+    if (best < 0) break; cur = best;
+  }
+}
+const cum = [0];
+for (let i = 1; i < route.length; i++) { const a = HOUSES[route[i - 1]], b = HOUSES[route[i]]; cum.push(cum[i - 1] + Math.hypot(b[0] - a[0], b[1] - a[1])); }
+const LEN = cum[cum.length - 1];
+const visitT = new Float32Array(HOUSES.length);
+route.forEach((h, i) => { visitT[h] = cum[i] / LEN; });
+
+function piece(x, y, s, r, c, a = 1) {
+  g.save(); g.globalAlpha = a; g.translate(x, y); g.rotate(r); g.fillStyle = c;
+  g.beginPath(); g.roundRect(-s / 2, -s * 0.35, s, s * 0.7, 1.5); g.fill();
+  g.fillStyle = 'rgba(255,255,255,.45)'; g.fillRect(-s / 2 + 1, -s * 0.35 + 1, s * 0.4, 1.2);
+  g.restore();
+}
+function container(a) {
+  g.save(); g.globalAlpha = a;
+  g.fillStyle = 'rgba(0,123,97,.06)'; g.strokeStyle = '#5E8F80'; g.lineWidth = 4;
+  g.beginPath(); g.roundRect(CX - CW / 2, CT, CW, CB - CT, [6, 6, 14, 14]); g.fill(); g.stroke();
+  g.fillStyle = '#ECEBE6'; g.fillRect(CX - SLOT / 2, CT - 4, SLOT, 9);
+  g.strokeStyle = '#5E8F80'; g.lineWidth = 4;
+  g.beginPath(); g.moveTo(CX - SLOT / 2, CT - 14); g.lineTo(CX - SLOT / 2, CT + 4); g.moveTo(CX + SLOT / 2, CT - 14); g.lineTo(CX + SLOT / 2, CT + 4); g.stroke();
+  g.fillStyle = '#5E8F80'; g.font = '600 20px FS'; g.textAlign = 'center'; g.fillText('RETURPUNKT', CX, CT - 28);
+  g.restore();
+}
+function text(id, t, a, b, dy = 24) {
+  const e = $(id), A = env(t, a, b, 0.9, 0.7);
+  e.style.opacity = A.toFixed(3);
+  e.style.transform = `translateY(${(1 - pr(t, a, a + 0.9, o3)) * dy}px)`;
+}
+function renderAt(t) {
+  g.clearRect(0, 0, 1920, 1080);
+  container(pr(t, 0.4, 1.4, o3));
+  const ph2 = pr(t, 5.6, 6.4);           // second phase: households appear
+  // households
+  if (ph2 > 0) {
+    HOUSES.forEach((h, i) => {
+      const v = clamp((pr(t, 6.8, 8.9, x => x) - visitT[i]) * 40);
+      g.fillStyle = v > 0 ? '#0E9C79' : '#B7BEBB';
+      g.globalAlpha = ph2 * (0.55 + 0.45 * v);
+      g.beginPath(); g.arc(h[0], h[1], 3.4 + v * 1.2, 0, 6.283); g.fill();
+    });
+    g.globalAlpha = 1;
+  }
+  // route
+  const rp = pr(t, 6.8, 8.9, x => x);
+  if (rp > 0) {
+    const L = rp * LEN; let i = 1;
+    g.strokeStyle = 'rgba(0,123,97,.75)'; g.lineWidth = 2.4; g.lineJoin = 'round';
+    g.beginPath(); g.moveTo(...HOUSES[route[0]].slice(0, 2));
+    while (i < route.length && cum[i] <= L) { g.lineTo(...HOUSES[route[i]].slice(0, 2)); i++; }
+    let hx = HOUSES[route[i - 1]][0], hy = HOUSES[route[i - 1]][1];
+    if (i < route.length) { const a = HOUSES[route[i - 1]], b = HOUSES[route[i]], f = (L - cum[i - 1]) / (cum[i] - cum[i - 1]); hx = lerp(a[0], b[0], f); hy = lerp(a[1], b[1], f); g.lineTo(hx, hy); }
+    g.stroke();
+    const gr = g.createRadialGradient(hx, hy, 0, hx, hy, 26);
+    gr.addColorStop(0, 'rgba(14,156,121,.55)'); gr.addColorStop(1, 'rgba(14,156,121,0)');
+    g.fillStyle = gr; g.beginPath(); g.arc(hx, hy, 26, 0, 6.283); g.fill();
+    g.fillStyle = '#007B61'; g.beginPath(); g.arc(hx, hy, 6, 0, 6.283); g.fill();
+  }
+  // pieces
+  for (const p of P) {
+    if (t < p.ts) continue;
+    const u = t - p.ts;
+    let x, y, r = p.r0 + p.rv * Math.min(u, p.inside ? p.dA + p.dB : p.dA);
+    if (p.inside) {
+      if (u < p.dA) { const q = u / p.dA; x = lerp(p.xs, p.xm, io(q)); y = lerp(p.ys, p.ym, i2(q)); }
+      else { const q = clamp((u - p.dA) / p.dB); x = lerp(p.xm, p.xe, o3(q)); y = lerp(p.ym, p.ye, i2(q)); }
+      piece(x, y, p.s, r, p.c);
+    } else {
+      const q = clamp(u / p.dA);
+      x = lerp(p.xs, p.xe, io(q)); y = lerp(p.ys, p.ye, i2(q));
+      // phase 2: the scattered tenth rises calmly to the households
+      const m = pr(t, 6.0 + (p.xe - 1000) / 780 * 0.6, 7.0 + (p.xe - 1000) / 780 * 0.6);
+      if (m > 0) { x = lerp(x, p.h[0], m); y = lerp(y, p.h[1], m) - Math.sin(m * Math.PI) * 60; }
+      piece(x, y, p.s, r + m * 3, p.c, 1 - 0.85 * pr(t, 7.2, 7.8));
+    }
+  }
+  text('h1', t, 0.8, 5.8);
+  text('v1', t, 4.6, 9.6); text('v1b', t, 4.9, 9.6);
+  text('h2', t, 6.0, 9.8);
+  text('cnt', t, 6.8, 9.8); text('cntl', t, 7.0, 9.8);
+  const n = Math.round(56000 * rp / 100) * 100;
+  $('cnt').textContent = (rp >= 1 ? 'ca. ' : '') + String(n).replace(/\B(?=(\d{3})+(?!\d))/g, '\u00A0');
+  text('src', t, 1.0, 9.8);
+  $('black').style.opacity = Math.max(1 - pr(t, 0, 0.8, o3), pr(t, 9.3, 10)).toFixed(3);
+}
+async function ready() { await document.fonts.ready; return true; }
+window.FILM = { renderAt, ready, DUR, FPS };
+ready().then(() => { renderAt(+(location.search.match(/t=([\d.]+)/) || [0, 8])[1]); window.FILM_READY = true; });
+})();
+</script>
+</body>
+</html>

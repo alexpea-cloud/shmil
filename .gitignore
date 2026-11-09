@@ -2,3 +2,4 @@ node_modules/
 output/frames/
 output/stills/
 .DS_Store
+output/frames-*/
