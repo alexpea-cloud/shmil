@@ -1,0 +1,68 @@
+<!doctype html>
+<html lang="no"><head><meta charset="utf-8"><title>Variant A – vekten</title>
+<link rel="stylesheet" href="common.css">
+<style>
+.blk{font:600 27px/1 FD;fill:#fff}
+.blkS{font:400 19px/1 FS;fill:rgba(255,255,255,.78)}
+</style></head>
+<body><div id="stage">
+<svg width="1920" height="1080" viewBox="0 0 1920 1080">
+  <defs>
+    <linearGradient id="metal" x1="0" x2="1"><stop offset="0" stop-color="#5B686D"/><stop offset=".5" stop-color="#8A979C"/><stop offset="1" stop-color="#4C585D"/></linearGradient>
+    <linearGradient id="beam" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#7E8B90"/><stop offset="1" stop-color="#4A565B"/></linearGradient>
+    <linearGradient id="pan" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#C9CFD1"/><stop offset="1" stop-color="#8E999D"/></linearGradient>
+    <radialGradient id="shadow"><stop offset="0" stop-color="rgba(40,45,40,.28)"/><stop offset="1" stop-color="rgba(40,45,40,0)"/></radialGradient>
+    <symbol id="jar" viewBox="0 0 40 52"><rect x="10" y="1" width="20" height="8" rx="2.5" fill="#6E7F7A"/><path d="M8 11 h24 a4 4 0 0 1 4 4 v27 a8 8 0 0 1 -8 8 h-16 a8 8 0 0 1 -8 -8 v-27 a4 4 0 0 1 4 -4z" fill="currentColor"/><rect x="11" y="17" width="4.5" height="24" rx="2.2" fill="rgba(255,255,255,.55)"/></symbol>
+    <filter id="soft" x="-20%" y="-20%" width="140%" height="160%"><feDropShadow dx="0" dy="10" stdDeviation="10" flood-color="#1B2326" flood-opacity=".18"/></filter>
+  </defs>
+  <!-- floor shadow -->
+  <ellipse cx="1110" cy="968" rx="520" ry="34" fill="url(#shadow)"/>
+  <!-- pillar -->
+  <path d="M1050 960 L1070 400 L1150 400 L1170 960 Z" fill="url(#metal)"/>
+  <rect x="960" y="944" width="300" height="26" rx="10" fill="#4C585D"/>
+  <!-- beam (tilted 12°, right side down) -->
+  <g transform="rotate(12 1110 392)" filter="url(#soft)">
+    <rect x="650" y="378" width="920" height="28" rx="14" fill="url(#beam)"/>
+    <circle cx="664" cy="392" r="10" fill="#3E494D"/><circle cx="1556" cy="392" r="10" fill="#3E494D"/>
+  </g>
+  <circle cx="1110" cy="392" r="26" fill="#3E494D"/><circle cx="1110" cy="392" r="10" fill="#9AA6AA"/>
+  <!-- left pan: hangs from (660, 296) -->
+  <g>
+    <path d="M660 296 L540 470 M660 296 L780 470" stroke="#5B686D" stroke-width="3"/>
+    <path d="M520 470 Q660 528 800 470 Z" fill="url(#pan)" filter="url(#soft)"/>
+    <use href="#jar" x="636" y="420" width="40" height="52" style="color:#3FA37A"/>
+  </g>
+  <!-- right pan: hangs from (1560, 488) -->
+  <g>
+    <path d="M1560 488 L1400 840 M1560 488 L1720 840" stroke="#5B686D" stroke-width="3" opacity=".55"/>
+  </g>
+  <!-- right pan load: stacked weights -->
+  <g filter="url(#soft)">
+    <rect x="1410" y="778" width="300" height="62" rx="10" fill="#3A4A50"/>
+    <text class="blk" x="1560" y="807" text-anchor="middle">Utslipp · støy · veistøv</text>
+    <text class="blkS" x="1560" y="830" text-anchor="middle">ny tungtrafikk i boliggatene</text>
+    <rect x="1425" y="710" width="270" height="62" rx="10" fill="#45575E"/>
+    <text class="blk" x="1560" y="739" text-anchor="middle">9 228 beholdere</text>
+    <text class="blkS" x="1560" y="762" text-anchor="middle">nye i tettbygd strøk</text>
+    <rect x="1440" y="642" width="240" height="62" rx="10" fill="#4F626A"/>
+    <text class="blk" x="1560" y="671" text-anchor="middle">225 bildager</text>
+    <text class="blkS" x="1560" y="694" text-anchor="middle">i året</text>
+    <rect x="1455" y="574" width="210" height="62" rx="10" fill="#5A6E76"/>
+    <text class="blk" x="1560" y="603" text-anchor="middle">56 000 stopp</text>
+    <text class="blkS" x="1560" y="626" text-anchor="middle">tømmestopp i året</text>
+    <rect x="1445" y="500" width="230" height="68" rx="10" fill="#2A7FA6"/>
+    <text class="blk" x="1560" y="535" text-anchor="middle" style="font-size:34px">74 kr</text>
+    <text class="blkS" x="1560" y="558" text-anchor="middle">per ekstra kilo</text>
+  </g>
+  <path d="M1380 840 Q1560 900 1740 840 Z" fill="url(#pan)" filter="url(#soft)"/>
+</svg>
+<div class="ab k" style="left:150px;top:110px">Per innbygger i tettbygd strøk</div>
+<div class="ab h" style="left:150px;top:150px">Hva veier tyngst?</div>
+<!-- left pan caption -->
+<div class="ab" style="left:420px;top:560px;width:480px;text-align:center;white-space:normal">
+  <div style="font:700 104px/1 FD;letter-spacing:-.02em;color:var(--green)">1,7 kg</div>
+  <div class="sub" style="font-size:30px;margin-top:10px">ekstra glass og metall<br>per innbygger i året</div>
+  <div style="font:500 24px/1 FS;color:var(--ink3);margin-top:14px">– ca. 33 gram i uka</div>
+</div>
+<div class="ab foot" style="left:150px;top:990px;width:1620px">Beregnet fra søknaden: modellert meruttak 45,7 tonn ÷ 26 456 innbyggere i tettbygd strøk ≈ 1,7 kg. 74 286 kr per ekstra tonn = 74 kr per kilo.</div>
+</div></body></html>

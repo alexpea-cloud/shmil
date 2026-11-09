@@ -1,0 +1,57 @@
+<!doctype html>
+<html lang="no"><head><meta charset="utf-8"><title>Variant B – én innbygger</title>
+<link rel="stylesheet" href="common.css">
+<style>
+.row{position:absolute;left:1130px;display:flex;align-items:center;gap:26px;white-space:nowrap}
+.ic{width:72px;height:72px;border-radius:18px;background:#fff;box-shadow:0 10px 24px rgba(27,35,38,.08);display:flex;align-items:center;justify-content:center}
+.rv{font:700 44px/1 FD;color:var(--ink)}
+.rl{font:400 24px/1.25 FS;color:var(--ink2);margin-top:6px}
+</style></head>
+<body><div id="stage">
+<svg width="1920" height="1080" viewBox="0 0 1920 1080">
+  <defs>
+    <symbol id="jar" viewBox="0 0 40 52"><rect x="10" y="1" width="20" height="8" rx="2.5" fill="#6E7F7A"/><path d="M8 11 h24 a4 4 0 0 1 4 4 v27 a8 8 0 0 1 -8 8 h-16 a8 8 0 0 1 -8 -8 v-27 a4 4 0 0 1 4 -4z" fill="currentColor"/><rect x="11" y="17" width="4.5" height="24" rx="2.2" fill="rgba(255,255,255,.55)"/></symbol>
+  </defs>
+  <!-- person -->
+  <g fill="#9AA4A8">
+    <circle cx="270" cy="430" r="56"/>
+    <path d="M190 510 h160 a40 40 0 0 1 40 40 v170 a18 18 0 0 1 -36 0 v-150 h-12 v330 a22 22 0 0 1 -44 0 v-190 h-16 v190 a22 22 0 0 1 -44 0 v-330 h-12 v150 a18 18 0 0 1 -36 0 v-170 a40 40 0 0 1 40 -40z"/>
+  </g>
+  <!-- jars: 1 jar = 0,5 kg. Today 14,2 kg ≈ 28 jars; extra 1,7 kg ≈ 3,5 jars -->
+  <g id="jars"></g>
+  <line x1="1050" y1="330" x2="1050" y2="900" stroke="#CDD2CD" stroke-width="2"/>
+</svg>
+<div class="ab k" style="left:150px;top:110px">Én innbygger i tettbygd strøk · ett år</div>
+<div class="ab h" style="left:150px;top:150px">33 gram i uka</div>
+<div class="ab sub" style="left:150px;top:248px;font-size:34px">– det er den ekstra mengden henteordning er beregnet å gi</div>
+<div class="ab" style="left:470px;top:350px;font:600 26px/1 FS;color:var(--ink2)">Samles inn i dag: <b style="color:var(--green)">ca. 14,2 kg</b></div>
+<div class="ab" style="left:470px;top:800px;font:600 26px/1.35 FS;color:var(--ink2);white-space:normal;width:540px">Ekstra med henteordning: <b style="color:var(--green-hi)">ca. 1,7 kg</b><br><span style="font-weight:400;color:var(--ink3)">modellert – ca. 33 gram i uka</span></div>
+<div class="ab" style="left:1130px;top:350px;font:600 26px/1 FS;color:var(--ink2)">Det de ekstra grammene krever:</div>
+<div class="row" style="top:410px"><div class="ic"><svg width="44" height="44" viewBox="0 0 44 44" style="position:static"><rect x="2" y="12" width="26" height="18" rx="3" fill="#2A7FA6"/><path d="M28 17 h8 l6 7 v6 h-14z" fill="#2A7FA6"/><circle cx="10" cy="33" r="5" fill="#1B2326"/><circle cx="34" cy="33" r="5" fill="#1B2326"/></svg></div><div><div class="rv">56 000 stopp</div><div class="rl">tømmestopp i året – 0,8 kg per stopp</div></div></div>
+<div class="row" style="top:520px"><div class="ic"><svg width="44" height="44" viewBox="0 0 44 44" style="position:static"><circle cx="15" cy="24" r="9" fill="#9AA4A8"/><circle cx="26" cy="18" r="11" fill="#B7BEBB"/><circle cx="31" cy="27" r="8" fill="#9AA4A8"/></svg></div><div><div class="rv">Utslipp og veistøv</div><div class="rl">ny tungtrafikk i boliggatene</div></div></div>
+<div class="row" style="top:630px"><div class="ic"><svg width="44" height="44" viewBox="0 0 44 44" style="position:static"><path d="M6 17 h8 l10 -8 v26 l-10 -8 h-8z" fill="#5B686D"/><path d="M29 15 q5 7 0 14 M33 11 q9 11 0 22" stroke="#5B686D" stroke-width="3" fill="none" stroke-linecap="round"/></svg></div><div><div class="rv">Støy</div><div class="rl">fra tømming og tungtransport</div></div></div>
+<div class="row" style="top:740px"><div class="ic"><svg width="44" height="44" viewBox="0 0 44 44" style="position:static"><path d="M6 6 h18 l16 16 -18 18 -16 -16z" fill="#007B61"/><circle cx="14" cy="14" r="4" fill="#fff"/></svg></div><div><div class="rv">74 kr per ekstra kilo</div><div class="rl">mot 1,81 kr i Miljødirektoratets anslag</div></div></div>
+<div class="ab foot" style="left:150px;top:990px;width:1620px">Beregnet fra søknaden: 375,5 tonn og modellert meruttak 45,7 tonn ÷ 26 456 innbyggere i tettbygd strøk. Ett glass i figuren = 0,5 kg.</div>
+<script>
+const g = document.getElementById('jars');
+const per = 8, W = 60, H = 78, X0 = 470, Y0 = 400;
+for (let i = 0; i < 32; i++) {
+  const extra = i >= 28;
+  const x = X0 + (i % per) * W, y = Y0 + Math.floor(i / per) * H + (extra ? 18 : 0);
+  if (i === 31) { // 0,4 of a jar: clip the bottom part (fill level) and show the rest faintly
+    const cp = document.createElementNS('http://www.w3.org/2000/svg', 'clipPath'); cp.id = 'half';
+    const r = document.createElementNS('http://www.w3.org/2000/svg', 'rect'); r.setAttribute('x', x); r.setAttribute('y', y + 39); r.setAttribute('width', 46); r.setAttribute('height', 30); cp.appendChild(r);
+    g.appendChild(cp);
+    const ghost = document.createElementNS('http://www.w3.org/2000/svg', 'use');
+    ghost.setAttribute('href', '#jar'); ghost.setAttribute('x', x); ghost.setAttribute('y', y); ghost.setAttribute('width', 46); ghost.setAttribute('height', 60);
+    ghost.style.color = '#0E9C79'; ghost.style.opacity = 0.22; g.appendChild(ghost);
+  }
+  const u = document.createElementNS('http://www.w3.org/2000/svg', 'use');
+  u.setAttribute('href', '#jar'); u.setAttribute('x', x); u.setAttribute('y', y); u.setAttribute('width', 46); u.setAttribute('height', 60);
+  u.style.color = extra ? '#0E9C79' : '#8CC9A8';
+  if (extra) u.style.filter = 'drop-shadow(0 0 8px rgba(14,156,121,.6))';
+  if (i === 31) { const gg = document.createElementNS('http://www.w3.org/2000/svg', 'g'); gg.setAttribute('clip-path', 'url(#half)'); gg.appendChild(u); g.appendChild(gg); }
+  else g.appendChild(u);
+}
+</script>
+</div></body></html>
