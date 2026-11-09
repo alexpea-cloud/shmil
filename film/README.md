@@ -6,26 +6,30 @@ fagsystemer, analysert og sammenstilt i Vedlegg 1 og 2, og hvordan søknaden byg
 Laget for visning i PowerPoint for representanter fra SHMILs 11 eierkommuner.
 
 **Ferdig film:** [`output/SHMIL_grunnlaget_for_soknaden.mp4`](../output/SHMIL_grunnlaget_for_soknaden.mp4)
-(H.264/AAC, 1920×1080, 30 fps, lydspor «Cosmos 18 (Remix)»)
+(H.264/AAC, 1920×1080, 30 fps, 3:50, lydspor «Cosmos 18 (Remix)», forlenget med åpningstemaet)
 
-## Disposisjon (versjon 3)
+## Disposisjon (versjon 5, 3:50)
 
-Lyst, rolig uttrykk med lange hold og store bokstaver. Scenene klippes på musikkens fraser
-(128 bpm, 15-sekunders fraser).
+Rolig regi: ett budskap om gangen, få ord, lange hold. Høydepunktet i musikken treffer «22 gram i uka».
 
 | Tid | Del | Innhold |
 |-----|-----|---------|
-| 0:00 | Tittel | «Grunnlaget for søknaden» over søknaden og vedleggene |
-| 0:12 | Tilsynet | 6.11.2025 – tilsynsavvik, krav om henteordning |
-| 0:20 | Januar – SHMILs spørsmål | Brevet 15.01.2026 (7 sider, 6 spørsmål markert i originalen) · spørsmål 1a, 1c og 3a ordrett |
-| 0:50 | Mai – svaret ordrett | Svarbrevet 07.05.2026 · SHMILs spørsmål og direktoratets svar ordrett for 1c, 2a og 3a · § 19-4 («slår urimelig ut …», «det skal mye til») · «ikke tilstrekkelig informasjon» · «Grunnlaget manglet.» |
-| 1:35 | Dokumentasjonen | Søknad, Vedlegg 1 og Vedlegg 2 (31 sider) på flaten · kameraet blar gjennom originalsidene og stopper ved vurderingene: datastatus og kilder (V1), kvalitetsindikatorer (V1), sensitivitet (2.3), alternativer (3.4), usikker mengdeeffekt (4.2), forholdsmessighet (5.2) |
-| 2:05 | Beregningsmodellen | 8 959 avtaler → ca. 8 650 stoppesteder → ca. 56 000 tømmestopp → 225 kjøretøydager → 2,99 + 0,40 mill. kr = 3,39 mill. kr i året |
-| 2:20 | Søknaden | Søknaden legges på grunnlaget · «Denne søknaden gir det manglende grunnlaget» – koblet til kildene |
-| 2:35 | Nytte og belastning | Ni av ti kilo samles allerede inn · den siste tidelen krever ca. 56 000 tømmestopp i året |
-| 2:42 | Konklusjonen | Boksen på side 1: 74 286 kr per ekstra tonn – over 40 ganger direktoratets anslag · 3,39 mill. kr i året, 3–4 % høyere gebyr |
-| 3:05 | Oversendt | Søknad + Vedlegg 1 + Vedlegg 2 sendes 31.08.2026 |
-| 3:11 | Avslutning | «SHMIL søker om tidsbegrenset unntak etter § 19-4» · tidslinjen · «Vi venter fortsatt på svar.» |
+| 0:00 | Åpning | Kartet glir fra Norge til Helgeland; de 11 eierkommunene (Kartverket) · «Grunnlaget for søknaden» |
+| 0:20 | Avviket | Statsforvalteren 6.11.2025 · sorteringsmerkene for papp/papir og glass/metall · «Henteordning mangler» |
+| 0:35 | Brevvekslingen | SHMILs brev (januar) og svaret (mai) |
+| 0:50 | Spørsmål og svar 1c | «Plikten til henteordning gjelder uavhengig av målkravet …» |
+| 1:05 | Spørsmål og svar 3a | «Kommunenes plikter … gjelder uavhengig av pliktene til produsentansvaret.» |
+| 1:20 | Til slutt: § 19-4 | «… slår urimelig ut», «… det skal mye til», «ikke tilstrekkelig informasjon» · «Grunnlaget manglet.» |
+| 1:50 | Grunnlaget | 3D: fire fundamentblokker, de 31 originalsidene faller og legger seg i tre bunker |
+| 2:15 | Forutsetningen | Miljødirektoratet regnet med ca. 1 810 kr per ekstra tonn |
+| 2:25 | Én innbygger | 22 gram i uka per innbygger · konsekvensen av henteordning på kartet (tre biler, ferjer til Vega, Herøy og Dønna, 56 000 stopp, utslipp, støy) · 3,39 mill. kr i året |
+| 3:15 | Konklusjonen | Boksen på søknadens side 1 · 74 286 kr per ekstra tonn – over 40 ganger direktoratets eget anslag |
+| 3:29 | Søknaden sendt | 31.08.2026 · fiberdunk for papp/papir · søknad om unntak til 2030 |
+| 3:40 | Avslutning | Tidslinjen · «Vi venter på svar.» |
+
+Filmen settes sammen av `tools/build_film.sh` fra fire sider: `demos/kart.html`, `index.html` (film.js),
+`demos/grunnlag3d.html` og `demos/innbygger.html`, med ett sekunds overtoninger. Kjørerutene og
+gatenettet i kartsekvensen er illustrasjoner; sorteringsmerkene er gjenskapt etter de nasjonale merkene.
 
 Alle tall og sitater er hentet ordrett fra de fem PDF-ene i `source/`, og alle dokumentsider er
 originalsidene. Tilsynsrapporten var ikke vedlagt og vises ikke. Beregningskjeden følger Vedlegg 1
