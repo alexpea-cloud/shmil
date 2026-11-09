@@ -371,16 +371,27 @@ function sceneAvvik() {
   const a = Q(1), b = Q(2);
   const sc = mkScene(a - 0.3, b + 0.6, 0.9, 0.9);
   const ov = sc.ov;
-  const k = txt(ov, 'k g', 'Statsforvalteren i Nordland · 6. november 2025', 0, 268, { center: true });
-  const h = txt(ov, 'dt', 'Tilsynet fant avvik', 0, 310, { center: true, size: 120 });
-  const cards = ['Papp og papir', 'Glass- og metallemballasje'].map((ttl, i) => {
-    const c = $('div', 'card', ov, `<div class="bar" style="background:#9AA4A8"></div><div class="lb">Henteordning mangler</div><div class="tt">${ttl}</div>`);
-    return place(c, 300 + i * 680, 560, 640);
+  const k = txt(ov, 'k g', 'Statsforvalteren i Nordland · 6. november 2025', 0, 196, { center: true });
+  const h = txt(ov, 'dt', 'Tilsynet fant avvik', 0, 238, { center: true, size: 112 });
+  // national sorting labels: square, white border, text outside the coloured field
+  const G = [
+    { icons: ['papir', 'papp'], name: 'Papp og papir', x: 330 },
+    { icons: ['glassemballasje', 'metallemballasje'], name: 'Glass- og metallemballasje', x: 1010 },
+  ].map((g, gi) => {
+    const e = $('div', 'fgrp', ov,
+      `<div class="fic">${g.icons.map(n => `<img src="assets/icons/${n}.svg" alt="">`).join('')}</div>` +
+      `<div class="fname">${g.name}</div><div class="fmiss">Henteordning mangler</div>`);
+    e.querySelectorAll('img').forEach(im => IMGS.push(im));
+    return place(e, g.x, 430, 580);
   });
   sc.upd = t => {
     calm(k, t, a + 0.6, b);
     calm(h, t, a + 1.0, b, { st: 0.05 });
-    cards.forEach((c, i) => fade(c, t, a + 5.0 + i * 1.2, b, { dy: 24 }));
+    G.forEach((e, i) => {
+      fade(e, t, a + 3.4 + i * 1.6, b, { dy: 30, fi: 1.3 });
+      const m = e.querySelector('.fmiss'), p = pr(t, a + 6.8 + i * 0.8, a + 7.8 + i * 0.8, E.o);
+      m.style.opacity = p.toFixed(3); m.style.transform = `translateY(${((1 - p) * 14).toFixed(1)}px)`;
+    });
   };
 }
 

@@ -1,0 +1,23 @@
+<!doctype html>
+<html lang="no"><head><meta charset="utf-8"><title>Sorteringsmerker – kontroll</title>
+<link rel="stylesheet" href="common.css">
+<style>
+.row{position:absolute;left:150px;display:flex;gap:40px;align-items:flex-start}
+.lbl{display:flex;flex-direction:column;align-items:center;gap:14px}
+.lbl .sq{background:#fff;padding:10px;box-shadow:0 10px 24px rgba(27,35,38,.10)}
+.lbl img{display:block;width:220px;height:220px}
+.lbl span{font:600 24px/1.2 FS;color:var(--ink)}
+.ref{display:block;height:240px}
+.cap{position:absolute;left:150px;font:600 22px/1 FS;letter-spacing:.14em;text-transform:uppercase;color:var(--ink3)}
+</style></head><body><div id="stage">
+<div class="cap" style="top:90px">Originaler (skjermbilder)</div>
+<div class="row" style="top:130px"><img class="ref" src="ref_glass.png"><img class="ref" src="ref_papp.png"></div>
+<div class="cap" style="top:450px">Gjenskapt som vektor</div>
+<div class="row" style="top:490px">
+  <div class="lbl"><div class="sq"><img src="../../assets/icons/glassemballasje.svg"></div><span>Glassemballasje</span></div>
+  <div class="lbl"><div class="sq"><img src="../../assets/icons/metallemballasje.svg"></div><span>Metallemballasje</span></div>
+  <div class="lbl"><div class="sq"><img src="../../assets/icons/papir.svg"></div><span>Papir</span></div>
+  <div class="lbl"><div class="sq"><img src="../../assets/icons/drikkekartong.svg"></div><span>Drikkekartong</span></div>
+  <div class="lbl"><div class="sq"><img src="../../assets/icons/papp.svg"></div><span>Papp</span></div>
+</div>
+</div></body></html>
