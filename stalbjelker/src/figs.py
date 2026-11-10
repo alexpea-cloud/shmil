@@ -165,7 +165,7 @@ def fig_snow(path):
 def fig_path(path):
     """Lastveier med status: grønn = regnet/kontrollert, gul = regnet med antakelse, rød = ikke dokumentert."""
     s = Fig(170, 86)
-    OKC, ASC, NDC = GREEN, AMBER, RED
+    ASC, NDC = AMBER, RED
     bw, bh, gap = 25.5, 11.0, 3.2
 
     def box(x, y, title, sub, color, w=bw):
@@ -186,41 +186,48 @@ def fig_path(path):
             x += bw + gap
 
     b1, b2, su = R["B1"], R["B2"], R["supports"]
+    w0 = su["web"]["FRd_ss0"]
+    stu = su["studs"]
+    c9 = su["c90"]
+
+    def steg(F):
+        return ("Stålbjelke", ["steg ved opplegg", f"≤ {num(F / w0 * 100, 0)} % (S235 antatt)"], ASC)
+
+    def stend(key, dim):
+        return (dim, ["stendere, fastholdt", f"{num(stu[key]['C24']['util_strong'] * 100, 0)}–{num(stu[key]['C24']['util_ecc'] * 100, 0)} % (C24 antatt)"], ASC)
+
+    def stokk(key):
+        return ("Tømmerstokk", ["148×148, trykk ⊥ fiber", f"{num(c9[key]['C24']['util'] * 100, 0)}–{num(c9[key]['C24']['util_98'] * 100, 0)} % (C24 antatt)"], ASC)
+
     s.text(2.0, 5.0, "Lastveier fra stålbjelkene ned til grunnen – med dokumentasjonsstatus", size=T_M, weight=700)
     chain(9.0, "B1 · O1", f"{num(b1['VEd'], 1)} kN", [
-        ("Stålbjelke", ["steg ved opplegg", f"{num(b1['VEd'] / su['web']['FRd'] * 100, 0)} %"], OKC),
-        ("2 × 48×98", ["stendere, fastholdt", f"{num(su['studs']['B1_pipe']['C24']['util_strong'] * 100, 0)} % (C24 antatt)"], ASC),
+        steg(b1["VEd"]), stend("B1_pipe", "2 × 48×98"),
         ("Gulvbjelke", ["48×196, trykk ⊥ fiber", "flate ikke dokumentert"], NDC),
-        ("IPN 200", ["lastpunkt over", "betongklossen"], ASC),
+        ("IPN 200", ["lastpunkt over kloss;", f"verste fall {num(su['ipn']['util'] * 100, 0)} %"], ASC),
         ("Betongkloss", ["0,90 m; underlag", "ikke dokumentert"], NDC),
     ])
     chain(27.5, "B1 · O2", f"{num(b1['VEd'], 1)} kN", [
-        ("Stålbjelke", ["steg ved opplegg", f"{num(b1['VEd'] / su['web']['FRd'] * 100, 0)} %"], OKC),
-        ("2 × 48×148", ["stendere, fastholdt", f"{num(su['studs']['B1_wall']['C24']['util_strong'] * 100, 0)} % (C24 antatt)"], ASC),
-        ("Tømmerstokk", ["148×148, trykk ⊥ fiber", f"{num(su['c90']['B1_wall']['C24']['util'] * 100, 0)} % (C24 antatt)"], ASC),
-        ("Grunnmur", ["ca. 0,25 m; som før", "2018"], ASC),
+        steg(b1["VEd"]), stend("B1_wall", "2 × 48×148"), stokk("B1_wall"),
+        ("Grunnmur", ["ca. 0,25 m; tilstand", "ikke undersøkt"], ASC),
     ])
     chain(46.0, "B2 · O3", f"{num(b2['RA'], 1)} kN", [
-        ("Stålbjelke", ["steg ved opplegg", f"{num(b2['RA'] / su['web']['FRd'] * 100, 0)} %"], OKC),
-        ("2 × 48×148", ["stendere, fastholdt", f"{num(su['studs']['B2_wall']['C24']['util_strong'] * 100, 0)} % (C24 antatt)"], ASC),
-        ("Tømmerstokk", ["148×148, trykk ⊥ fiber", f"{num(su['c90']['B2_wall']['C24']['util'] * 100, 0)} % (C24 antatt)"], ASC),
-        ("Grunnmur", ["ca. 0,25 m; som før", "2018"], ASC),
+        steg(b2["RA"]), stend("B2_wall", "2 × 48×148"), stokk("B2_wall"),
+        ("Grunnmur", ["ca. 0,25 m; tilstand", "ikke undersøkt"], ASC),
     ])
     chain(64.5, "B2 · O4", f"{num(b2['RB'], 1)} kN", [
-        ("Stålbjelke", ["steg ved opplegg", f"{num(b2['RB'] / su['web']['FRd'] * 100, 0)} %"], OKC),
-        ("2 × 48×98", ["stendere, fastholdt", f"{num(su['studs']['B2_col']['C24']['util_strong'] * 100, 0)} % (C24 antatt)"], ASC),
+        steg(b2["RB"]), stend("B2_col", "2 × 48×98"),
         ("Gulvbjelke", ["48×196 + kubbinger,", "flate ikke dokumentert"], NDC),
         ("Stolpesko", ["plate 400 mm; type", "ikke dokumentert"], NDC),
         ("Betongsøyle", ["Ø ca. 200; fundament", "ikke dokumentert"], NDC),
     ])
     # forklaring
     yl = 80.5
-    x = 2.0
-    for color, txt in ((OKC, "regnet med dokumenterte mål"), (ASC, "regnet med antakelse (materialklasse, fastholding)"),
+    x = 21.0
+    for color, txt in ((ASC, "regnet eller vurdert med antakelse (materialklasse, fastholding)"),
                        (NDC, "ikke dokumentert – må kontrollmåles")):
         s.rect(x, yl - 2.4, 3.2, 3.2, None, fill=color, rx=0.6)
         s.text(x + 4.6, yl + 0.2, txt, size=T_XS, fill=INK2)
-        x += text_w(txt, T_XS) + 10.5
+        x += text_w(txt, T_XS) + 12.0
     s.save(path)
 
 

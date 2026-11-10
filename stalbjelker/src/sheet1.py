@@ -145,7 +145,7 @@ def build(out_svg):
     s.dim(P(b2x, c2a), P(b2x, c2b), -7.0, "L = 3,40", weight=700, side=-1, text_off=3.2)
     # felt over kjøkkenet: yttervegg – B1 – bodvegg (påskrevne mål, regnet fra B1)
     yd = 5.52
-    s.dim(P(b1x - 3.60, yd), P(b1x, yd), 0, "3,60", ext=False)
+    s.dim(P(0.197, yd), P(b1x, yd), 0, "3,60", ext=False, nts=True)
     s.dim(P(b1x, yd), P(b1x + 1.50, yd), 0, "1,50", ext=False)
     # lastbredde B1
     yl = 8.12
@@ -165,7 +165,7 @@ def build(out_svg):
     # takbjelkenes felt
     yt = 12.46
     s.dim(P(M.BATH_WALL_X, yt), P(b2x, yt), 0, "ca. 1,50", ext=False, color=BLUE, size=T_S)
-    s.dim(P(b2x, yt), P(M.ENTRE_EAST_WALL_X, yt), 0, "ca. 1,65", ext=False, color=BLUE, size=T_S)
+    s.dim(P(b2x, yt), P(M.ENTRE_EAST_WALL_X, yt), 0, "ca. 1,65", ext=False, color=BLUE, size=T_S, nts=True)
     # husbredde
     s.dim(P(0, y_top - 0.02), P(7.593, y_top - 0.02), 4.0, "7,60 (husbredde iht. E2)", size=T_XS, color=INK3,
           text_off=0.7, side=-1)
@@ -306,6 +306,8 @@ def build(out_svg):
         s.text(x + 12, y + 1.2, "A", size=T_M, weight=700, anchor="middle")
     lg(sym_sec, "Snitt – A og B på ark 2 og 3, C på ark 3")
     lg(lambda x, y: s.tag(x + 8, y, "O1", size=T_XS), "Oppleggsnummer (se tabell over)")
+    lg(lambda x, y: s.dim((x + 1, y + 1.2), (x + 15, y + 1.2), 0, "3,60", ext=False, size=T_S, nts=True, halo=False),
+       "Understreket mål: påskrevet mål gjelder,", "tegnet vegg (etter E2) avviker noe")
 
     # forbehold
     yb_box = s.notebox(cx, ly + 1.0, cw, "Status og forbehold", [

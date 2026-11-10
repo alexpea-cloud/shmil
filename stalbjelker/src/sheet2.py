@@ -245,12 +245,13 @@ def build(out_svg):
         ("Moment, kNm", num(r1["MEd"], 1), num(res["MRd_el"], 1), r1["util_M"], None, None),
         ("Skjær / oppleggskraft, kN", num(r1["VEd"], 1), num(res["VRd"], 0), r1["util_V"], None, None),
         ("Nedbøyning g + q, mm (L/300)", num(r1["delta_gq"], 1), num(r1["delta_lim"], 1), r1["util_delta"], None, None),
-        ("Steg ved opplegg, kN", num(r1["VEd"], 1), num(sup["web"]["FRd"], 0), r1["VEd"] / sup["web"]["FRd"], None, None),
+        ("Steg ved opplegg, kN", num(r1["VEd"], 1), f"{num(sup['web']['FRd_ss0'], 0)}–{num(sup['web']['FRd'], 0)}",
+         r1["VEd"] / sup["web"]["FRd_ss0"], None, None),
         ("Følsomhet: lastbredde 3,71 m, kNm", num(r1s["MEd"], 1), num(res["MRd_el"], 1), r1s["util_M"], AMBER, None),
         ("Vipping uten sideavstivning, kNm", num(r1["MEd"], 1), f"{num(r1['ltb']['MbRd_6322'], 1)}–{num(r1['ltb']['MbRd_6323'], 1)}",
          None, AMBER, f"{num(r1['util_ltb_6323'] * 100, 0)}–{num(r1['util_ltb_6322'] * 100, 0)} %"),
-        ("Trykk ⊥ fiber, flate A/B (48 mm), N/mm²", num(c90["sigma_joist_only"], 1), num(c90["C24"]["fRd"], 1), None, RED,
-         "ikke dokumentert"),
+        ("Trykk ⊥ fiber, flate A og B (48 mm), N/mm²", f"{num(c90['sigma_joist_only'], 1)}–{num(c90['sigma_min'], 1)}",
+         num(c90["C24"]["fRd"], 1), None, RED, "ikke dokumentert"),
     ]
     yk = check_table(s, cx, yk, cw, rows, title="Kontroll")
 
@@ -264,13 +265,13 @@ def build(out_svg):
     ], size=T_XS, tsize=T_S, accent=STEEL_D, pad=2.2)
     s.notebox(22.0 + bw + 3.0, by, bw, "Forutsetninger", [
         "S235 og C24 er forutsatt, ikke dokumentert.",
-        "Bodveggen i 2. etasje bærer ikke taklast (vurdert ved befaring).",
+        "Bodveggen i 2. etasje bærer ikke taklast (vurdert ved befaring). Egenlast 1,2 kN/m² gjelder lett bjelkelag.",
         "Bjelkelaget regnes som separate felt (3,60 og 1,50 m). Full kontinuitet er vist som følsomhet.",
         "Momentkapasiteten forutsetter at bjelkelaget holder overflensen sideveis, og at stenderne er sideveis fastholdt.",
     ], size=T_XS, tsize=T_S, accent=INK3, pad=2.2)
     s.notebox(22.0 + 2 * (bw + 3.0), by, bw, "Kontrollpunkter på stedet", [
         "Bjelkelagets feste/anlegg mot overflensen langs hele B1.",
-        "Trykkflater under stenderne ved O1 (kubbinger/svill?) og mot IPN-flensen.",
+        "Trykkflater under stenderne ved O1 (kubbinger/svill?) og mot IPN-flensen. Står stenderne rett over IPN-en?",
         "Tømmerstokk og grunnmur under O2: ingen knusing eller riss.",
         "Betongklossens tilstand og underlag.",
     ], size=T_XS, tsize=T_S, accent=AMBER, pad=2.2)

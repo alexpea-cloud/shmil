@@ -315,7 +315,7 @@ class Sheet:
 
     # ---- målsetting ----------------------------------------------------
     def dim(self, p1, p2, off, label, *, side=1, size=T_M, weight=500, ext=True, color=INK,
-            text_off=0.9, gap=1.0, text_shift=0.0, halo=True):
+            text_off=0.9, gap=1.0, text_shift=0.0, halo=True, nts=False):
         """Mållinje mellom papirpunktene p1 og p2, forskjøvet off mm vinkelrett (fortegn gir side).
 
         Mållinja tegnes parallelt med p1–p2. Skrå målstreker, hjelpelinjer fra punktene, tekst
@@ -348,8 +348,14 @@ class Sheet:
         # tekst plasseres på "oversiden" av linja i lese-retningen
         a = math.radians(ang)
         ox, oy = -math.sin(a), -math.cos(a)        # enhetsvektor "opp" i tekstens system (skjerm)
-        self.text(mx + ox * text_off * side, my + oy * text_off * side, label, size=size, weight=weight,
-                  fill=color, anchor="middle", rot=ang, halo=halo)
+        tx, ty = mx + ox * text_off * side, my + oy * text_off * side
+        self.text(tx, ty, label, size=size, weight=weight, fill=color, anchor="middle", rot=ang, halo=halo)
+        if nts:   # understreket mål = påskrevet mål gjelder, tegnet lengde avviker
+            w = text_w(label, size, weight) / 2
+            ca, sa = math.cos(a), -math.sin(a)
+            ux2, uy2 = ca, sa
+            bx_, by_ = tx - ox * 0.55, ty - oy * 0.55
+            self.line(bx_ - ux2 * w, by_ - uy2 * w, bx_ + ux2 * w, by_ + uy2 * w, (color, 0.22, None))
 
     # ---- henvisning ----------------------------------------------------
     def leader(self, anchor, pos, title, lines=(), *, align="left", size=T_S, tsize=T_M, width=None,

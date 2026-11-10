@@ -314,7 +314,7 @@ def build(out_svg):
     s.leader((DX(3.4 + 0.049), DY(-BOARD1)), (lx, DY(0.045)), "Kontaktflate A", ["stendere → gulvbjelke.", "Bare bjelken: 48 mm.",
                                                                                "Med kubbinger: 98 mm."],
              size=T_XS, tsize=T_XS, color=RED, line_fill=INK2)
-    s.leader((DX(3.4 + 0.072), DY(Z_J1B + 0.10)), (lx, DY(-0.10)), "Sidekubbinger 48 mm", ["omfang og anlegg ikke", "dokumentert (stiplet)"],
+    s.leader((DX(3.4 + 0.072), DY(Z_J1B + 0.10)), (lx, DY(-0.10)), "Sidekubbinger 48 mm", ["omfang, anlegg og feste", "ikke dokumentert (stiplet)"],
              size=T_XS, tsize=T_XS, color=TIMBER, line_fill=INK2)
     s.leader((DX(3.4 + 0.031), DY(Z_J1B - 0.004)), (lx, DY(-0.215)), "Stålplate og stolpesko", ["plate 400 mm (opplyst);", "type og kapasitet",
                                                                                             "ikke dokumentert"],
@@ -365,8 +365,9 @@ def build(out_svg):
         ("Moment, kNm", num(r2["MEd"], 1), num(res["MRd_el"], 1), r2["util_M"], None, None),
         ("Skjær / oppleggskraft O4, kN", num(r2["RB"], 1), num(res["VRd"], 0), r2["util_V"], None, None),
         ("Nedbøyning g + q, mm (L/300)", num(r2["delta_gq"], 1), num(r2["delta_lim"], 1), r2["util_delta"], None, None),
-        ("Steg ved opplegg O4, kN", num(r2["RB"], 1), num(sup["web"]["FRd"], 0), r2["RB"] / sup["web"]["FRd"], None, None),
-        ("Stendere O4, 2 × 48×98 fastholdt, kN", num(r2["RB"], 1), num(st["strong"]["NRd"], 0), st["util_strong"], None, None),
+        ("Steg ved opplegg O4, kN", num(r2["RB"], 1), f"{num(sup['web']['FRd_ss0'], 0)}–{num(sup['web']['FRd'], 0)}",
+         r2["RB"] / sup["web"]["FRd_ss0"], None, None),
+        ("Stendere O4, 2 × 48×98 fastholdt, kN", num(r2["RB"], 1), num(st["strong"]["NRd"], 0), st["util_ecc"], None, None),
         ("Terrassebruk 4,0 kN/m² (uten snø), kNm", num(r2t["MEd"], 1), num(res["MRd_el"], 1), r2t["util_M"], None, None),
         ("Følsomhet: takstripe ved gavl, kNm", num(rob["roof_strip"]["MEd"], 1), num(res["MRd_el"], 1), rob["roof_strip"]["util"],
          AMBER, None),
@@ -393,8 +394,8 @@ def build(out_svg):
         "Overflensen holdes sideveis av veksling og takbjelker.",
     ], size=T_XS, tsize=T_S, accent=INK3, pad=2.2)
     s.notebox(22.0 + 2 * (bw + 3.0), by, bw, "Kontrollpunkter på stedet", [
-        "Trykkflate under stenderne ved O4: ligger kubbingene an oppe og nede?",
-        "Stolpesko: type og feste. Søyle: fundament og masser.",
+        "Trykkflate under stenderne ved O4: ligger kubbingene an oppe, og er de festet eller har anlegg nede?",
+        "Står stenderne rett over stolpesko og søyle? Stolpesko: type. Søyle: fundament.",
         "Vekslingens og takbjelkenes feste til overflensen.",
         "Gavlveggen: bærer den en takstripe?",
     ], size=T_XS, tsize=T_S, accent=AMBER, pad=2.2)
