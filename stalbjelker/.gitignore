@@ -1,0 +1,5 @@
+build/
+leveranse/
+privat/
+__pycache__/
+*.pyc
