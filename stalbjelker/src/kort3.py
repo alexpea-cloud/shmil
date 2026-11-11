@@ -23,10 +23,11 @@ Z_TERR = Z_F2 + 0.064                       # overkant terrassebord
 Z_TOP = Z_F2 + 0.36                         # bruddlinje i tømmervegg og gavlvegg
 BOARD1, J1_H = 0.022, 0.196                 # gulvbord og gulvbjelker 48 x 196 i 1. etasje
 Z_J1T, Z_J1B = -BOARD1, -BOARD1 - J1_H
-Z_COLT = Z_J1B                              # overkant betongsøyle = underkant gulvbjelke (U-beslaget står i søyletoppen)
-Z_FT = -0.680                               # overkant betongfundament (tegnet enkelt, ikke målsatt)
+Z_COLT = -0.278                             # overkant betongsøyle: søyleskoens stamme står litt opp av betongen (etter bilde, ikke målt)
+Z_FT = -0.830                               # overkant betongfundament, under terreng (tegnet enkelt, ikke målsatt)
 Z_GROUND = -0.800                           # terreng i krypkjelleren (tegnet enkelt, ikke målsatt)
 Z_BOT = -0.905                              # bruddlinje nederst
+Z_BOT_F = -1.000                            # bruddlinje nederst i betongfundamentet
 X_FOUND = (-0.150, 0.100)                   # gammel grunnmur
 X_LOG = (-0.099, 0.049)                     # stendere 48 x 148 og tømmerstokk 148 x 148
 X_LOGWALL = (-0.132, 0.082)                 # tømmerveggen bak snittet
@@ -86,9 +87,9 @@ def build(out_svg):
     def RR(x1, z1, x2, z2):
         return (X(min(x1, x2)), Y(max(z1, z2)), abs(x2 - x1) * K, abs(z2 - z1) * K)
 
-    def open_bottom(xa, xb):
+    def open_bottom(xa, xb, zb=Z_BOT):
         """Brutt nederst: fjern underkanten og tegn bruddlinje med ett bruddmerke (sikksakk) på midten."""
-        y, z, m = Y(Z_BOT), 1.4, X((xa + xb) / 2)
+        y, z, m = Y(zb), 1.4, X((xa + xb) / 2)
         s.line(X(xa) + 0.2, y, X(xb) - 0.2, y, (PAPER, 0.9, None))
         s.poly([(X(xa) - 1.5, y), (m - z, y), (m - 0.3 * z, y + z), (m + 0.3 * z, y - z), (m + z, y), (X(xb) + 1.5, y)],
                "thin")
@@ -110,15 +111,16 @@ def build(out_svg):
     # ---------------------------------------------------------------- under gulvet
     s.concrete(*RR(X_FOUND[0], Z_BOT, X_FOUND[1], -0.148))                       # gammel grunnmur
     open_bottom(*X_FOUND)
-    s.concrete(*RR(X_FOOT[0], Z_BOT, X_FOOT[1], Z_FT))                           # betongfundament
-    open_bottom(*X_FOOT)
+    s.concrete(*RR(X_FOOT[0], Z_BOT_F, X_FOOT[1], Z_FT))                         # betongfundament, under terreng
+    open_bottom(*X_FOOT, zb=Z_BOT_F)
     s.concrete(*RR(X_COL[0], Z_FT, X_COL[1], Z_COLT))                            # betongsøyle Ø ca. 200
     # gulvbjelker 48 x 196 (snittet) og gulv i 1. etasje
     for xj in JOISTS1:
         s.timber_section(*RR(xj - 0.024, Z_J1B, xj + 0.024, Z_J1T))
     for xk in (L - 0.048, L + 0.048):                                            # kubbinger på hver side av gulvbjelken
         s.timber_side(*RR(xk - 0.024, Z_J1T - KUB_H, xk + 0.024, Z_J1T), grain=None)
-    # innstøpt søylesko (U-beslag) rundt nedre del av gulvbjelken, rett i toppen av betongsøylen
+    # innstøpt søylesko: U-beslag rundt nedre del av gulvbjelken, på en stålstamme som er støpt inn i søyletoppen
+    s.rect(*RR(L - 0.011, Z_COLT, L + 0.011, Z_J1B), (STEEL, 0.3, None), fill=STEEL_F)
     xa, xb, yu = X(L - 0.024) - 0.3, X(L + 0.024) + 0.3, Y(Z_J1B) + 0.3
     s.poly([(xa, Y(Z_J1B + SKO_H)), (xa, yu), (xb, yu), (xb, Y(Z_J1B + SKO_H))], (STEEL, 0.6, None))
     s.timber_side(*RR(X_LOG[1], Z_J1T, X_END, 0.0), grain=None)
@@ -217,8 +219,8 @@ def build(out_svg):
     s.circle(X(X_TJ[1]), Y(zj), 0.42, None, fill=BLUE)
     right(L + 0.072, -0.065, "Kubbinger")
     right(L + 0.024 + 0.006, Z_J1B + 0.028, "Gulvbjelke 48 × 196", ["i innstøpt søylesko (U-beslag)"])
-    right(X_COL[1], -0.47, "Betongsøyle Ø ca. 200")
-    right(X_FOOT[1], -0.735, "Betongfundament")
+    right(X_COL[1], -0.50, "Betongsøyle Ø ca. 200", ["støpt i forskalingsrør"])
+    right(X_FOOT[1], -0.915, "Betongfundament")
 
     # ---------------------------------------------------------------- høyre kolonne: tegnforklaring, linjal, merknad
     s.text(COL_X, COL_Y, "Tegnforklaring", size=T_M, weight=700)
