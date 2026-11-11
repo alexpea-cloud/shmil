@@ -40,7 +40,6 @@ X_TJ = M.X_JOISTS                           # de to takbjelkene under takterrass
 X_END = 3.62                                # bruddlinje mot resten av gulvet og takterrassen
 SKO_H = 0.100                               # søyleskoens sider (tegnet enkelt)
 POST_B = 0.100                              # opprinnelig hjørnestolpe, fjernet 2018 (tegnet enkelt)
-KUB_H = 0.098                               # kubbingene ved gulvbjelken (tegnet enkelt)
 
 # ---- plassering på arket (mm) ----
 PX, PY = 72.0, 186.0                        # papirpunktet for x = 0, z = 0 (overkant gulv 1. etasje)
@@ -115,16 +114,17 @@ def build(out_svg):
     open_bottom(*X_FOOT, zb=Z_BOT_F)
     s.concrete(*RR(X_COL[0], Z_FT, X_COL[1], Z_COLT))                            # betongsøyle Ø ca. 200
     # gulvbjelker 48 x 196 (snittet) og gulv i 1. etasje
+    # kubbinger mellom gulvbjelkene ved opplegget (stykker på tvers, sett fra siden; antall og plass er tegnet enkelt)
+    for xa, xb in ((JOISTS1[-2] + 0.024, L - 0.024), (L + 0.024, X_END)):
+        s.timber_side(*RR(xa, Z_J1B, xb, Z_J1T), grain="h", n=2)
     for xj in JOISTS1:
         s.timber_section(*RR(xj - 0.024, Z_J1B, xj + 0.024, Z_J1T))
-    for xk in (L - 0.048, L + 0.048):                                            # kubbinger på hver side av gulvbjelken
-        s.timber_side(*RR(xk - 0.024, Z_J1T - KUB_H, xk + 0.024, Z_J1T), grain=None)
     # innstøpt søylesko: U-beslag rundt nedre del av gulvbjelken, på en stålstamme som er støpt inn i søyletoppen
     s.rect(*RR(L - 0.011, Z_COLT, L + 0.011, Z_J1B), (STEEL, 0.3, None), fill=STEEL_F)
     xa, xb, yu = X(L - 0.024) - 0.3, X(L + 0.024) + 0.3, Y(Z_J1B) + 0.3
     s.poly([(xa, Y(Z_J1B + SKO_H)), (xa, yu), (xb, yu), (xb, Y(Z_J1B + SKO_H))], (STEEL, 0.6, None))
     s.timber_side(*RR(X_LOG[1], Z_J1T, X_END, 0.0), grain=None)
-    s.breakline(X(X_END), Y(0.0) - 3.0, X(X_END), Y(Z_J1T) + 1.5)
+    s.breakline(X(X_END), Y(0.0) - 3.0, X(X_END), Y(Z_J1B) + 1.5)
     # tømmerstokk 148 x 148 over grunnmuren
     s.timber_section(*RR(X_LOG[0], -0.148, X_LOG[1], 0.0))
 
@@ -217,7 +217,7 @@ def build(out_svg):
     zj = Z_BT + J2_H / 2
     right(X_TJ[0], zj, "Takbjelker under takterrassen", color=BLUE)
     s.circle(X(X_TJ[1]), Y(zj), 0.42, None, fill=BLUE)
-    right(L + 0.072, -0.065, "Kubbinger")
+    right(L + 0.12, -0.075, "Kubbinger mellom gulvbjelkene")
     right(L + 0.024 + 0.006, Z_J1B + 0.028, "Gulvbjelke 48 × 196", ["i innstøpt søylesko (U-beslag)"])
     right(X_COL[1], -0.50, "Betongsøyle Ø ca. 200", ["støpt i forskalingsrør"])
     right(X_FOOT[1], -0.915, "Betongfundament")
