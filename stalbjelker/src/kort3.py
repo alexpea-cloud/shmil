@@ -15,7 +15,7 @@ HERE = os.path.dirname(os.path.abspath(__file__))
 
 # ---- geometri i snittet (m). x fra oppleggssenter ved tømmerveggen mot betongsøylen; z opp fra overkant gulv 1. etasje ----
 L = 3.40
-H_STUD = 2.22                               # gulv – underkant stålbjelke
+H_STUD = 2.22                               # stenderhøyde: underkant stendere – underkant stålbjelke
 Z_BB, Z_BT = H_STUD, H_STUD + 0.18          # stålbjelke under-/overkant
 J2_H, BOARD2 = 0.148, 0.037                 # bjelkelag og gulv i 2. etasje
 Z_F2 = Z_BT + J2_H + BOARD2                 # overkant gulv 2. etasje / taktro under terrassen
@@ -23,7 +23,7 @@ Z_TERR = Z_F2 + 0.064                       # overkant terrassebord
 Z_TOP = Z_F2 + 0.36                         # bruddlinje i tømmervegg og gavlvegg
 BOARD1, J1_H = 0.022, 0.196                 # gulvbord og gulvbjelker 48 x 196 i 1. etasje
 Z_J1T, Z_J1B = -BOARD1, -BOARD1 - J1_H
-Z_COLT = -0.278                             # overkant betongsøyle
+Z_COLT = Z_J1B                              # overkant betongsøyle = underkant gulvbjelke (U-beslaget står i søyletoppen)
 Z_FT = -0.680                               # overkant betongfundament (tegnet enkelt, ikke målsatt)
 Z_GROUND = -0.800                           # terreng i krypkjelleren (tegnet enkelt, ikke målsatt)
 Z_BOT = -0.905                              # bruddlinje nederst
@@ -47,6 +47,27 @@ COL_X = 333.3                               # høyre kolonne: tegnforklaring, m�
 COL_Y = 57.0
 
 CENTER = (INK2, 0.13, "3 0.8 0.5 0.8")      # senterlinje
+
+
+def stud(s, x, y, w, h, step=1.0):
+    """Stendere fra 2018: fylt felt med tette loddrette streker, slik at de også skiller seg ut i svart-hvitt."""
+    s.rect(x, y, w, h, "timber_cut", fill=TIMBER_F2)
+    xx = x + step
+    while xx < x + w - 0.3:
+        s.line(xx, y + 0.3, xx, y + h - 0.3, (TIMBER, 0.13, None))
+        xx += step
+
+
+def legend(s, x, y, rows, *, dy=6.2):
+    """Tegnforklaring med én rad per linje. «stud» tegnes med samme skravur som stenderne i snittet."""
+    for kind, label in rows:
+        if kind == "stud":
+            stud(s, x, y - 2.0, 6.0, 2.4)
+            s.text(x + 7.4, y, label, size=T_S, fill=INK2)
+        else:
+            s.legend_row(x, y, [(kind, label)], size=T_S)
+        y += dy
+    return y
 
 
 def build(out_svg):
@@ -97,8 +118,7 @@ def build(out_svg):
         s.timber_section(*RR(xj - 0.024, Z_J1B, xj + 0.024, Z_J1T))
     for xk in (L - 0.048, L + 0.048):                                            # kubbinger på hver side av gulvbjelken
         s.timber_side(*RR(xk - 0.024, Z_J1T - KUB_H, xk + 0.024, Z_J1T), grain=None)
-    # innstøpt søylesko (U-beslag) rundt nedre del av gulvbjelken, med stamme ned i betongsøylen
-    s.rect(*RR(L - 0.020, Z_COLT, L + 0.020, Z_J1B), (STEEL, 0.3, None), fill=STEEL_F)
+    # innstøpt søylesko (U-beslag) rundt nedre del av gulvbjelken, rett i toppen av betongsøylen
     xa, xb, yu = X(L - 0.024) - 0.3, X(L + 0.024) + 0.3, Y(Z_J1B) + 0.3
     s.poly([(xa, Y(Z_J1B + SKO_H)), (xa, yu), (xb, yu), (xb, Y(Z_J1B + SKO_H))], (STEEL, 0.6, None))
     s.timber_side(*RR(X_LOG[1], Z_J1T, X_END, 0.0), grain=None)
@@ -107,8 +127,8 @@ def build(out_svg):
     s.timber_section(*RR(X_LOG[0], -0.148, X_LOG[1], 0.0))
 
     # ---------------------------------------------------------------- over gulvet: stendere, hjørnestolpe, stålbjelke
-    s.timber_side(*RR(X_LOG[0], 0.0, X_LOG[1], H_STUD), grain="v", new=True, n=5)            # 2 x 48 x 148 ved tømmerveggen
-    s.timber_side(*RR(L - 0.049, 0.0, L + 0.049, H_STUD), grain="v", new=True, n=3)          # 2 x 48 x 98 ved betongsøylen
+    stud(s, *RR(X_LOG[0], 0.0, X_LOG[1], H_STUD))                                            # 2 x 48 x 148 ved tømmerveggen
+    stud(s, *RR(L - 0.049, 0.0, L + 0.049, H_STUD))                                          # 2 x 48 x 98 ved betongsøylen
     # opprinnelig hjørnestolpe under gavlveggen – fjernet 2018
     s.rect(*RR(X_GABLE - POST_B / 2, 0.0, X_GABLE + POST_B / 2, H_STUD), "removed", fill="#fdf1f0", opacity=0.6)
     xg, yg = X(X_GABLE), Y(1.40)
@@ -155,7 +175,7 @@ def build(out_svg):
         s.line(X(xs), Y(Z_BB) + 0.6, X(xs), Y(zL) + 2.5, CENTER)
     xh = 1.30                                                                   # mellom gulvbjelkene, til side for påskriftene
     s.dim((X(xh), Y(0.0)), (X(xh), Y(H_STUD)), 0, "2,22", ext=False, weight=700)
-    s.text(X(xh) + 3.0, Y(H_STUD / 2), "gulv – underkant stålbjelke", size=T_XS, fill=INK2, anchor="middle", rot=90)
+    s.text(X(xh) + 3.0, Y(H_STUD / 2), "stenderhøyde", size=T_XS, fill=INK2, anchor="middle", rot=90)
     # grunnmuren
     yb1 = Y(Z_BOT) + 5.0
     s.dim((X(X_FOUND[0]), yb1), (X(X_FOUND[1]), yb1), 0, "ca. 0,25", ext=False, size=T_XS, halo=False)
@@ -203,10 +223,8 @@ def build(out_svg):
     # ---------------------------------------------------------------- høyre kolonne: tegnforklaring, linjal, merknad
     s.text(COL_X, COL_Y, "Tegnforklaring", size=T_M, weight=700)
     yy = COL_Y + 7.5
-    for item in (("steel", "stål"), ("timber_new", "stendere fra 2018"), ("timber", "annet treverk"), ("conc", "betong"),
-                 ("removed", "fjernet 2018")):
-        s.legend_row(COL_X, yy, [item], size=T_S)
-        yy += 6.2
+    yy = legend(s, COL_X, yy, (("steel", "Stål"), ("stud", "Stendere fra 2018"), ("timber", "Annet treverk"),
+                               ("conc", "Betong"), ("removed", "Fjernet 2018")))
     s.scalebar(COL_X, yy + 6.0, K, meters=(0, 0.5, 1), sub=0.1)
     s.mtext(COL_X, yy + 21.0, ["Mål i meter, tverrsnitt i mm.", "Mål merket «ca.» er omtrentlige."], size=T_S,
             fill=INK2)

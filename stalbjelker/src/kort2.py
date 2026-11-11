@@ -14,7 +14,7 @@ HERE = os.path.dirname(os.path.abspath(__file__))
 
 # ---- geometri i snittet (m). x fra oppleggssenter ved pipa mot tømmerveggen; z opp fra overkant gulv 1. etasje ----
 L = 3.63
-H_STUD = 2.07                               # gulv – underkant stålbjelke
+H_STUD = 2.07                               # stenderhøyde: underkant stendere – underkant stålbjelke
 Z_BB, Z_BT = H_STUD, H_STUD + 0.18          # stålbjelke under-/overkant
 J2_H, BOARD2 = 0.148, 0.037                 # gulvbjelker og gulv i 2. etasje
 Z_F2 = Z_BT + J2_H + BOARD2                 # overkant gulv 2. etasje
@@ -39,6 +39,27 @@ COL_X = 333.3                               # høyre kolonne: tegnforklaring, m�
 COL_Y = 57.0
 
 CENTER = (INK2, 0.13, "3 0.8 0.5 0.8")      # senterlinje i oppleggene
+
+
+def stud(s, x, y, w, h, step=1.0):
+    """Stendere fra 2018: fylt felt med tette loddrette streker, slik at de også skiller seg ut i svart-hvitt."""
+    s.rect(x, y, w, h, "timber_cut", fill=TIMBER_F2)
+    xx = x + step
+    while xx < x + w - 0.3:
+        s.line(xx, y + 0.3, xx, y + h - 0.3, (TIMBER, 0.13, None))
+        xx += step
+
+
+def legend(s, x, y, rows, *, dy=6.2):
+    """Tegnforklaring med én rad per linje. «stud» tegnes med samme skravur som stenderne i snittet."""
+    for kind, label in rows:
+        if kind == "stud":
+            stud(s, x, y - 2.0, 6.0, 2.4)
+            s.text(x + 7.4, y, label, size=T_S, fill=INK2)
+        else:
+            s.legend_row(x, y, [(kind, label)], size=T_S)
+        y += dy
+    return y
 
 
 def build(out_svg):
@@ -94,8 +115,8 @@ def build(out_svg):
     s.timber_section(*RR(X_LOG[0], -0.148, X_LOG[1], 0.0))
 
     # ---------------------------------------------------------------- over gulvet: stendere, stålbjelke, gulvbjelker 2. etasje
-    s.timber_side(*RR(-0.049, 0.0, 0.049, H_STUD), grain="v", new=True, n=3)                 # 2 x 48 x 98 ved pipa
-    s.timber_side(*RR(X_LOG[0], 0.0, X_LOG[1], H_STUD), grain="v", new=True, n=5)            # 2 x 48 x 148 ved tømmerveggen
+    stud(s, *RR(-0.049, 0.0, 0.049, H_STUD))                                                  # 2 x 48 x 98 ved pipa
+    stud(s, *RR(X_LOG[0], 0.0, X_LOG[1], H_STUD))                                            # 2 x 48 x 148 ved tømmerveggen
     s.ibeam_side(*RR(-0.049, Z_BB, L + 0.049, Z_BT), tf=0.008 * K, label="B1 – IPE 180", size=T_L)
     for xj in JOISTS2:
         s.timber_section(*RR(xj - 0.024, Z_BT, xj + 0.024, Z_BT + J2_H))
@@ -108,7 +129,7 @@ def build(out_svg):
         s.line(X(xs), Y(Z_BB) + 0.6, X(xs), Y(zL) + 2.5, CENTER)
     xh = 2.10                                                                   # mellom gulvbjelkene, til side for påskriften på B1
     s.dim((X(xh), Y(0.0)), (X(xh), Y(H_STUD)), 0, "2,07", ext=False, weight=700)
-    s.text(X(xh) + 3.0, Y(H_STUD / 2), "gulv – underkant stålbjelke", size=T_XS, fill=INK2, anchor="middle", rot=90)
+    s.text(X(xh) + 3.0, Y(H_STUD / 2), "stenderhøyde", size=T_XS, fill=INK2, anchor="middle", rot=90)
     # oppleggslengde på stenderne
     lab = "opplegg ca. 0,10"
     sh = 0.049 * K + 2.9 + text_w(lab, T_XS, 600) / 2
@@ -151,10 +172,8 @@ def build(out_svg):
     # ---------------------------------------------------------------- høyre kolonne: tegnforklaring, linjal, merknad
     s.text(COL_X, COL_Y, "Tegnforklaring", size=T_M, weight=700)
     yy = COL_Y + 7.5
-    for item in (("steel", "stål"), ("timber_new", "stendere fra 2018"), ("timber", "annet treverk"), ("conc", "betong"),
-                 ("brick", "tegl")):
-        s.legend_row(COL_X, yy, [item], size=T_S)
-        yy += 6.2
+    yy = legend(s, COL_X, yy, (("steel", "Stål"), ("stud", "Stendere fra 2018"), ("timber", "Annet treverk"),
+                               ("conc", "Betong"), ("brick", "Tegl")))
     s.scalebar(COL_X, yy + 6.0, K, meters=(0, 0.5, 1), sub=0.1)
     s.mtext(COL_X, yy + 21.0, ["Mål i meter, tverrsnitt i mm.", "Mål merket «ca.» er omtrentlige."], size=T_S,
             fill=INK2)
