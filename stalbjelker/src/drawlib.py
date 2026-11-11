@@ -242,7 +242,7 @@ class Sheet:
 
     def titleblock(self, *, title, subtitle, drawing_no, sheet_no, scale, rev, date,
                    status="PRINSIPPSKISSE, SOM UTFØRT 2018 – IKKE KONTROLLERT AV FORETAK", w=178.0, project="[eiendom]",
-                   owner="[tiltakshaver]", case="[saksnummer]"):
+                   owner="[tiltakshaver]", case="[saksnummer]", author="Tiltakshaver", review=True):
         """Tittelfelt nederst til høyre. Returnerer (x, y, w, h) for feltet."""
         h = 40.0
         x = self.x1 - w
@@ -283,10 +283,13 @@ class Sheet:
         # rad 4: status | utarbeidet | gjennomgått
         c2, c3 = x + w * 0.52, x + w * 0.72
         self.line(c2, r3, c2, y + h, "thin")
-        self.line(c3, r3, c3, y + h, "thin")
         cell(x, r3, "STATUS", status, vsize=T_XS, vweight=700, cw=w * 0.52)
-        cell(c2, r3, "UTARBEIDET AV", "Tiltakshaver", vsize=T_XS, vweight=500, cw=w * 0.20)
-        cell(c3, r3, "GJENNOMGÅTT AV (dato/sign.)", "", vsize=T_XS)
+        if review:      # eget felt for gjennomgang (detaljerte ark)
+            self.line(c3, r3, c3, y + h, "thin")
+            cell(c2, r3, "UTARBEIDET AV", author, vsize=T_XS, vweight=500, cw=w * 0.20)
+            cell(c3, r3, "GJENNOMGÅTT AV (dato/sign.)", "", vsize=T_XS)
+        else:
+            cell(c2, r3, "UTARBEIDET AV", author, vsize=T_XS, vweight=500, cw=w * 0.48)
         return x, y, w, h
 
     def revtable(self, x, y_bottom, w, rows):
