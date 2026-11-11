@@ -217,7 +217,7 @@ def fig_path(path):
     chain(9.0, "B1 · O1", f"{num(b1['VEd'], 1)} kN", [
         steg(b1["VEd"]), stend("B1_pipe", "2 × 48×98"),
         ("Gulvbjelke", ["48×196, trykk ⊥ fiber", "flate ikke dokumentert"], NDC),
-        ("IPN 200", ["lastpunkt anslått over", f"kloss; øvre grense {num(su['ipn']['util'] * 100, 0)} %"], ASC),
+        ("IPN 200", ["overslag: bidrag fra", f"B1 høyst {num(su['ipn']['util'] * 100, 0)} %"], UNK),
         ("Betongkloss", ["0,90 m; underlag", "ikke dokumentert"], NDC),
     ])
     chain(27.5, "B1 · O2", f"{num(b1['VEd'], 1)} kN", [
@@ -231,7 +231,7 @@ def fig_path(path):
     chain(64.5, "B2 · O4", f"{num(b2['RB'], 1)} kN", [
         steg(b2["RB"]), stend("B2_col", "2 × 48×98"),
         ("Gulvbjelke", ["48×196 + kubbinger,", "flate ikke dokumentert"], NDC),
-        ("Plate og stolpesko", ["plate 400 mm (opplyst);", "type og feste ikke kjent"], NDC),
+        ("Plate, stolpesko", ["plate 400 mm (opplyst);", "type og feste ikke kjent"], NDC),
         ("Betongsøyle", ["Ø ca. 200; fundament", "ikke dokumentert"], NDC),
     ])
     # forklaring

@@ -206,6 +206,8 @@ class Sheet:
              italic=False, halo=False, baseline=None, spacing=None):
         """Tekst med grunnlinje i (x, y). anchor: start|middle|end. rot i grader (mot klokka positiv).
         halo: hvit bakgrunnsboks bak teksten (True eller polstring i mm)."""
+        if not s:
+            return
         tr = f' transform="rotate({-rot:.2f} {x:.3f} {y:.3f})"' if rot else ""
         it = ' font-style="italic"' if italic else ""
         if s and rot in (0, 90):

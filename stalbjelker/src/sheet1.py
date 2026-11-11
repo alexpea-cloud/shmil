@@ -79,9 +79,9 @@ def build(out_svg):
         v.rect(fxa, fya, fxb, fyb, (INK3, 0.15, None))
         for xs in M.STAIR["steps_x"]:
             v.line(xs, fya, xs, fyb, (INK3, 0.12, None))
-    s.text(X(7.02), Y(9.92), "Trapp", size=T_S, fill=INK3, anchor="middle", halo=1.0)
-    s.text(X(7.02), Y(9.92) + 3.0, "(åpning i", size=T_XS, fill=INK3, anchor="middle", halo=1.0)
-    s.text(X(7.02), Y(9.92) + 5.8, "etasjeskillet)", size=T_XS, fill=INK3, anchor="middle", halo=1.0)
+    s.text(X(6.96), Y(9.60), "Trapp", size=T_S, fill=INK3, anchor="middle", halo=1.0)
+    s.text(X(6.96), Y(9.60) + 3.1, "(åpning i", size=T_XS, fill=INK3, anchor="middle", halo=1.0)
+    s.text(X(6.96), Y(9.60) + 6.2, "etasjeskillet)", size=T_XS, fill=INK3, anchor="middle", halo=1.0)
 
     # --- romnavn
     for name, rx, ry in M.ROOMS:
@@ -89,7 +89,7 @@ def build(out_svg):
             s.text(X(rx), Y(ry), name, size=T_M, fill=INK3, anchor="middle")
 
     # --- veggnavn som henvisningene bruker
-    s.text(X(M.FORMER_WALL2_X) - 1.3, Y(9.36), "badvegg", size=T_XS, fill=INK3, anchor="middle", rot=90)
+    s.text(X(M.BATH_WALL_X) + 3.0, Y(9.70), "badvegg", size=T_XS, fill=INK3, anchor="middle", rot=90, halo=0.8)
     s.text(X(3.343) - 0.9, Y(13.30), "soveromsvegg", size=T_XS, fill=INK3, anchor="middle", rot=90)
     s.text(X(5.432) + 3.0, Y(6.28), "bodvegg 1. etasje", size=T_XS, fill=INK3, anchor="middle", rot=90)
 
@@ -244,7 +244,7 @@ def build(out_svg):
             "ca. 0,5 m forbi B1. Bjelkelaget ligger oppå overflensen. Felt 3,60 m og 1,50 m gir lastbredde 2,55 m. "
             "Rød stiplet kontur langs B1 og B2: bærevegg fjernet 2018 (plassering etter opplysning).", STEEL),
         (4, "IPN 200 under gulvet", "Ligger i krypkjelleren rett under B1, fra betongklossen ved pipa til en stålkonsoll "
-            "i grunnmuren. Konsollens utforming og innfesting er ikke dokumentert.", INK2),
+            "i grunnmuren (skjult under B1 i planen). Konsollens utforming og innfesting er ikke dokumentert.", INK2),
         (5, "Tømmervegg på grunnmur", "Opprinnelig yttervegg, ca. 0,20 m, på grunnmur ca. 0,25 m. Opplegg O2 og O3 står i "
             "døråpningen i tømmerveggen, inntil karmene og rett over grunnmuren.", TIMBER),
         (6, "Bjelkelag over gangen – lastfelt B2", "Går fra badveggen (ca. 1,50 m) til trappevekslingen, som ligger på B2 "
@@ -266,13 +266,13 @@ def build(out_svg):
     cx = 300.0
     cw = 108.0
     s.text(cx, 20.5, "Opplegg", size=T_L, weight=700)
-    rows = [["", "Opplegg", "Lastvei ned", "R_{Ed}"],
-            ["O1", "B1 ved pipa", "2 × 48×98 → gulvbjelke → IPN 200 → betongkloss", f"{num(r1['VEd'], 1)} kN"],
-            ["O2", "B1 mot grunnmur", "2 × 48×148 → tømmerstokk 148×148 → grunnmur", f"{num(r1['VEd'], 1)} kN"],
-            ["O3", "B2 mot grunnmur", "2 × 48×148 → tømmerstokk 148×148 → grunnmur", f"{num(r2['RA'], 1)} kN"],
-            ["O4", "B2 ved betongsøyle", "2 × 48×98 → gulvbjelke → stolpesko → betongsøyle", f"{num(r2['RB'], 1)} kN"]]
+    rows = [["", "Opplegg", "Lastvei ned", "R_{Ed}, kN"],
+            ["O1", "B1 ved pipa", "2 × 48×98 → gulvbjelke → IPN 200 → betongkloss", f"{num(r1['VEd'], 1)}"],
+            ["O2", "B1 mot grunnmur", "2 × 48×148 → tømmerstokk 148×148 → grunnmur", f"{num(r1['VEd'], 1)}"],
+            ["O3", "B2 mot grunnmur", "2 × 48×148 → tømmerstokk 148×148 → grunnmur", f"{num(r2['RA'], 1)}"],
+            ["O4", "B2 ved betongsøyle", "2 × 48×98 → gulvbjelke → stålplate → stolpesko → søyle", f"{num(r2['RB'], 1)}"]]
     wts = [[None] * 4] + [[700, None, None, 700] for _ in range(4)]
-    yt2 = s.table(cx, 23.0, [7, 26, 61, 14], rows, size=T_XS, row_h=4.6, align=["l", "l", "l", "r"], weights=wts)
+    yt2 = s.table(cx, 23.0, [6, 24, 66, 12], rows, size=T_XS, row_h=4.6, align=["l", "l", "l", "r"], weights=wts)
     s.mtext(cx, yt2 + 3.4, wrap("R_{Ed} = dimensjonerende oppleggskraft (1,35 g + 1,5 q), se ark 2–3 og beregningsnotat rev. 11. "
                                 "Oppleggenes videre lastføring er bare delvis dokumentert – se notatets kap. 7.",
                                 T_XS, cw), size=T_XS, fill=INK2)
@@ -340,7 +340,7 @@ def build(out_svg):
     ], size=T_XS, tsize=T_S, accent=AMBER)
 
     # ------------------------------------------------------------ resultatsammendrag (under planen)
-    rx, ry, rw = 120.0, 255.2, 108.0
+    rx, ry, rw = 112.0, 253.8, 117.0
     s.text(rx, ry, "Beregningsresultat – sammendrag", size=T_L, weight=700)
     r1s = R["B1_sens"]
     rob = R["robust"]
@@ -351,21 +351,22 @@ def build(out_svg):
             ["B2 gang", "3,40 m", f"{num(r2['MEd'], 1)} kNm", f"{num(res['MRd_el'], 1)} kNm", f"{num(r2['util_M'] * 100, 0)} %",
              f"{num(r2['delta_gq'], 1)} mm", f"{num(r2['delta_lim'], 1)} mm"]]
     wts2 = [[None] * 7, [700, None, None, None, 700, None, None], [700, None, None, None, 700, None, None]]
-    ye = s.table(rx, ry + 2.0, [22, 13, 16, 16, 15, 15, 11], rows, size=T_XS, row_h=4.4,
+    ye = s.table(rx, ry + 2.0, [25, 14, 17, 17, 16, 16, 12], rows, size=T_XS, row_h=4.4,
                  align=["l", "r", "r", "r", "r", "r", "r"], weights=wts2)
     s.mtext(rx, ye + 3.3, wrap("Regnet utnyttelse (overslag): elastisk momentkapasitet, S235 forutsatt, overflensen forutsatt "
-                               "sideveis fastholdt. Med ugunstigere lastantakelser: B1 "
-                               f"{num(r1s['util_M'] * 100, 0)} %, B2 {num(rob['roof_strip']['util'] * 100, 0)} %. "
-                               "Opplegg O1 og O4: trykk på tvers av fiber i gulvbjelken under stenderne er ikke dokumentert – "
-                               "se ark 2 og 3 og beregningsnotat rev. 11, kap. 7.", T_XS, rw),
+                               "sideveis fastholdt. Følsomhet, ikke øvre grenser: B1 "
+                               f"{num(r1s['util_M'] * 100, 0)} % ved full kontinuitet i bjelkelaget, B2 "
+                               f"{num(rob['roof_strip']['util'] * 100, 0)} % med takstripe på gavlveggen. Flere ugunstige avvik "
+                               "samtidig kan gi over 100 % (notat kap. 5.2 og 6.4). Opplegg O1 og O4: trykk på tvers av fiber i "
+                               "gulvbjelken under stenderne er ikke dokumentert (ark 2 og 3, notat kap. 7).", T_XS, rw),
             size=T_XS, fill=INK2)
 
     # ------------------------------------------------------------ målestokk
     s.scalebar(22.0, 256.5, K, meters=(0, 1, 2, 3, 4), sub=0.5)
     s.mtext(22.0, 267.0, wrap("Målestokk 1:50 gjelder ved utskrift i A3. Ved annen utskrift: bruk målestokklinjalen.",
-                              T_XS, 92.0)
+                              T_XS, 85.0)
             + wrap("Himmelretning er ikke angitt i grunnlaget (E2) og vises derfor ikke. Planen er orientert som E2. "
-                   "Snittene er sett i pilretningen.", T_XS, 92.0), size=T_XS, fill=INK2)
+                   "Snittene er sett i pilretningen.", T_XS, 85.0), size=T_XS, fill=INK2)
     s.save(out_svg)
 
 

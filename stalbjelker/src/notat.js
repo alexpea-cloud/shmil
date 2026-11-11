@@ -47,7 +47,7 @@ c.push(spacer(160));
 // ===================================================================== sammendrag
 c.push(H1('Sammendrag'));
 c.push(P('I 2018 ble to bærende vegger i 1. etasje erstattet med stålbjelker IPE 180: B1 ved kjøkkenet (spenn 3,63 m) og B2 i gangen ved trappeåpningen (spenn 3,40 m). Notatet etterregner bjelkene og oppleggene slik de er utført, etter Eurokodene med norske nasjonale tillegg. Grunnlaget er tiltakshavers oppmåling og tegning S-01 til S-03.'));
-c.push(P('Prosenttallene viser utnyttelse: regnet påkjenning i forhold til regnet kapasitet. Under 100 % betyr at kapasiteten er tilstrekkelig med de forutsetningene som er oppgitt. «OK» er resultatet av regnestykket, ikke en godkjenning eller en kontroll. O1 og O2 er oppleggene til B1 (ved pipa og mot grunnmuren). O3 og O4 er oppleggene til B2 (mot grunnmuren og ved betongsøylen).'));
+c.push(P('Prosenttallene viser utnyttelse: regnet påkjenning i forhold til regnet kapasitet. Under 100 % betyr at kapasiteten er tilstrekkelig med de forutsetningene som er oppgitt. «OK» er resultatet av regnestykket, ikke en godkjenning eller en kontroll. O1 og O2 er oppleggene til B1 (ved pipa og mot grunnmuren). O3 og O4 er oppleggene til B2 (mot grunnmuren og ved betongsøylen). C24 og C18 er fasthetsklasser for trevirke. C24 er antatt, og C18 er en lavere klasse som er brukt som kontroll.'));
 c.push(tbl([
   ['Kontroll', 'B1 kjøkken', 'B2 gang', 'Status'],
   ['Bøyemoment, M_{Ed} / M_{Rd}', `${fmt(b1.MEd, 1)} / ${fmt(sec.MRd_el, 1)} kNm = ${pct(b1.util_M)}`, `${fmt(b2.MEd, 1)} / ${fmt(sec.MRd_el, 1)} kNm = ${pct(b2.util_M)}`, FOR('OK – forutsetter fastholdt overflens')],
@@ -56,10 +56,11 @@ c.push(tbl([
   ['Kontrollregning med ugunstigere lastantakelser (kap. 5.2 og 6.4)', `${pct(b1s.util_M)} ved full kontinuitet i bjelkelaget`, `${pct(rob.roof_strip.util)} med takstripe på gavlveggen`, FOR('OK for bjelken – forutsetter fastholdt overflens. Oppleggene: se kap. 7.4')],
   ['Stålbjelkens steg ved opplegg (lokalt trykk i bjelken)', rng(b1.VEd / web.FRd, b1.VEd / web.FRd_ss0), rng(b2.RB / web.FRd, b2.RB / web.FRd_ss0), OK()],
   ['Stendere under bjelkeendene', rng(st.B1_wall.C24.util_strong, st.B1_pipe.C24.util_ecc), rng(st.B2_wall.C24.util_strong, st.B2_col.C24.util_ecc), FOR('OK – forutsetter C24 og fastholdte stendere')],
-  ['Trykk mot tømmerstokk over grunnmur (O2, O3)', rng(c9.B1_wall.C24.util, c9.B1_wall.C24.util_98), rng(c9.B2_wall.C24.util, c9.B2_wall.C24.util_98), OK('OK i hovedtilfellet, også med C18')],
+  ['Trykk mot tømmerstokk over grunnmur (O2, O3)', rng(c9.B1_wall.C24.util, c9.B1_wall.C24.util_98), rng(c9.B2_wall.C24.util, c9.B2_wall.C24.util_98), OK('OK i hovedberegningen, også med C18')],
   ['Trykk vinkelrett på fiber i gulvbjelke (O1, O4)', `${rng(c9.B1_pipe.C24.util_joist_only, c9.B1_pipe.C24.util_min)} dersom bare gulvbjelken (48 mm) bærer. ${pct(c9.B1_pipe.C24.util_with_blocking)} dersom hele stenderflaten har anlegg`, `${pct(c9.B2_col.C24.util_joist_only)} dersom bare gulvbjelken bærer. ${pct(c9.B2_col.C24.util_with_blocking)} dersom kubbingene bærer fullt ut`, ND('Ikke dokumentert – ingen margin ved O4')],
-  ['IPN 200 og stålkonsoll i grunnmuren (O1)', `øvre grense ${pct(sup.ipn.util)}; lastpunkt anslått over betongklossen`, '–', FOR('Overslag – ikke undersøkt')],
-  ['Grunnmur (O2, O3)', 'ca. 0,5 N/mm² (overslag)', 'ca. 0,3 N/mm² (overslag)', FOR('Materiale og tilstand ikke undersøkt')],
+  ['IPN 200 under gulvet (O1)', `bidrag fra B1 høyst ${pct(sup.ipn.util)} (${pct(sus.ipn.util)} ved full kontinuitet). Gulvlast fra 1. etasje er ikke regnet`, '–', FOR('Overslag – ikke undersøkt')],
+  ['Stålkonsoll i grunnmuren (O1)', 'ikke regnet', '–', ND('Ikke undersøkt')],
+  ['Grunnmur (O2, O3)', 'ca. 0,5 N/mm² (overslag)', 'ca. 0,4 N/mm² (overslag)', FOR('Materiale og tilstand ikke undersøkt')],
   ['Betongkloss (O1); stolpesko, betongsøyle og fundament (O4)', 'underlag ukjent', 'type og fundament ukjent', ND()],
 ], [2950, 2150, 2150, 2160], { align: ['l', 'l', 'l', 'l'], size: 17 }));
 c.push(spacer(120));
@@ -67,16 +68,17 @@ c.push(H3('Hva beregningen viser'));
 c.push(...bullets([
   `Forutsatt at overflensen er holdt sideveis (se tredje punkt), har begge stålbjelkene kapasitet i bøyning og skjær. Utnyttelsen er ${pct(b1.util_M)} (B1) og ${pct(b2.util_M)} (B2) av elastisk momentkapasitet, og nedbøyningene er ${fmt(b2.util_delta * 100, 0)}–${fmt(b1.util_delta * 100, 0)} % av kontrollgrensen L/300.`,
   `Bjelkene holder også i følsomhetsregningene: full kontinuitet i bjelkelaget over B1 gir ${pct(b1s.util_M)}, og en takstripe på gavlveggen over B2 gir ${pct(rob.roof_strip.util)}. Marginene er da små, og de tåler ikke flere ugunstige avvik samtidig. Regningene forutsetter egenlast 1,2 kN/m² i etasjeskillet.`,
-  `Resultatene forutsetter at treverket som ligger på overflensen, holder bjelkene sideveis. Uten slik fastholding kan bjelkene vippe, det vil si vri seg og bøye ut sideveis. De er da utnyttet ${rng(b2.util_ltb_6323, b1.util_ltb_6322)} i hovedberegningen og ${rng(rob.roof_strip.util_ltb_6323, b1s.util_ltb_6322)} i følsomhetstilfellene. Fastholdingen er vurdert i kapittel 8, men er ikke dokumentert, og står som kontrollpunkt.`,
+  `Resultatene forutsetter at treverket som ligger på overflensen, holder bjelkene sideveis. Uten slik fastholding kan bjelkene vippe, det vil si vri seg og bøye ut sideveis. De er da utnyttet ${rng(b2.util_ltb_6323, b1.util_ltb_6322)} i hovedberegningen og ${rng(rob.roof_strip.util_ltb_6323, b1s.util_ltb_6322)} i følsomhetstilfellene. Fastholdingen er vurdert i kapittel 8, men er ikke dokumentert, og står som kontrollpunkt. Kraften som trengs for å holde overflensen, er liten, ca. 3 kN per bjelke.`,
   'Stålbjelkens steg, stenderne og tømmerstokken over grunnmuren har kapasitet under de angitte antakelsene.',
 ]));
 c.push(H3('Hva som ikke er dokumentert'));
 c.push(...bullets([
-  `Trykk vinkelrett på fiber i gulvbjelken under stenderne ved O1 (ved pipa) og O4 (ved betongsøylen). Bærer bare gulvbjelkens 48 mm bredde, er treverket utnyttet ${rng(c9.B1_pipe.C24.util_joist_only, c9.B1_pipe.C24.util_min)} ved O1 og ${pct(c9.B2_col.C24.util_joist_only)} ved O4. Ved O4 er det opplyst om sidekubbinger. Selv om de bærer fullt ut, er utnyttelsen ${pct(c9.B2_col.C24.util_with_blocking)}, og ${rng(c9.B2_col.C18.util_with_blocking, c9.B2_col.C24.util_with_blocking_kc1)} med lavere fasthetsklasse eller strengere regneregel. Opplegget ved O4 har altså ingen regnemessig margin.`,
+  `Trykk vinkelrett på fiber i gulvbjelken under stenderne ved O1 (ved pipa) og O4 (ved betongsøylen). Bærer bare gulvbjelkens 48 mm bredde, er treverket utnyttet ${rng(c9.B1_pipe.C24.util_joist_only, c9.B1_pipe.C24.util_min)} ved O1 og ${pct(c9.B2_col.C24.util_joist_only)} ved O4. Ved O4 er det opplyst om sidekubbinger. Selv om de bærer fullt ut, er utnyttelsen ${pct(c9.B2_col.C24.util_with_blocking)}, og ${rng(c9.B2_col.C18.util_with_blocking, c9.B2_col.C24.util_with_blocking_kc1)} med lavere fasthetsklasse eller strengere regneregel. Opplegget ved O4 har altså ingen regnemessig margin. For høyt trykk vinkelrett på fiber gir sammentrykking av treverket og setning ved opplegget. Det gir ikke brudd i stålbjelken, men forholdet må avklares (kap. 7.4).`,
+  `Takbjelkenes bredde og anlegg på B2-flensen. Er de 48 mm brede, er trykket vinkelrett på fiber utnyttet ${pct(sup.roof_joist.util)}.`,
   'Stolpesko, betongsøyle og fundament ved O4, og betongklossens underlag ved O1.',
   'Stålkvalitet (S235 er forutsatt) og trevirkets fasthetsklasse (C24 er forutsatt).',
 ]));
-c.push(P('Kapittel 10 viser hva som må måles og undersøkes på stedet. Målingene kan avklare forholdene ved O1 og fastholdingen av bjelkene. Ved O4 kan de ikke alene gi margin. Der må en fagkyndig vurdere opplegget, og tiltak kan bli nødvendig. Notatet konkluderer ikke for de delene som ikke er dokumentert.'));
+c.push(P('Kapittel 10 viser hva som må måles og undersøkes på stedet. Målingene kan avklare forholdene ved O1 i hovedberegningen og fastholdingen av bjelkene. Ved O4 kan de ikke alene gi margin. Der må en fagkyndig vurdere opplegget, og tiltak kan bli nødvendig. Notatet konkluderer ikke for de delene som ikke er dokumentert.'));
 c.push(H3('Hva som gjenstår'));
 c.push(...numbered([
   'Kontrollmåling og undersøkelse på stedet etter kapittel 10.',
@@ -122,7 +124,7 @@ c.push(...bullets([
 ]));
 c.push(P('Den opprinnelige hjørnestolpen ble fjernet i 2018. Målene 2,25 m og 1,15 m på tegningene viser hvor stolpen sto. De beskriver ikke dagens opplegg, og det er ingen utkraging i dag.'));
 c.push(H2('2.4  Taket'));
-c.push(P('Taket er et sperretak uten mønsås. Taksperrene over trappa har opplegg på en tidligere yttervegg i 2. etasje. Denne oppleggslinjen ligger 1,70 m fra B2, det vil si 0,20 m på den andre siden av badveggen, sett fra B2. Den er vist på tegning S-01 og i prinsippsnitt C–C på S-03. Etter opplysningene går hovedtaklasten fra denne sperredelen via denne veggen og ytterveggen, og ikke direkte ned i B2. Hanebjelker er synlige i overgangen til den eldre takdelen, men er ikke dokumentert i den nyere delen. Bodveggen i 2. etasje, ca. 0,5 m fra B1, er ved befaringen vurdert å ikke bære taklast. Taklast er derfor ikke regnet inn på bjelkene, men veggenes egenvekt er tatt med. Lastveien i taket og videre ned fra den tidligere ytterveggen er ikke kontrollert (kap. 10, punkt 9 og 10).'));
+c.push(P('Taket er et sperretak uten mønsås. Taksperrene over trappa har opplegg på en tidligere yttervegg i 2. etasje. Denne oppleggslinjen ligger 1,70 m fra B2, det vil si 0,20 m på den andre siden av badveggen, sett fra B2. Den er vist på tegning S-01 og i prinsippsnitt C–C på S-03. Etter opplysningene går hovedtaklasten fra denne sperredelen via denne veggen og ytterveggen, og ikke direkte ned i B2. Hanebjelker er synlige i overgangen til den eldre takdelen, men er ikke dokumentert i den nyere delen. Bodveggen i 2. etasje, ca. 0,5 m fra B1, er ved befaringen vurdert å ikke bære taklast. Last fra sperretaket er derfor ikke regnet inn på bjelkene, men veggenes egenvekt er tatt med. Takterrassen over B2 er regnet for seg (kap. 6). Lastveien i taket og videre ned fra den tidligere ytterveggen er ikke kontrollert (kap. 10, punkt 9 og 10).'));
 c.push(...figure(path.join(FIG, 'fig_path.png'), 166, 'Figur 1  Lastveier fra bjelkeendene og ned, med dokumentasjonsstatus for hvert ledd.'));
 
 // ===================================================================== 3
@@ -175,7 +177,7 @@ c.push(calc([
 c.push(P(`Grensen γ · h gjør at fonnlasten ved veggen ikke kan bli større enn ${fmt(sn.peak)} kN/m², uansett snølast på mark. Resultatet for B2 er derfor det samme for alle s_{k} fra ${fmt(sn.sk_limit, 1)} kN/m² og oppover. ${proj('snolast_gjelder', '')} I beregningen er ${fmt(sn.peak)} kN/m² brukt som jevn last på begge takbjelkene. Høyden 3,72 m er målt ved mønet. Lenger ut mot raftene er veggen lavere og fonnlasten mindre. Begge deler er på sikker side.`, { before: 80 }));
 c.push(...figure(path.join(FIG, 'fig_snow.png'), 150, 'Figur 2  Snøfonn mot gavlveggen etter NS-EN 1991-1-3 pkt. 5.3.6 (prinsipp). Figuren viser lastens størrelse, ikke snødybden.'));
 c.push(H2('4.4  Lastkombinasjon'));
-c.push(P('Dimensjonerende last er regnet som 1,35 g_{k} + 1,5 q_{k} med de variable lastene fullt samtidig. For de lastene som er kombinert, gir det like stor eller større last enn NS-EN 1990 ligning 6.10a (1,35 G + 1,5 ψ_{0} Q) og 6.10b (1,2 G + 1,5 Q_{1} + 1,5 ψ_{0} Q_{i}), med ψ_{0} = 0,7 for både nyttelast og snø. For B2 er snø dominerende last i ligning 6.10b:'));
+c.push(P('Dimensjonerende last er regnet som 1,35 g_{k} + 1,5 q_{k} med de variable lastene fullt samtidig. For de lastene som er kombinert, gir det like stor eller større last enn NS-EN 1990 ligning 6.10a (1,35 G + 1,5 ψ_{0} Q) og 6.10b (1,2 G + 1,5 Q_{1} + 1,5 ψ_{0} Q_{i}), med ψ_{0} = 0,7 for både nyttelast og snø. For B2 er snø dominerende last i ligning 6.10b:', { keepNext: true }));
 c.push(tbl([
   ['Størrelse', 'Forenklet (brukt)', 'Ligning 6.10a', 'Ligning 6.10b', 'Forenklet gir mer, %'],
   ['B1: q_{Ed}, kN/m', fmt(b1.qEd.forenklet), fmt(b1.qEd['6.10a']), fmt(b1.qEd['6.10b']), pct(b1.qEd.forenklet / Math.max(b1.qEd['6.10a'], b1.qEd['6.10b']) - 1)],
@@ -187,7 +189,7 @@ c.push(P(`Nyttelast på terrassen er holdt utenfor snøtilfellet (kap. 4.2). Tas
 // ===================================================================== 5
 c.push(H1('5  Kjøkkenbjelke B1'));
 c.push(H2('5.1  Hovedberegning'));
-c.push(P('Bjelkelaget vurderes i hovedsak å virke som separate felt på hver side av B1, med lokale forsterkninger og noe samvirke. Hovedmodellen er derfor to tilstøtende felt med opplegg på stålbjelken:'));
+c.push(P('Bjelkelaget vurderes i hovedsak å virke som separate felt på hver side av B1, med lokale forsterkninger og noe samvirke. Hovedberegningen er derfor to tilstøtende felt med opplegg på stålbjelken:'));
 c.push(calc([
   ['Lastbredde', '3,60 / 2 + 1,50 / 2 = 2,55 m'],
   ['Egenlast', `g_{k} = 1,2 · 2,55 + 0,5 + ${gSteel} = ${fmt(b1.gk)} kN/m`],
@@ -209,9 +211,9 @@ c.push(tbl([
   [`Bodveggen står på endene av de fire nye bjelkene: ${fmt(b1x.wall_on_b1_max)} kN/m på B1 i stedet for 0,50`, fmt(b1x.wallmax.MEd, 1), pct(b1x.wallmax.util)],
   ['Tyngre etasjeskille: 2,0 kN/m² i stedet for 1,2 (stubbloftsfyll)', fmt(b1x.heavy.MEd, 1), pct(b1x.heavy.util)],
   [`Full kontinuitet i bjelkelaget: lastbredde ${fmt(R.bw_cont)} m`, fmt(b1s.MEd, 1), pct(b1s.util_M)],
-  ['Full kontinuitet og 2,0 kN/m² samtidig', fmt(b1x.heavy_cont.MEd, 1), `${pct(b1x.heavy_cont.util)} (${pct(b1x.heavy_cont.util_610)} etter lign. 6.10b; ${pct(b1x.heavy_cont.util_610_pl)} av plastisk kapasitet)`],
-], [5600, 1300, 2510], { size: 17 }));
-c.push(P(`B1 tåler ${fmt(b1.dq_reserve, 1)} kN/m ekstra dimensjonerende last i hovedmodellen. Ved full kontinuitet er reserven ${fmt(b1s.dq_reserve, 1)} kN/m, som svarer til ${fmt(b1x.dg_floor_to_100_cont, 1)} kN/m² høyere egenlast i etasjeskillet. B1 har altså kapasitet i hvert av tilfellene alene. Opptrer full kontinuitet og et tungt etasjeskille samtidig, er elastisk kapasitet overskredet, og bare plastisk kapasitet og ligning 6.10b gir da dekning. Etasjeskillets oppbygning og bodveggens plassering er derfor kontrollpunkter (kap. 10).`, { before: 80 }));
+  ['Full kontinuitet og 2,0 kN/m² samtidig', fmt(b1x.heavy_cont.MEd, 1), `${pct(b1x.heavy_cont.util)} (${pct(b1x.heavy_cont.MEd / sec.MRd_pl)} av plastisk kapasitet; ${pct(b1x.heavy_cont.util_610)} og ${pct(b1x.heavy_cont.util_610_pl)} etter lign. 6.10b)`],
+], [5600, 1300, 2510], { size: 17, keep: true }));
+c.push(P(`B1 tåler ${fmt(b1.dq_reserve, 1)} kN/m ekstra dimensjonerende last i hovedberegningen. Ved full kontinuitet er reserven ${fmt(b1s.dq_reserve, 1)} kN/m, som svarer til ${fmt(b1x.dg_floor_to_100_cont, 1)} kN/m² høyere egenlast i etasjeskillet. B1 har altså kapasitet i hvert av tilfellene alene. Opptrer full kontinuitet og et tungt etasjeskille samtidig, er elastisk kapasitet overskredet. Plastisk kapasitet gir da dekning, med ${pct(b1x.heavy_cont.MEd / sec.MRd_pl)} (${pct(b1x.heavy_cont.util_610_pl)} etter ligning 6.10b). Etasjeskillets oppbygning og bodveggens plassering er derfor kontrollpunkter (kap. 10).`, { before: 80 }));
 c.push(P(`Ved full kontinuitet er nedbøyningen ${fmt(b1s.delta_gq, 1)} mm (under L/300 = ${fmt(b1s.delta_lim, 1)} mm), og oppleggskraften øker til ${fmt(b1s.VEd, 1)} kN i hver ende. Det er ført videre til oppleggene i kap. 7.4. Uten fastholdt overflens ville utnyttelsen i dette tilfellet vært ${rng(b1s.util_ltb_6323, b1s.util_ltb_6322)}.`));
 c.push(H2('5.3  Vipping dersom overflensen ikke er fastholdt'));
 c.push(P('Hovedberegningen forutsetter at bjelkelaget holder overflensen sideveis. Som kontroll er vippekapasiteten regnet for en bjelke uten fastholding mellom oppleggene, gaffellagret i endene og med lasten på overflensen (NS-EN 1993-1-1 pkt. 6.3.2):'));
@@ -234,7 +236,7 @@ c.push(tbl([
   ['Gavlvegg i 2. etasje (anslått)', '2,25', `${fmt(lGable.gk)} kN`, '–', `${fmt(lGable.Ed)} kN`],
   [`Takbjelke, hver: ${fmt(b2.kR, 3)} · 0,60 · (1,2 og ${fmt(sn.peak)}) kN/m²`, '2,55 og 3,15', `${fmt(lJoist.gk)} kN`, `${fmt(lJoist.qk)} kN`, `${fmt(lJoist.Ed)} kN`],
   ['Egenvekt IPE 180', '0–3,40', `${fmt(lSelf.gk, 3)} kN/m`, '–', `${fmt(lSelf.Ed)} kN/m`],
-], [4350, 1250, 1150, 1150, 1510], { size: 17 }));
+], [4350, 1250, 1150, 1150, 1510], { size: 17, keep: true }));
 c.push(H2('6.2  Hovedberegning – snøfonn mot gavlveggen'));
 c.push(calc([
   ['Oppleggskraft O4', `R_{B} = (${fmt(lFloor.Ed)} · 2,0 · 1,10 + ${fmt(lSelf.Ed)} · 3,40 · 1,70 + ${fmt(lStair.Ed)} · 1,20 + ${fmt(lGable.Ed)} · 2,25 + ${fmt(lJoist.Ed)} · (2,55 + 3,15)) / 3,40 = **${fmt(b2.RB, 1)} kN**`],
@@ -254,8 +256,8 @@ c.push(tbl([
   ['Gulvlast med lastbredde 1,50 m på x = 0–2,25 m, i stedet for 0,75 m med veksling og trapp', fmt(rob.alt_bw150.MEd, 1), pct(rob.alt_bw150.util), fmt(rob.alt_bw150.RB, 1)],
   [`Ugunstige anslag samtidig: trapp i x = 1,61 m, 0,15 m av terrassestripen på bjelken under gavlveggen, og gavlvegg ${fmt(rob.unfav.gable_P, 1)} kN (1,0 kN/m²)`, fmt(rob.unfav.MEd, 1), pct(rob.unfav.util), fmt(rob.unfav.RB, 1)],
   [`Gavlveggen bærer i tillegg en takstripe på 0,6 m: ${fmt(rob.roof_strip.Pg)} kN egenlast og ${fmt(rob.roof_strip.Ps)} kN snø`, fmt(rob.roof_strip.MEd, 1), pct(rob.roof_strip.util), fmt(rob.roof_strip.RB, 1)],
-], [5000, 1300, 1300, 1810], { size: 17 }));
-c.push(P(`Takstripen er regnet som 0,6 m · 1,97 m influenslengde, med 0,7 kN/m² egenlast og snø 0,8 · ${fmt(sn.sk, 1)} = ${fmt(sn.base, 1)} kN/m². Den dekker muligheten for at ytterste sperrepar og takutstikket hviler på gavlveggen. Bjelken tåler ${fmt(rob.dP_to_100, 1)} kN ekstra dimensjonerende punktlast ved gavlveggen før elastisk momentkapasitet er nådd.`, { before: 80 }));
+], [5000, 1300, 1300, 1810], { size: 17, keep: true }));
+c.push(P(`Takstripen er regnet som 0,6 m · 1,97 m (lengden B2 bærer, se kap. 4.1), med 0,7 kN/m² egenlast og snø 0,8 · ${fmt(sn.sk, 1)} = ${fmt(sn.base, 1)} kN/m². Den dekker muligheten for at ytterste sperrepar og takutstikket hviler på gavlveggen. Bjelken tåler ${fmt(rob.dP_to_100, 1)} kN ekstra dimensjonerende punktlast ved gavlveggen før elastisk momentkapasitet er nådd.`, { before: 80 }));
 c.push(P(`Med takstripe øker oppleggskraften ved O4 til ${fmt(rob.roof_strip.RB, 1)} kN. Det er ført videre til oppleggene i kap. 7.4. Uten fastholdt overflens ville utnyttelsen i dette tilfellet vært ${rng(rob.roof_strip.util_ltb_6323, rob.roof_strip.util_ltb_6322)}.`));
 c.push(H2('6.5  Vipping dersom overflensen ikke er fastholdt'));
 c.push(P(`Regnet på samme måte som for B1 blir M_{cr} = ${fmt(b2.ltb.Mcr, 1)} kNm og M_{b,Rd} = ${fmt(b2.ltb.MbRd_6322, 1)}–${fmt(b2.ltb.MbRd_6323, 1)} kNm. Utnyttelsen uten fastholding er ${rng(b2.util_ltb_6323, b2.util_ltb_6322)}. Momentforløpet er regnet som for jevnt fordelt last, som er på sikker side. Også for B2 er fastholdingen av overflensen en nødvendig forutsetning.`));
@@ -272,7 +274,7 @@ c.push(tbl([
 ], [1000, 2700, 1900, 1700, 2110], { align: ['l', 'l', 'r', 'r', 'r'], size: 17, boldFirstCol: true, keep: true }));
 c.push(P('Følsomhet: full kontinuitet i bjelkelaget for B1 og takstripe på gavlveggen for B2.', { size: 17, color: INK2, before: 60 }));
 c.push(H2('7.2  Stålbjelkens steg ved opplegg'));
-c.push(P(`Steget er kontrollert for konsentrert oppleggskraft uten stivere, etter NS-EN 1993-1-5 kapittel 6 (endeopplegg, oppleggslengde 98 mm). Med k_{F} = ${fmt(web.kF)}, effektiv lastlengde l_{y} = ${fmt(web.ly, 0)} mm og λ_{F} = ${fmt(web.lamF)} blir χ_{F} = 1,0 og F_{Rd} = 235 · ${fmt(web.ly, 0)} · 5,3 / 1,05 = ${fmt(web.FRd, 0)} kN. Stenderne følger ikke bjelkens endevinkel. Settes oppleggslengden derfor til null i ligning (6.10), blir l_{y} = ${fmt(web.ly_ss0, 0)} mm og F_{Rd} = ${fmt(web.FRd_ss0, 0)} kN. Største oppleggskraft er ${fmt(sup.R.B2_col, 1)} kN, det vil si ${rng(sup.R.B2_col / web.FRd, sup.R.B2_col / web.FRd_ss0)}. Steget trenger ikke stivere for oppleggskraften. Om bjelkeendene er holdt mot vridning, er et eget kontrollpunkt.`));
+c.push(P(`Steget er kontrollert for konsentrert oppleggskraft uten stivere, etter NS-EN 1993-1-5 kapittel 6 (endeopplegg, oppleggslengde 98 mm). Med k_{F} = ${fmt(web.kF)}, effektiv lastlengde l_{y} = ${fmt(web.ly, 0)} mm og λ_{F} = ${fmt(web.lamF)} blir χ_{F} = 1,0 og F_{Rd} = 235 · ${fmt(web.ly, 1)} · 5,3 / 1,05 = ${fmt(web.FRd, 0)} kN. Stenderne følger ikke bjelkens endevinkel. Settes oppleggslengden derfor til null i ligning (6.10), blir l_{y} = ${fmt(web.ly_ss0, 0)} mm og F_{Rd} = ${fmt(web.FRd_ss0, 0)} kN. Største oppleggskraft er ${fmt(sup.R.B2_col, 1)} kN, det vil si ${rng(sup.R.B2_col / web.FRd, sup.R.B2_col / web.FRd_ss0)}. Steget trenger ikke stivere for oppleggskraften. Om bjelkeendene er holdt mot vridning, er et eget kontrollpunkt.`));
 c.push(H2('7.3  Stendere'));
 c.push(P('Stenderne er regnet for trykk med knekking etter NS-EN 1995-1-1 pkt. 6.3.2. Stenderne er 48 mm tykke og svært slanke om den svake aksen. Kapasiteten avhenger derfor av at de er sammenskrudd og holdt sideveis, slik de er beskrevet (skrudd fast i pipa, stående i tømmerveggen, sidestøttet). Tabellen viser kapasiteten med og uten slik fastholding:'));
 const srow = (key, name, dim, h) => [name, dim, `${fmt(h)} m`, `${fmt(st[key].C24.strong.NRd, 0)} / ${fmt(st[key].C18.strong.NRd, 0)}`,
@@ -284,14 +286,14 @@ c.push(tbl([
   srow('B1_wall', 'O2', '2 × 48 × 148', 2.07),
   srow('B2_wall', 'O3', '2 × 48 × 148', 2.22),
   srow('B2_col', 'O4', '2 × 48 × 98', 2.22),
-], [900, 1300, 800, 1650, 1500, 1500, 1760], { align: ['l', 'l', 'r', 'r', 'r', 'r', 'r'], size: 17, boldFirstCol: true }));
+], [900, 1300, 800, 1650, 1500, 1500, 1760], { align: ['l', 'l', 'r', 'r', 'r', 'r', 'r'], size: 17, boldFirstCol: true, keep: true }));
 c.push(P(`Utnyttelsene er oppgitt for C24 / C18. Bjelkens endevinkel flytter oppleggskraften mot innerkanten av stenderne. «Eksentrisk last» er regnet med 16 mm eksentrisitet, en sjettedel av oppleggslengden. Med fastholding er utnyttelsen da høyst ${pct(st.B2_col.C24.util_ecc)} med C24 og ${pct(st.B2_col.C18.util_ecc)} med C18. Med takstripe på gavlveggen (${fmt(sus.R.B2_col, 1)} kN ved O4) er tallene ${pct(sus.studs.B2_col.C24.util_ecc)} og ${pct(sus.studs.B2_col.C18.util_ecc)}. Uten fastholding ville stenderne ved O1 og O4 ikke hatt tilstrekkelig kapasitet. Fastholdingen er derfor et kontrollpunkt. Trykket mellom stålflensen og stendertoppen (endeved) er høyst ${fmt(st.B2_col.sigma_c0, 1)} N/mm², mot en kapasitet på 13–15 N/mm².`, { before: 80 }));
 c.push(H2('7.4  Trykk vinkelrett på fiber under stenderne'));
-c.push(P('Der stenderne står på liggende treverk, gir oppleggskraften trykk vinkelrett på fiberretningen. Kontrollen følger NS-EN 1995-1-1 pkt. 6.1.5: σ_{c,90,d} = F / A_{ef} ≤ k_{c,90} · f_{c,90,d}. Den effektive flaten A_{ef} er kontaktflaten forlenget med 30 mm i hver ende langs fiberretningen. Det er regnet med C24 (f_{c,90,k} = 2,5 N/mm²), k_{c,90} = 1,25 og k_{mod} = 0,8 for B1 (nyttelast) og 0,9 for B2 (snø).'));
+c.push(P('Der stenderne står på liggende treverk, gir oppleggskraften trykk vinkelrett på fiberretningen. Kontrollen følger NS-EN 1995-1-1 pkt. 6.1.5: σ_{c,90,d} = F / A_{ef} ≤ k_{c,90} · f_{c,90,d}. Den effektive flaten A_{ef} er kontaktflaten forlenget med 30 mm i hver ende langs fiberretningen. Det er regnet med C24 (f_{c,90,k} = 2,5 N/mm²), k_{c,90} = 1,25 og k_{mod} = 0,8 for B1 (nyttelast) og 0,9 for B2 (snø). k_{c,90} = 1,25 er valgt for heltre. 1,0 er vist som strengere alternativ, fordi lasten går rett gjennom bjelken til en omtrent like stor flate under.'));
 c.push(P(`Kontrollen forutsetter at stenderne står rett over understøttelsen. Gulvbjelken alene har en skjærkapasitet på ${fmt(sup.joist_shear.B1_pipe.VRd_kcr067, 0)}–${fmt(sup.joist_shear.B2_col.VRd_kcr1, 0)} kN og kan ikke føre oppleggskraften sideveis (kap. 10, punkt 13).`));
 c.push(tbl([
-  ['Opplegg', 'Flate', 'A_{ef}, cm²', 'σ_{c,90,d}', 'k_{c,90} · f_{c,90,d}', 'Utnyttelse', 'Status'],
-  ['O2', 'Stendere på tømmerstokk. Hele stenderbredden 148 mm, eller bare oppleggsbredden 98 mm', `${cm2(c9.B1_wall.A_ef)} / ${cm2(c9.B1_wall.A_ef_98)}`, `${fmt(c9.B1_wall.sigma)} / ${fmt(c9.B1_wall.sigma_98)}`, fmt(c9.B1_wall.C24.fRd), rng(c9.B1_wall.C24.util, c9.B1_wall.C24.util_98), OK('OK – også med C18')],
+  ['Opplegg', 'Flate', 'A_{ef}, cm²', 'σ_{c,90,d}', 'k_{c,90} · f_{c,90,d}', 'Utn.', 'Status'],
+  ['O2', 'Stendere på tømmerstokk. Hele stenderbredden 148 mm, eller bare oppleggslengden 98 mm', `${cm2(c9.B1_wall.A_ef)} / ${cm2(c9.B1_wall.A_ef_98)}`, `${fmt(c9.B1_wall.sigma)} / ${fmt(c9.B1_wall.sigma_98)}`, fmt(c9.B1_wall.C24.fRd), rng(c9.B1_wall.C24.util, c9.B1_wall.C24.util_98), OK('OK – også med C18')],
   ['O3', 'Som O2', `${cm2(c9.B2_wall.A_ef)} / ${cm2(c9.B2_wall.A_ef_98)}`, `${fmt(c9.B2_wall.sigma)} / ${fmt(c9.B2_wall.sigma_98)}`, fmt(c9.B2_wall.C24.fRd), rng(c9.B2_wall.C24.util, c9.B2_wall.C24.util_98), OK('OK – også med C18')],
   ['O1', 'Stendere på gulvbjelke (flate A) og gulvbjelke på IPN-flens (flate B). Bare bjelkens bredde 48 mm', `${cm2(c9.B1_pipe.A_joist_only)} / ${cm2(c9.B1_pipe.A_min)}`, `${fmt(c9.B1_pipe.sigma_joist_only)} / ${fmt(c9.B1_pipe.sigma_min)}`, fmt(c9.B1_pipe.C24.fRd), rng(c9.B1_pipe.C24.util_joist_only, c9.B1_pipe.C24.util_min), ND()],
   ['O4', 'Stendere på gulvbjelke. Bare bjelkens bredde 48 mm', cm2(c9.B2_col.A_joist_only), fmt(c9.B2_col.sigma_joist_only), fmt(c9.B2_col.C24.fRd), pct(c9.B2_col.C24.util_joist_only), ND()],
@@ -318,7 +320,7 @@ c.push(callout([
 c.push(P(`**Takbjelkene på B2.** Hver takbjelke fører ${fmt(sup.roof_joist.P, 1)} kN ned på bjelkeflensen, som er 91 mm bred. Takbjelkenes dimensjon er ikke målt. Er de 48 mm brede, er A_{ef} = 48 · (91 + 60) mm² = ${cm2(sup.roof_joist.A)} cm² og spenningen ${fmt(sup.roof_joist.sigma)} N/mm², det vil si ${pct(sup.roof_joist.util)} (${pct(sup.roof_joist.util_kc1)} med k_{c,90} = 1,0). Bredden er et kontrollpunkt (kap. 10, punkt 7).`, { before: 120 }));
 c.push(H2('7.5  IPN 200 og betongkloss ved O1'));
 c.push(P('Det er lagt til grunn at den fjernede veggen sto i samme linje som B1, over IPN 200 i krypkjelleren, og belastet IPN-en langs lengden. Dette er ikke dokumentert. Etter 2018 kommer lasten fra 2. etasje ned i to punkter: ved O1, anslått over betongklossen, og ved O2 direkte i grunnmuren. Holder forutsetningen, er bøyepåkjenningen i IPN 200 fra 2. etasje blitt mindre, ikke større. Stålkonsollen i grunnmuren, som bærer IPN-enden, er ikke undersøkt eller regnet.'));
-c.push(P(`Som øvre grense: dersom IPN-en bare lå an mot klossens kant, 0,60 m fra lastpunktet, ville momentet vært ${fmt(sup.R.B1_pipe, 1)} · 0,60 = ${fmt(sup.ipn.M, 1)} kNm. Det er ${pct(sup.ipn.util)} av elastisk kapasitet for IPN 200 (${fmt(sup.ipn.MRd, 1)} kNm med S235 antatt). Lasten på betongklossen fra 2. etasje er ${fmt(sup.R.B1_pipe, 1)} kN. Klossens fundamentering og underlag er ikke dokumentert.`));
+c.push(P(`Som øvre grense: dersom IPN-en bare lå an mot klossens kant, 0,60 m fra lastpunktet, ville momentet vært ${fmt(sup.R.B1_pipe, 1)} · 0,60 = ${fmt(sup.ipn.M, 1)} kNm. Det er ${pct(sup.ipn.util)} av elastisk kapasitet for IPN 200 (${fmt(sup.ipn.MRd, 1)} kNm med S235 antatt). Ved full kontinuitet i bjelkelaget (${fmt(sus.R.B1_pipe, 1)} kN) er tallet ${fmt(sus.ipn.M, 1)} kNm, det vil si ${pct(sus.ipn.util)}. Lasten IPN-en bærer fra gulvet i 1. etasje, er ikke med i overslaget. Lasten på betongklossen fra 2. etasje er ${fmt(sup.R.B1_pipe, 1)} kN. Klossens fundamentering og underlag er ikke dokumentert.`));
 c.push(H2('7.6  Stolpesko, betongsøyle og fundament ved O4'));
 c.push(P(`Trykkspenningen i betongsøylen er ${fmt(sup.R.B2_col, 1)} kN / (π · 100² mm²) = ${fmt(sup.column.sigma, 1)} N/mm², som er lavt for betong. Betongen er ikke det svake leddet. Uten utvidet fundament under søylen ville trykket mot grunnen vært ca. ${fmt(Math.round(sup.column.q_ground / 100) * 100, 0)} kN/m². Stolpeskoens type og kapasitet, stålplatens tykkelse, søylens fundament og massene under er ikke dokumentert. Disse delene kan ikke vurderes uten undersøkelse på stedet.`));
 c.push(H2('7.7  Grunnmur ved O2 og O3'));
@@ -338,9 +340,11 @@ c.push(calc([
   ['Last fra treverket på flensen', `B1: (${fmt(b1.qEd.forenklet)} − 1,35 · ${gSteel}) · 3,63 = ${fmt(b1.restraint.load, 1)} kN. B2: ${fmt(b2.RA, 1)} + ${fmt(b2.RB, 1)} − 1,35 · ${gSteel} · 3,40 = ${fmt(b2.restraint.load, 1)} kN`],
   ['Nødvendig friksjonskoeffisient', `B1: ${fmt(b1.restraint.F_25pct, 1)} / ${fmt(b1.restraint.load, 1)} = ${fmt(b1.restraint.mu_req)}. B2: ${fmt(b2.restraint.mu_req)}`],
   ['Ett fastholdingspunkt', `B1 holdt midt i spennet: M_{b,Rd} minst ${fmt(b1.restraint.seg.MbRd, 1)} kNm, utnyttelse høyst ${pct(b1.restraint.util_seg)}. B2 holdt ved gavlveggen: minst ${fmt(b2.restraint.seg.MbRd, 1)} kNm, høyst ${pct(b2.restraint.util_seg)}`],
+  ['To fastholdingspunkter', `Fri lengde høyst ${fmt(b1.restraint.two.seg.Lseg)} m: M_{b,Rd} minst ${fmt(b1.restraint.two.seg.MbRd, 1)} kNm. Utnyttelse høyst ${pct(b1.restraint.two.util)} (B1) og ${pct(b2.restraint.two.util)} (B2)`],
 ]));
 c.push(P('Regnestykket viser at kraften som trengs, er liten. Nødvendig friksjonskoeffisient er ca. 0,07, mens en forsiktig verdi for tre mot stål er 0,2. Den verdien er antatt og ikke dokumentert. Eurokode 3 har heller ingen regel for å regne friksjon som sideveis fastholding. Dette er derfor en vurdering og ikke en påvisning.', { before: 80 }));
-c.push(P('Den siste linjen viser at det er nok at overflensen er holdt i ett punkt nær midten av spennet. Tallene er regnet på sikker side, med konstant moment i det lengste segmentet og last på overflensen. Forutsetningen kan regnes som oppfylt når det er påvist mekanisk feste mellom treverket og overflensen i minst ett punkt nær midten av hvert spenn, at bjelkelaget selv er holdt av gulvet, og at bjelkeendene er holdt mot velting ved oppleggene (kap. 10, punkt 6 og 7).'));
+c.push(P(`Den nest siste linjen viser at det i hovedberegningen er nok at overflensen er holdt i ett punkt nær midten av spennet. Tallene er regnet på sikker side, med konstant moment i det lengste segmentet og last på overflensen. I følsomhetstilfellene er ett punkt ikke nok: samme regning gir ${pct(b1.restraint.util_seg_sens)} for B1 (full kontinuitet) og ${pct(b2.restraint.util_seg_sens)} for B2 (takstripe). Med feste i to punkter, slik at ingen fri lengde er over ca. 1,2 m, er tallene ${pct(b1.restraint.two.util_sens)} og ${pct(b2.restraint.two.util_sens)}.`));
+c.push(P('Forutsetningen kan regnes som oppfylt når det er påvist mekanisk feste mellom treverket og overflensen i minst to punkter i hvert spenn, med høyst ca. 1,2 m fri lengde, at bjelkelaget selv er holdt av gulvet, og at bjelkeendene er holdt mot vridning ved oppleggene (kap. 10, punkt 6, 7 og 16).'));
 
 // ===================================================================== 9
 c.push(H1('9  Resultatoversikt'));
@@ -366,7 +370,9 @@ c.push(tbl([
   ['Tømmerstokk over grunnmur (størst ved O2)', `${fmt(c9.B1_wall.sigma)}–${fmt(c9.B1_wall.sigma_98)} N/mm²`, `${fmt(c9.B1_wall.C24.fRd)} N/mm²`, rng(c9.B1_wall.C24.util, c9.B1_wall.C24.util_98), OK('OK – også med C18')],
   ['Gulvbjelke under stendere, O1', `${fmt(c9.B1_pipe.sigma_joist_only, 1)}–${fmt(c9.B1_pipe.sigma_min, 1)} N/mm²`, `${fmt(c9.B1_pipe.C24.fRd, 1)} N/mm²`, `${rng(c9.B1_pipe.C24.util_joist_only, c9.B1_pipe.C24.util_min)} (${pct(c9.B1_pipe.C24.util_with_blocking)} med fullt anlegg)`, ND()],
   ['Gulvbjelke under stendere, O4', `${fmt(c9.B2_col.sigma_with_blocking, 1)}–${fmt(c9.B2_col.sigma_joist_only, 1)} N/mm²`, `${fmt(c9.B2_col.C24.fRd, 2)} N/mm²`, rng(c9.B2_col.C24.util_with_blocking, c9.B2_col.C24.util_joist_only), ND('Ikke dokumentert – ingen margin')],
-  ['IPN 200 og stålkonsoll i grunnmuren (O1)', `${fmt(sup.ipn.M, 1)} kNm (øvre grense)`, `${fmt(sup.ipn.MRd, 1)} kNm`, pct(sup.ipn.util), FOR('Overslag – ikke undersøkt')],
+  ['Takbjelker på B2-flensen (48 mm bredde antatt)', `${fmt(sup.roof_joist.sigma)} N/mm²`, `${fmt(sup.roof_joist.fRd, 2)} N/mm²`, `${pct(sup.roof_joist.util)} (${pct(sup.roof_joist.util_kc1)} med k_{c,90} = 1,0)`, ND('Ikke dokumentert – bredde ikke målt')],
+  ['IPN 200 under gulvet (O1), bidrag fra B1', `${fmt(sup.ipn.M, 1)} kNm (høyst)`, `${fmt(sup.ipn.MRd, 1)} kNm`, `${pct(sup.ipn.util)} (${pct(sus.ipn.util)} ved full kontinuitet)`, FOR('Overslag – gulvlast fra 1. etasje ikke regnet')],
+  ['Stålkonsoll i grunnmuren (O1)', 'ikke regnet', '–', '–', ND('Ikke undersøkt')],
   ['Grunnmur (O2, O3)', 'ca. 0,5 N/mm²', '–', '–', FOR('Materiale og tilstand ikke undersøkt')],
   ['Betongkloss O1; stolpesko, søyle og fundament O4', '–', '–', '–', ND()],
 ], [3100, 1500, 1500, 1200, 2110], { align: ['l', 'r', 'r', 'r', 'l'], size: 17 }));
@@ -374,27 +380,27 @@ c.push(tbl([
 // ===================================================================== 10
 c.push(pageBreak());
 c.push(H1('10  Kontrollpunkter på stedet'));
-c.push(P('Punktene under kan lukke det som ikke er dokumentert. Tabellen er laget for å fylles ut ved befaring, med måltall, bilder og signatur.'));
+c.push(P('Punktene under viser hva som må måles og undersøkes på stedet. Målingene kan avklare forholdene ved O1 i hovedberegningen og fastholdingen av bjelkene. Ved O4 kan de ikke alene gi margin (kap. 7.4). Tabellen er laget for å fylles ut ved befaring, med måltall, bilder og signatur.'));
 const a1 = `${cm2(c9.B1_pipe.C24.A_req)}–${cm2(c9.B1_pipe.C18.A_req_kc1)}`, a1s = cm2(sus.c90.B1_pipe.C18.A_req_kc1);
 const a4 = `${cm2(c9.B2_col.C24.A_req)}–${cm2(c9.B2_col.C18.A_req_kc1)}`, a4s = cm2(sus.c90.B2_col.C18.A_req_kc1);
 const cp = [
-  ['1', 'Trykkflate under stenderne ved O1', `Mål bredde og lengde på treverket stenderne står på (gulvbjelke, kubbinger, svill), og anlegget mot IPN-flensen. Regnestykket krever ${a1} cm² i hovedtilfellet, og inntil ${a1s} cm² ved full kontinuitet i bjelkelaget.`],
-  ['2', 'Trykkflate under stenderne ved O4', `Ligger sidekubbingene an mot stenderne oppe og mot stålplaten nede? Hvordan er de festet til gulvbjelken (antall og type skruer eller spiker)? Mål kubbinger og stålplatens bredde og tykkelse. Regnestykket krever ${a4} cm² i hovedtilfellet, og inntil ${a4s} cm² med takstripe på gavlveggen. Stendernes fotavtrykk (96 × 98 mm) gir høyst ${cm2(c9.B2_col.A_with_blocking)} cm² uten lastfordelende plate eller svill.`],
+  ['1', 'Trykkflate under stenderne ved O1', `Mål bredde og lengde på treverket stenderne står på (gulvbjelke, kubbinger, svill), og anlegget mot IPN-flensen. Regnestykket krever ${a1} cm² i hovedberegningen, og inntil ${a1s} cm² ved full kontinuitet i bjelkelaget. Stendernes fotavtrykk (96 × 98 mm) gir høyst ${cm2(c9.B2_col.A_with_blocking)} cm² uten lastfordelende plate eller svill. Det dekker hovedberegningen med C24, men ikke full kontinuitet i bjelkelaget.`],
+  ['2', 'Trykkflate under stenderne ved O4', `Ligger sidekubbingene an mot stenderne oppe og mot stålplaten nede? Hvordan er de festet til gulvbjelken (antall og type skruer eller spiker)? Mål kubbinger og stålplatens bredde og tykkelse. Regnestykket krever ${a4} cm² i hovedberegningen, og inntil ${a4s} cm² med takstripe på gavlveggen. Stendernes fotavtrykk (96 × 98 mm) gir høyst ${cm2(c9.B2_col.A_with_blocking)} cm² uten lastfordelende plate eller svill.`],
   ['3', 'Stolpesko ved O4', `Type og fabrikat, stangdiameter, fri høyde mellom plate og betong, feste til søyle og gulvbjelke. Sammenlign med produktdata: dimensjonerende last ${fmt(sup.R.B2_col, 1)} kN (${fmt(sus.R.B2_col, 1)} kN med takstripe), karakteristisk ${fmt(sup.R_kar.B2_col, 1)} kN.`],
   ['4', 'Betongsøyle og fundament ved O4', 'Diameter, høyde, fundamentflate og masser. Riss eller setning?'],
   ['5', 'Betongkloss, IPN 200 og stålkonsoll ved O1', 'Klossens mål, tilstand og underlag. Hvor ligger lastpunktet i forhold til klossen? IPN-ens og konsollens tilstand (korrosjon) og anlegg.'],
-  ['6', 'Bjelkelaget mot overflensen på B1', 'Feste eller anlegg (spiker, beslag, lasker) langs bjelken, og minst ett mekanisk feste nær midten.'],
-  ['7', 'Veksling og takbjelker mot overflensen på B2', 'Feste eller anlegg ved x = 0,1–2,1 m og ved 2,25, 2,55 og 3,15 m. Mål takbjelkenes bredde og oppleggslengde på flensen.'],
+  ['6', 'Bjelkelaget mot overflensen på B1', 'Feste eller anlegg (spiker, beslag, lasker) langs bjelken. Mekanisk feste i minst to punkter, med høyst ca. 1,2 m fri lengde mellom festene og til oppleggene.'],
+  ['7', 'Veksling og takbjelker mot overflensen på B2', 'Feste eller anlegg ved x = 0,1–2,1 m og ved 2,25, 2,55 og 3,15 m. Mekanisk feste i minst to punkter, med høyst ca. 1,2 m fri lengde. Mål takbjelkenes bredde og oppleggslengde på flensen.'],
   ['8', 'Stenderne ved O1–O4', 'Er de sammenskrudd og festet til pipe, tømmervegg eller sidestøtte? Utbøyning? Pipa inngår i fastholdingen av stenderne ved O1 og kan ikke fjernes uten at stenderne sikres på annen måte.'],
   ['9', 'Gavlveggen og taket over B2', 'Hviler ytterste sperrepar eller takutstikket på gavlveggen? Finnes hanebjelker eller strekkbånd i den nyere takdelen? Hva står gavlveggen på over B2 og til hver side?'],
   ['10', 'Tidligere yttervegg i 2. etasje', 'Hva står veggen på i 1. etasje, 0,20 m på den andre siden av badveggen, sett fra B2?'],
   ['11', 'Synlige deformasjoner', 'Nedbøyning av B1 og B2 (snor eller laser), riss i himling og vegger over oppleggene, knusemerker i treverk.'],
   ['12', 'Stålprofil, stålkvalitet og oppleggslengde', 'Mål høyde, flensbredde og flenstykkelse (IPE 180: 180 / 91 / 8,0 mm) og oppleggslengden i hver ende. Valsemerking på bjelkene, eller ordre og faktura fra leverandøren i 2018.'],
-  ['13', 'Stendernes plassering over understøttelsen', 'Sideforskyvning mellom stendernes senter og IPN-flensen (O1), og mellom stendernes senter og stolpesko og søyle (O4), målt i begge retninger. Forskyvning over ca. 0,2 m må vurderes av fagkyndig.'],
+  ['13', 'Stendernes plassering over understøttelsen', 'Mål sideforskyvningen mellom stendernes senter og IPN-flensen (O1), og mellom stendernes senter og stolpesko og søyle (O4), i begge retninger. Regnestykket i kap. 7.4 gjelder bare når stenderne står rett over understøttelsen. Forskyvning over ca. 50 mm må vurderes av fagkyndig.'],
   ['14', 'Bodveggen i 2. etasje ved B1', 'Står veggen på de fire nye bjelkene eller på de eldre? Bærer den noe fra taket?'],
   ['15', 'Oppbygning av etasjeskille og terrasse', 'Stubbloftsfyll? Bad med påstøp eller flis i lastfeltet til B1 eller B2? Belegg på terrassen? Beregningen forutsetter 1,2 kN/m².'],
   ['16', 'Bjelkeendene', 'Er bjelkeendene holdt mot vridning og sideveis forskyvning ved oppleggene (innfelt i vegg, kubbinger, feste til stendertopp)?'],
-  ['17', 'Treverkets tilstand', 'Fukt, råte eller sprekker i gulvbjelkene ved O1 og O4 og i tømmerstokken ved O2 og O3. Er gulvbjelkene sikret mot kantring?'],
+  ['17', 'Treverkets tilstand', 'Fukt, råte eller sprekker i gulvbjelkene ved O1 og O4 og i tømmerstokken ved O2 og O3. Er gulvbjelkene sikret mot kantring? Finnes sorteringsstempel (C24 eller C18) på stendere og gulvbjelker?'],
   ['18', 'Innkledning av stålbjelkene', 'Er bjelkene kledd inn? Materiale, tykkelse og antall lag. Brannmotstand er ikke vurdert i notatet.'],
 ];
 c.push(tbl([['Nr.', 'Kontrollpunkt', 'Hva som måles eller observeres', 'Resultat', 'Dato / sign.'],
@@ -402,20 +408,20 @@ c.push(tbl([['Nr.', 'Kontrollpunkt', 'Hva som måles eller observeres', 'Resulta
   [500, 2150, 3900, 1660, 1200], { align: ['l', 'l', 'l', 'l', 'l'], size: 17, padV: 70 }));
 
 // ===================================================================== 11
+c.push(pageBreak());
 c.push(H1('11  Konklusjon'));
 c.push(P(`Med forutsetningene i kapittel 3 viser etterregningen at begge stålbjelkene har tilstrekkelig kapasitet i bøyning og skjær. Utnyttelsen er ${pct(b1.util_M)} for B1 og ${pct(b2.util_M)} for B2 av elastisk momentkapasitet, og nedbøyningene ligger under kontrollgrensen L/300. Bjelkene holder også i hvert av følsomhetstilfellene alene, men marginene er da små. Notatet gjelder bare vertikale laster. Brann, avstivning mot vind og treverkets tilstand er ikke vurdert.`));
 c.push(P('Resultatet forutsetter at overflensen er sideveis fastholdt av treverket som ligger på den, at stenderne er sideveis fastholdt, og at stål og trevirke minst har de antatte kvalitetene.'));
-c.push(P('For oppleggene er stålbjelkens steg, stenderne og tømmerstokken over grunnmuren regnet og funnet tilstrekkelige under de samme antakelsene. Trykk vinkelrett på fiber i gulvbjelken ved O1 og O4, stolpeskoen, betongsøylen med fundament og betongklossens underlag er ikke dokumentert. Notatet konkluderer derfor ikke for disse delene. De må kontrollmåles og vurderes av en fagkyndig før oppleggene kan dokumenteres i sin helhet. Ved O4 har opplegget ingen regnemessig margin, og tiltak kan bli nødvendig.'));
+c.push(P('For oppleggene er stålbjelkens steg, stenderne og tømmerstokken over grunnmuren regnet og funnet tilstrekkelige under de samme antakelsene. Trykk vinkelrett på fiber i gulvbjelken ved O1 og O4, takbjelkenes anlegg på B2, stolpeskoen, betongsøylen med fundament, stålkonsollen og betongklossens underlag er ikke dokumentert. Notatet konkluderer derfor ikke for disse delene. De må kontrollmåles og vurderes av en fagkyndig før oppleggene kan dokumenteres i sin helhet. Ved O4 har opplegget ingen regnemessig margin, og tiltak kan bli nødvendig.'));
 c.push(P(`Notatet er tiltakshavers etterregning og er ikke gjennomgått av fagkyndig. Det er ikke prosjektering eller kontroll fra foretak med ansvarsrett, og det tar ikke stilling til kommunens krav i ${proj('kommunens_brev', 'mangelbrevet')} om erklæring om ansvarsrett fra foretak.`));
 
 // ===================================================================== 12
-c.push(pageBreak());
 c.push(H1('12  Gjennomgang og signatur'));
 c.push(P('Tiltakshavers signatur bekrefter at mål og opplysninger om bygget er gitt etter beste kunnskap. Den er ikke en faglig kontroll av beregningene.'));
 c.push(P('Feltet «Gjennomgått av» fylles ut bare av den som faktisk har gått gjennom beregningene i denne revisjonen. Signaturen bekrefter gjennomgang av dette notatet, med det omfanget og de forbeholdene som føres inn. Den bekrefter ikke prosjekteringen fra 2018, og den er ikke en erklæring om ansvarsrett.', { keepNext: true }));
 c.push(tbl([
   ['Rolle', 'Navn og kompetanse', 'Sted og dato', 'Signatur'],
-  [{ t: 'Utarbeidet av', bold: true, align: 'l' }, `${proj('tiltakshaver')}, tiltakshaver`, '', ''],
+  [{ t: 'Utarbeidet av', bold: true, align: 'l' }, `[[${proj('tiltakshaver')}, tiltakshaver / Satt opp for tiltakshaver med regneskript – velg samme formulering som i svarbrevet og redegjørelsen]]`, '', ''],
   [{ t: 'Gjennomgått av', bold: true, align: 'l' }, '', '', ''],
   [{ t: 'Omfang av gjennomgangen og forbehold', bold: true, align: 'l' }, { t: '', span: 3 }],
 ], [1800, 3400, 2000, 2210], { align: ['l', 'l', 'l', 'l'], size: 18, padV: 260, keep: true }));
@@ -431,12 +437,15 @@ c.push(tbl([
   ['χ_{LT}, pkt. 6.3.2.2 (kurve a, α = 0,21)', fmt(b1.ltb.chi_6322, 3), fmt(b2.ltb.chi_6322, 3)],
   ['χ_{LT,mod}, pkt. 6.3.2.3 (kurve b, λ_{LT,0} = 0,4, β = 0,75, k_{c} = 0,94)', fmt(b1.ltb.chi_6323, 3), fmt(b2.ltb.chi_6323, 3)],
   ['M_{b,Rd} = χ_{LT} · W_{pl} · f_{y} / γ_{M1}, kNm', `${fmt(b1.ltb.MbRd_6322, 1)} / ${fmt(b1.ltb.MbRd_6323, 1)}`, `${fmt(b2.ltb.MbRd_6322, 1)} / ${fmt(b2.ltb.MbRd_6323, 1)}`],
-  ['Ett fastholdingspunkt: segmentlengde, m', fmt(b1.restraint.seg.Lseg), fmt(b2.restraint.seg.Lseg)],
+  ['Ett fastholdingspunkt: segmentlengde, m', fmt(b1.restraint.seg.Lseg, 3), fmt(b2.restraint.seg.Lseg)],
   ['M_{cr} for segmentet (C_{1} = 1,0, last på overflens), kNm', fmt(b1.restraint.seg.Mcr, 1), fmt(b2.restraint.seg.Mcr, 1)],
   ['M_{b,Rd} for segmentet (kurve a), kNm', fmt(b1.restraint.seg.MbRd, 1), fmt(b2.restraint.seg.MbRd, 1)],
+  ['Utnyttelse med ett punkt: hovedberegning / følsomhet', `${pct(b1.restraint.util_seg)} / ${pct(b1.restraint.util_seg_sens)}`, `${pct(b2.restraint.util_seg)} / ${pct(b2.restraint.util_seg_sens)}`],
+  [`To fastholdingspunkter: M_{b,Rd} for fri lengde ${fmt(b1.restraint.two.seg.Lseg)} m, kNm`, fmt(b1.restraint.two.seg.MbRd, 1), fmt(b2.restraint.two.seg.MbRd, 1)],
+  ['Utnyttelse med to punkter: hovedberegning / følsomhet', `${pct(b1.restraint.two.util)} / ${pct(b1.restraint.two.util_sens)}`, `${pct(b2.restraint.two.util)} / ${pct(b2.restraint.two.util_sens)}`],
 ], [5200, 2100, 2110], { size: 17 }));
 c.push(H2('A.2  Steg under oppleggskraft (kap. 7.2)'));
-c.push(P(`NS-EN 1993-1-5 kap. 6, endeopplegg (type c) med s_{s} = 98 mm og c = 0: h_{w} = ${fmt(web.hw, 0)} mm, k_{F} = 2 + 6 (s_{s} + c) / h_{w} = ${fmt(web.kF)}, F_{cr} = 0,9 k_{F} E t_{w}³ / h_{w} = ${fmt(web.Fcr, 0)} kN, l_{y} = l_{e} + t_{f} · √(m_{1} + m_{2}) = 98 + 8,0 · √17,2 = ${fmt(web.ly, 0)} mm (ligning 6.12, med m_{1} = b_{f} / t_{w} = 17,2 og m_{2} = 0 fordi λ_{F} < 0,5), λ_{F} = √(l_{y} t_{w} f_{y} / F_{cr}) = ${fmt(web.lamF)}, χ_{F} = 0,5 / λ_{F} ≤ 1,0, F_{Rd} = f_{y} χ_{F} l_{y} t_{w} / γ_{M1} = ${fmt(web.FRd, 0)} kN. Nedre variant med s_{s} = 0 i ligning (6.10): l_{y} = 2 t_{f} (1 + √m_{1}) = ${fmt(web.ly_ss0, 0)} mm og F_{Rd} = ${fmt(web.FRd_ss0, 0)} kN.`));
+c.push(P(`NS-EN 1993-1-5 kap. 6, endeopplegg (type c) med s_{s} = 98 mm og c = 0: h_{w} = ${fmt(web.hw, 0)} mm, k_{F} = 2 + 6 (s_{s} + c) / h_{w} = ${fmt(web.kF)}, F_{cr} = 0,9 k_{F} E t_{w}³ / h_{w} = ${fmt(web.Fcr, 0)} kN, l_{y} = l_{e} + t_{f} · √(m_{1} + m_{2}) = 98 + 8,0 · √17,2 = ${fmt(web.ly, 1)} mm (ligning 6.12, med m_{1} = b_{f} / t_{w} = 17,2 og m_{2} = 0 fordi λ_{F} < 0,5), λ_{F} = √(l_{y} t_{w} f_{y} / F_{cr}) = ${fmt(web.lamF)}, χ_{F} = 0,5 / λ_{F} ≤ 1,0, F_{Rd} = f_{y} χ_{F} l_{y} t_{w} / γ_{M1} = ${fmt(web.FRd, 0)} kN. Nedre variant med s_{s} = 0 i ligning (6.10): l_{y} = 2 t_{f} (1 + √m_{1}) = ${fmt(web.ly_ss0, 0)} mm og F_{Rd} = ${fmt(web.FRd_ss0, 0)} kN.`));
 c.push(H2('A.3  Stendere (kap. 7.3)'));
 c.push(P('NS-EN 1995-1-1 pkt. 6.3.2 med β_{c} = 0,2: λ_{rel} = (λ / π) · √(f_{c,0,k} / E_{0,05}), k = 0,5 (1 + β_{c} (λ_{rel} − 0,3) + λ_{rel}²), k_{c} = 1 / (k + √(k² − λ_{rel}²)), N_{Rd} = 2 · k_{c} · f_{c,0,d} · b · h. C24: f_{c,0,k} = 21 N/mm², f_{m,k} = 24 N/mm², E_{0,05} = 7 400 N/mm². C18: 18, 18 og 6 000 N/mm². Eksentrisk last: N / N_{Rd} + (N · e / W) / f_{m,d} med e = 98 / 6 = 16 mm.'));
 const arow = (key, name) => [name, fmt(st[key].C24.strong.lam, 0), fmt(st[key].C24.strong.kc, 3), fmt(st[key].C24.strong.fc0d, 2), fmt(st[key].C24.strong.NRd, 1),

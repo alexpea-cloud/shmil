@@ -69,14 +69,14 @@ def build(out_svg):
         s.line(X(xa) + 0.2, Y(Z_BOT), X(xb) - 0.2, Y(Z_BOT), (PAPER, 0.9, None))      # åpen bunn: fundament ikke kjent
         s.breakline(X(xa) - 1.5, Y(Z_BOT), X(xb) + 1.5, Y(Z_BOT))
     # IPN 200
-    s.ibeam_side(*RR(X_IPN[0], Z_IPNB, X_IPN[1], Z_J1B), tf=0.0113 * K, label="IPN 200 – eksisterende", size=T_S)
+    s.ibeam_side(*RR(X_IPN[0], Z_IPNB, X_IPN[1], Z_J1B), tf=0.0113 * K, label="IPN 200 (alder ikke dokumentert)", size=T_S)
     # stålkonsoll i grunnmuren – vist skjematisk (utforming og innfesting er ikke dokumentert)
     cxa, cza = X_FOUND[0], Z_IPNB
     s.rect(*RR(cxa - 0.14, cza - 0.13, cxa, cza), (STEEL, 0.3, "1.4 0.8"), fill="#eef3f8")
     s.text(X(cxa - 0.07), Y(cza - 0.065) + 1.0, "?", size=T_M, weight=700, fill=STEEL, anchor="middle")
     # gulvbjelker 48 x 196 (snittet) og gulvbord
     for xj in JOISTS1:
-        s.timber_section(*RR(xj - 0.024, Z_J1B, xj + 0.024, Z_J1T), new=(xj == 0.0))
+        s.timber_section(*RR(xj - 0.024, Z_J1B, xj + 0.024, Z_J1T))
     s.timber_side(*RR(X_CHIM[1], Z_J1T, X_LOG[0], 0.0), grain=None)
     # tømmerstokk 148 x 148 over grunnmuren
     s.timber_section(*RR(X_LOG[0], -0.148, X_LOG[1], 0.0))
@@ -109,9 +109,9 @@ def build(out_svg):
     s.text(X(1.95) + 2.2, Y(1.03) + 2.0, "underkant stålbjelke", size=T_XS, fill=INK2)
     # opplegg 98 mm
     s.dim((X(-0.049), Y(Z_BB)), (X(0.049), Y(Z_BB)), 4.6, "ca. 98", size=T_XS, text_off=0.6, weight=600, side=-1,
-          text_shift=4.0)
+          text_shift=8.6)
     s.dim((X(L - 0.049), Y(Z_BB)), (X(L + 0.049), Y(Z_BB)), 4.6, "ca. 98", size=T_XS, text_off=0.6, weight=600, side=-1,
-          text_shift=-4.0)
+          text_shift=-8.6)
     # betongkloss
     yb1 = Y(Z_BOT) + 5.0
     s.dim((X(X_BLOCK[0]), yb1), (X(0.0), yb1), 0, "ca. 0,30", ext=False, size=T_S)
@@ -166,11 +166,11 @@ def build(out_svg):
     s.scalebar(X(1.25), Y(Z_BOT) + 6.0, K, meters=(0, 0.5, 1), sub=0.1)
     s.text(X(1.25) + K + 8.0, Y(Z_BOT) + 10.0, "Målestokk gjelder ved utskrift i A3.", size=T_XS, fill=INK2)
     # tegnforklaring for snittet
-    s.legend_row(22.0, 27.2, [("steel", "stål"), ("timber_new", "tre, montert 2018"), ("timber", "tre, eksisterende"),
+    s.legend_row(22.0, 27.2, [("steel", "stål"), ("timber_new", "tre, montert 2018"), ("timber", "tre, alder ikke dokumentert"),
                               ("conc", "betong"), ("brick", "tegl (bak snittet)"), ("unknown", "ikke dokumentert – vist skjematisk"),
                               ("react", "oppleggskraft")])
-    s.text(22.0, 31.0, "B1 og stenderne er fra 2018. For IPN 200, betongkloss og stålkonsoll er alderen ikke dokumentert.",
-           size=T_XS, fill=INK2)
+    s.text(22.0, 31.0, "B1 og stenderne er fra 2018, og fire av bjelkene i bjelkelaget over B1 (ikke skilt ut). For øvrig treverk, IPN 200, "
+           "betongkloss og stålkonsoll er alderen ikke dokumentert.", size=T_XS, fill=INK2)
 
     # ================================================================ høyre kolonne: detalj D1 (1:10)
     cx, cw = 266.0, 142.0
@@ -191,7 +191,7 @@ def build(out_svg):
     # IPN 200 i tverrsnitt (b = 90, tw = 7,5, tf = 11,3)
     s.ibeam_section(DX(0.0), DY(Z_J1B), 0.200 * DK, 0.090 * DK, 0.0075 * DK, 0.0113 * DK)
     # gulvbjelke 48 x 196 sett fra siden, gulvbord
-    s.timber_side(*DR(-0.44, Z_J1B, 0.46, Z_J1T), grain="h", new=True, n=5)
+    s.timber_side(*DR(-0.44, Z_J1B, 0.46, Z_J1T), grain="h", n=5)
     s.timber_side(*DR(-0.44, Z_J1T, 0.46, 0.0), grain=None)
     for xe in (-0.44, 0.46):
         s.breakline(DX(xe), DY(0.02), DX(xe), DY(Z_J1B - 0.02))
@@ -227,7 +227,7 @@ def build(out_svg):
     s.leader((DX(0.205), DY(-0.50)), (lx, DY(-0.47)), "Betongkloss", ["lastpunkt ca. 0,60 m inne", "på 0,90 m lang kloss"],
              size=T_XS, tsize=T_XS, color=CONC, line_fill=INK2)
     s.text(DX(0.23), DY(0.10), "pipe (bak)", size=T_XS, fill=BRICK, anchor="middle", weight=600, halo=1.2)
-    yd1 = DY(zb) + 7.4
+    yd1 = DY(zb) + 6.8
     yd1 = s.mtext(cx, yd1 + 2.5, wrap("Kontaktflatene A og B gir trykk vinkelrett på fiber i gulvbjelken. Med bare 48 mm bredde er "
                                       "flatene mindre enn det regnestykket krever (se tabellen under). Faktisk utførelse – om "
                                       "det ligger kubbinger eller svill som fordeler lasten – er ikke dokumentert og må "
@@ -240,7 +240,7 @@ def build(out_svg):
     s.text(cx + cw, yc + 5.2, "IPE 180 · S235 (forutsatt) · L = 3,63 m", size=T_XS, fill=INK2, anchor="end")
     s.text(cx, yc + 9.0, "Tiltakshavers overslag til gjennomgang – ikke kontrollert av foretak med ansvarsrett.", size=T_XS,
            fill=AMBER, weight=600)
-    yc += 10.6
+    yc += 10.0
     # statisk system + momentdiagram (venstre halvdel), laster (høyre halvdel)
     wl = 60.0
     y_sys = static_system(s, cx + 3.0, yc, wl - 6.0, L,
@@ -248,13 +248,13 @@ def build(out_svg):
                           reactions=(f"{num(r1['VEd'], 1)} kN", f"{num(r1['VEd'], 1)} kN"),
                           dims=[(0, L, "3,63")], h_load=6.0)
     curve = [(L * i / 60, r1["qEd"]["forenklet"] * (L * i / 60) * (L - L * i / 60) / 2) for i in range(61)]
-    y_m = moment_diagram(s, cx + 3.0, y_sys + 1.0, wl - 6.0, L, curve, h=8.0, x_max=L / 2,
+    y_m = moment_diagram(s, cx + 3.0, y_sys + 1.0, wl - 6.0, L, curve, h=7.2, x_max=L / 2,
                          label=f"M_{{Ed}} = {num(r1['MEd'], 1)} kNm")
     gp = r1["g_parts"]
     y_lt = load_table(s, cx + wl + 4.0, yc, cw - wl - 4.0, [
         ("Etasjeskille 1,2 / 2,0 kN/m² × 2,55 m", num(gp["floor"]), num(r1["qk"]), ""),
         ("Bodvegg i 2. etasje (anslått)", num(gp["wall"]), "–", ""),
-        ("Egenvekt IPE 180", num(gp["steel"]), "–", ""),
+        ("Egenvekt IPE 180", num(gp["steel"], 3), "–", ""),
         ("Sum, kN/m", num(r1["gk"]), num(r1["qk"]), num(r1["qEd"]["forenklet"])),
     ], title="Laster, kN/m", colfrac=(0.58, 0.14, 0.14, 0.14),
         note="q_{Ed} = 1,35 g_{k} + 1,5 q_{k} (forenklet, på sikker side av NS-EN 1990 lign. 6.10a/b).")
@@ -267,14 +267,15 @@ def build(out_svg):
         ("Nedbøyning g + q, mm (L/300)", num(r1["delta_gq"], 1), num(r1["delta_lim"], 1), r1["util_delta"], None, None),
         ("Steg ved opplegg, kN", num(r1["VEd"], 1), f"{num(sup['web']['FRd_ss0'], 0)}–{num(sup['web']['FRd'], 0)}",
          r1["VEd"] / sup["web"]["FRd_ss0"], None, None),
-        ("Stendere O1 (forutsatt C24, fastholdt), kN", num(r1["VEd"], 1), num(st["strong"]["NRd"], 0), st["util_ecc"], AMBER, None),
+        ("Stendere O1 (forutsatt C24, fastholdt), kN", num(r1["VEd"], 1), num(st["strong"]["NRd"], 0), st["util_ecc"], AMBER,
+         f"{num(st['util_strong'] * 100, 0)}–{num(st['util_ecc'] * 100, 0)} %"),
         ("Følsomhet: lastbredde 3,71 m, kNm", num(r1s["MEd"], 1), num(res["MRd_el"], 1), r1s["util_M"], AMBER, None),
         ("Vipping uten fastholding av overflensen, kNm", num(r1["MEd"], 1), f"{num(r1['ltb']['MbRd_6322'], 1)}–{num(r1['ltb']['MbRd_6323'], 1)}",
          None, AMBER, f"{num(r1['util_ltb_6323'] * 100, 0)}–{num(r1['util_ltb_6322'] * 100, 0)} %"),
         ("Trykk ⊥ fiber, flate A og B (48 mm), N/mm²", f"{num(c90['sigma_joist_only'], 1)}–{num(c90['sigma_min'], 1)}",
          num(c90["C24"]["fRd"], 1), None, RED, "ikke dokumentert"),
     ]
-    yk = check_table(s, cx, yk, cw, rows)
+    yk = check_table(s, cx, yk, cw, rows, note="Stendere: laveste tall er med sentrisk last, høyeste med 16 mm eksentrisk last (notat kap. 7.3).")
 
     # ================================================================ nederst til venstre: lastvei, forutsetninger, kontrollpunkter
     by = Y(Z_BOT) + 15.5
@@ -282,18 +283,18 @@ def build(out_svg):
     s.notebox(22.0, by, bw1, "Lastvei B1", [
         "Bjelkelaget i 2. etasje ligger på overflensen. B1 bærer en lastbredde på 2,55 m og bodveggen i 2. etasje.",
         "O1: stendere → gulvbjelke → IPN 200 → betongkloss. O2: stendere → tømmerstokk → grunnmur.",
-        "Etter opplysningene sto den fjernede veggen i samme linje, over IPN 200. Lasten er nå samlet i to opplegg. "
-        "Ikke kontrollert.",
+        "Det er lagt til grunn at den fjernede veggen sto i samme linje, over IPN 200. Ikke dokumentert. Lasten er nå "
+        "samlet i to opplegg.",
     ], size=T_XS, tsize=T_S, accent=STEEL_D, pad=2.2)
     s.notebox(22.0 + bw1 + 3.0, by, bw2, "Forutsetninger", [
         "S235 og C24 er forutsatt, ikke dokumentert.",
         "Bodveggen i 2. etasje bærer ikke taklast (vurdert ved befaring). Egenlast 1,2 kN/m² gjelder lett bjelkelag.",
-        "Bjelkelaget regnes som separate felt (3,60 og 1,50 m). Full kontinuitet er vist som følsomhet.",
+        "Bjelkelaget regnes som separate felt (3,60 og 1,50 m). Full kontinuitet er vist som følsomhet (ikke øvre grense).",
         "Momentkapasiteten forutsetter at bjelkelaget holder overflensen sideveis, og at stenderne er sideveis fastholdt.",
     ], size=T_XS, tsize=T_S, accent=INK3, pad=2.2)
     s.notebox(22.0 + bw1 + bw2 + 6.0, by, bw3, "Kontrollpunkter på stedet", [
         "Bjelkelagets feste eller anlegg mot overflensen langs hele B1.",
-        "Bjelkeendenes anlegg og feste til stenderne. Er endene sikret mot velting?",
+        "Bjelkeendenes anlegg og feste til stenderne. Er endene holdt mot vridning?",
         "Trykkflater under stenderne ved O1 (kubbinger eller svill?) og mot IPN-flensen. Står stenderne rett over IPN-en?",
         "O1 er sidestøttet av pipa. Pipa kan ikke rives uten ny avstivning.",
         "Tømmerstokk og grunnmur under O2. Betongkloss, IPN 200 og stålkonsoll: tilstand og underlag.",

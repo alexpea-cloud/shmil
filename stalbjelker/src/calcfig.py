@@ -72,7 +72,7 @@ def check_table(s: Sheet, x, y, w, rows, *, title="Regnet utnyttelse (overslag)"
         s.text(hx + c_ed + c_rd - 1.0, yy + rh * 0.70, rd, size=T_XS, anchor="end", fill=INK2)
         if util is not None:
             s.utilbar(hx + c_ed + c_rd + 1.5, yy + rh * 0.36, c_bar - 3.0, util, color=color or STEEL_D)
-            s.text(x + w, yy + rh * 0.70, f"{num(util * 100, 0)} %", size=T_XS, weight=700, anchor="end",
+            s.text(x + w, yy + rh * 0.70, comment or f"{num(util * 100, 0)} %", size=T_XS, weight=700, anchor="end",
                    fill=color or INK)
         elif comment:
             s.text(x + w, yy + rh * 0.70, comment, size=T_XS, weight=600, anchor="end", fill=color or INK2)

@@ -31,7 +31,8 @@ function runs(text, o = {}) {
                                     ...(hl ? { highlight: 'yellow' } : {}), ...extra, text: buf }));
     buf = '';
   };
-  const s = String(text);
+  // hardt mellomrom mellom tall og enhet, slik at de ikke skilles ved linjeskift
+  const s = String(text).replace(/(\d) (?=(?:kNm|kN\/m²|kN\/m³|kN\/m|kN|N\/mm²|mm²|mm|cm²|cm³|cm⁴|cm|m²|m³|m|%|kg\/m)(?![\wæøåÆØÅ]))/g, '$1\u00a0');
   while (i < s.length) {
     if (s.startsWith('[[', i)) { flush(); hl = true; buf = '['; i += 2; continue; }
     if (s.startsWith(']]', i)) { buf += ']'; flush(); hl = false; i += 2; continue; }
@@ -134,14 +135,16 @@ function tbl(rows, widths, o = {}) {
 }
 
 /** Regnelinjer: [[størrelse, uttrykk], ...] som rammeløs tabell. */
-function calc(lines, widths = [2700, 6710]) {
+function calc(lines, widths = [2700, 6710], keep = true) {
   const nb = { top: none, bottom: none, left: none, right: none };
   return new Table({
     width: { size: widths[0] + widths[1], type: WidthType.DXA }, columnWidths: widths, layout: TableLayoutType.FIXED,
-    rows: lines.map(([a, b]) => new TableRow({
+    rows: lines.map(([a, b], ri) => new TableRow({
       cantSplit: true,
-      children: [cell(a, widths[0], { borders: nb, color: INK2, size: 19, valign: VerticalAlign.TOP, padV: 28 }),
-                 cell(b, widths[1], { borders: nb, size: 19, valign: VerticalAlign.TOP, padV: 28 })],
+      children: [cell(a, widths[0], { borders: nb, color: INK2, size: 19, valign: VerticalAlign.TOP, padV: 28,
+                                   keepNext: keep && ri < lines.length - 1 }),
+                 cell(b, widths[1], { borders: nb, size: 19, valign: VerticalAlign.TOP, padV: 28,
+                                   keepNext: keep && ri < lines.length - 1 })],
     })),
   });
 }

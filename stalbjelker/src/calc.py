@@ -515,6 +515,9 @@ def calc_supports(R, dur, R610=None):
 # ==========================================================================
 # Sideavstivning – nødvendig fastholdingskraft vs. friksjon (vurdering)
 # ==========================================================================
+SEG_TWO = 1.21          # m – største frie lengde med to fastholdingspunkter i spennet (L/3 for B1)
+
+
 def restraint(b, load_on_flange_kN, L_m, seg_m):
     lever = (IPE180["h"] - IPE180["tf"]) / 1000.0
     Nf = b["MEd"] / lever                                   # trykkraft i overflens
@@ -588,6 +591,12 @@ def main():
                              util=b2r["util_M"], delta=b2r["delta_gq"],
                              util_ltb_6322=b2r["MEd"] / b2["ltb"]["MbRd_6322"],
                              util_ltb_6323=b2r["MEd"] / b2["ltb"]["MbRd_6323"])
+    # fastholding i følsomhetstilfellene: ett punkt (segment som i hovedberegningen) og to punkter (fri lengde 1,21 m)
+    seg2 = ltb_segment(SEG_TWO)
+    for bb, sens_M in ((b1, b1s["MEd"]), (b2, b2r["MEd"])):
+        t = bb["restraint"]
+        t["util_seg_sens"] = sens_M / t["seg"]["MbRd"]
+        t["two"] = dict(seg=seg2, util=bb["MEd"] / seg2["MbRd"], util_sens=sens_M / seg2["MbRd"])
     # ugunstige anslag samtidig: trapp midt i søndre løp, stripefordeling 0,15/0,45/0,60 og tyngre gavlvegg
     gable_heavy = 1.0 * H_GABLE * kR
     b2u = calc_b2("snø", stair_x=1.61, gable_P=gable_heavy, strips=(0.15, 0.45, 0.60))
@@ -700,3 +709,5 @@ if __name__ == "__main__":
         t = r[nm]["restraint"]
         print(f"{nm} fastholding: Nf {_fmt(t['Nf'],0)} kN, 2,5 % = {_fmt(t['F_25pct'],1)} kN, last på flens {_fmt(t['load'],1)} kN, mu_req {_fmt(t['mu_req'],3)}, "
               f"friksjon(0,2) {_fmt(t['friction_02'],1)} kN; ett punkt: segment {_fmt(t['seg']['Lseg'])} m, Mb,Rd {_fmt(t['seg']['MbRd'],1)} -> {_fmt(t['util_seg']*100,0)} %")
+        print(f"   følsomhet med ett punkt: {_fmt(t['util_seg_sens']*100,0)} %; to punkter ({_fmt(t['two']['seg']['Lseg'])} m): Mb,Rd {_fmt(t['two']['seg']['MbRd'],1)} -> "
+              f"{_fmt(t['two']['util']*100,0)} % / følsomhet {_fmt(t['two']['util_sens']*100,0)} %")
