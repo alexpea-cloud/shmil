@@ -106,7 +106,7 @@ c.push(P('Før 2018 sto det bærende vegger der bjelkene ligger i dag, og en hj�
 c.push(H2('2.2  B1 – kjøkkenbjelke'));
 c.push(P('B1 er en IPE 180 med spenn 3,63 m mellom oppleggssentrene. Bjelkelaget i 2. etasje ligger oppå overflensen, på tvers av bjelken. Det er 3,60 m fra ytterveggen til B1 og 1,50 m fra B1 til bodveggen i 1. etasje. Bjelkelaget består av eldre gulvbjelker og fire nye bjelker fra 2018 som går fra ytterveggen til ca. 0,5 m forbi B1.'));
 c.push(...bullets([
-  '**O1, ved teglsteinspipa:** to stendere 48 × 98 mm, skrudd fast i pipa, med ca. 98 mm oppleggslengde for bjelken. Stenderne står på en gulvbjelke 48 × 196 mm, som ligger på en IPN 200 i krypkjelleren. IPN-en hviler på en betongkloss. Lastpunktet er anslått til ca. 0,60 m inne på den 0,90 m lange klossen.',
+  '**O1, ved teglsteinspipa:** to stendere 48 × 98 mm, skrudd fast i pipa, med ca. 98 mm oppleggslengde for bjelken. Stenderne står på en gulvbjelke 48 × 198 mm, som ligger på en IPN 200 i krypkjelleren. IPN-en hviler på en betongkloss. Lastpunktet er anslått til ca. 0,60 m inne på den 0,90 m lange klossen.',
   '**O2, mot grunnmuren:** to stendere 48 × 148 mm i døråpningen i tømmerveggen, som er den opprinnelige ytterveggen (ca. 98 mm oppleggslengde og 50 mm videre inn i veggen). Stenderne står på en tømmerstokk 148 × 148 mm rett over grunnmuren, som er ca. 0,25 m bred.',
 ]));
 c.push(H2('2.3  B2 – gangbjelke'));
@@ -120,7 +120,7 @@ c.push(...bullets([
 c.push(P('Oppleggene er:', { after: 60 }));
 c.push(...bullets([
   '**O3, mot grunnmuren:** som O2 – to stendere 48 × 148 mm på tømmerstokk 148 × 148 mm over grunnmuren.',
-  '**O4, ved betongsøylen:** to stendere 48 × 98 mm, sidestøttet. De står på en gulvbjelke 48 × 196 mm med sidekubbinger. Under gulvbjelken ligger en stålplate (opplyst 400 mm) og en stolpesko på en betongsøyle, Ø ca. 200 mm, rett under stenderne.',
+  '**O4, ved betongsøylen:** to stendere 48 × 98 mm, sidestøttet. De står på en gulvbjelke 48 × 198 mm med sidekubbinger. Under gulvbjelken ligger en stålplate (opplyst 400 mm) og en stolpesko på en betongsøyle, Ø ca. 200 mm, rett under stenderne.',
 ]));
 c.push(P('Den opprinnelige hjørnestolpen ble fjernet i 2018. Målene 2,25 m og 1,15 m på tegningene viser hvor stolpen sto. De beskriver ikke dagens opplegg, og det er ingen utkraging i dag.'));
 c.push(H2('2.4  Taket'));

@@ -21,7 +21,7 @@ J2_H, BOARD2 = 0.148, 0.037                 # bjelkelag og gulv i 2. etasje
 Z_F2 = Z_BT + J2_H + BOARD2                 # overkant gulv 2. etasje / taktro under terrassen
 Z_TERR = Z_F2 + 0.064                       # overkant terrassebord
 Z_TOP = Z_F2 + 0.36                         # bruddlinje i tømmervegg og gavlvegg
-BOARD1, J1_H = 0.022, 0.196                 # gulvbord og gulvbjelker 48 x 196 i 1. etasje
+BOARD1, J1_H = 0.022, 0.198                 # gulvbord og gulvbjelker 48 x 198 i 1. etasje
 Z_J1T, Z_J1B = -BOARD1, -BOARD1 - J1_H
 Z_COLT = -0.278                             # overkant betongsøyle: søyleskoens stamme står litt opp av betongen (etter bilde, ikke målt)
 Z_FT = -0.830                               # overkant betongfundament, under terreng (tegnet enkelt, ikke målsatt)
@@ -113,7 +113,7 @@ def build(out_svg):
     s.concrete(*RR(X_FOOT[0], Z_BOT_F, X_FOOT[1], Z_FT))                         # betongfundament, under terreng
     open_bottom(*X_FOOT, zb=Z_BOT_F)
     s.concrete(*RR(X_COL[0], Z_FT, X_COL[1], Z_COLT))                            # betongsøyle Ø ca. 200
-    # gulvbjelker 48 x 196 (snittet) og gulv i 1. etasje
+    # gulvbjelker 48 x 198 (snittet) og gulv i 1. etasje
     # kubbinger mellom gulvbjelkene ved opplegget (stykker på tvers, sett fra siden; antall og plass er tegnet enkelt)
     for xa, xb in ((JOISTS1[-2] + 0.024, L - 0.024), (L + 0.024, X_END)):
         s.timber_side(*RR(xa, Z_J1B, xb, Z_J1T), grain="h", n=2)
@@ -218,7 +218,7 @@ def build(out_svg):
     right(X_TJ[0], zj, "Takbjelker under takterrassen", color=BLUE)
     s.circle(X(X_TJ[1]), Y(zj), 0.42, None, fill=BLUE)
     right(L + 0.12, -0.075, "Kubbinger mellom gulvbjelkene")
-    right(L + 0.024 + 0.006, Z_J1B + 0.028, "Gulvbjelke 48 × 196", ["i innstøpt søylesko (U-beslag)"])
+    right(L + 0.024 + 0.006, Z_J1B + 0.028, "Gulvbjelke 48 × 198", ["i innstøpt søylesko (U-beslag)"])
     right(X_COL[1], -0.50, "Betongsøyle Ø ca. 200", ["støpt i forskalingsrør"])
     right(X_FOOT[1], -0.915, "Betongfundament")
 

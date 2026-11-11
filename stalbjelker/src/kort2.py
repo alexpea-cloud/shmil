@@ -19,7 +19,7 @@ Z_BB, Z_BT = H_STUD, H_STUD + 0.18          # stålbjelke under-/overkant
 J2_H, BOARD2 = 0.148, 0.037                 # gulvbjelker og gulv i 2. etasje
 Z_F2 = Z_BT + J2_H + BOARD2                 # overkant gulv 2. etasje
 Z_TOP = Z_F2 + 0.27                         # bruddlinje i pipe og tømmervegg
-BOARD1, J1_H = 0.022, 0.196                 # gulvbord og gulvbjelker 48 x 196 i 1. etasje
+BOARD1, J1_H = 0.022, 0.198                 # gulvbord og gulvbjelker 48 x 198 i 1. etasje
 Z_J1T, Z_J1B = -BOARD1, -BOARD1 - J1_H
 Z_OLDB = Z_J1B - 0.200                      # underkant eldre stålbjelke
 Z_GROUND = -0.800                           # terreng i krypkjelleren (tegnet enkelt, ikke målsatt)
@@ -107,7 +107,7 @@ def build(out_svg):
     open_bottom(*X_FOUND)
     # eldre stålbjelke i krypkjelleren, rett under B1
     s.ibeam_side(*RR(X_OLD[0], Z_OLDB, X_OLD[1], Z_J1B), tf=0.0113 * K, label="eldre stålbjelke i krypkjelleren", size=T_S)
-    # gulvbjelker 48 x 196 (snittet) og gulv i 1. etasje
+    # gulvbjelker 48 x 198 (snittet) og gulv i 1. etasje
     for xj in JOISTS1:
         s.timber_section(*RR(xj - 0.024, Z_J1B, xj + 0.024, Z_J1T))
     s.timber_side(*RR(X_CHIM[1], Z_J1T, X_LOG[0], 0.0), grain=None)
@@ -165,7 +165,7 @@ def build(out_svg):
     s.leader((X(X_LOG[0]), Y(zt - 0.20)), (X(X_LOG[0]) - 10.0, Y(zt)), "Ved tømmerveggen",
              ["2 stendere 48 × 148", "på tømmerstokk 148 × 148", "over gammel grunnmur"], align="right")
     s.leader((X(0.024), Y(Z_J1B + 0.10)), (X(0.049) + 10.0, Y(0.34)), "Under gulvet ved pipa",
-             ["gulvbjelke 48 × 196,", "eldre stålbjelke og betongkloss"])
+             ["gulvbjelke 48 × 198,", "eldre stålbjelke og betongkloss"])
     s.leader((X(JOISTS2[1] + 0.012), Y(Z_BT + 0.085)), (X(1.20), Y(Z_TOP) + 2.6), "Gulvbjelker 2. etasje",
              ["på overflensen (vist i prinsipp)"])
 

@@ -19,7 +19,7 @@ Z_BB, Z_BT = H_STUD, H_STUD + 0.18
 J2_H, BOARD2 = 0.148, 0.037
 Z_F2 = Z_BT + J2_H + BOARD2                 # overkant gulv 2. etasje / taktro
 Z_TERR = Z_F2 + 0.064                       # overkant terrassebord
-BOARD1, J1_H = 0.022, 0.196
+BOARD1, J1_H = 0.022, 0.198
 Z_J1T, Z_J1B = -BOARD1, -BOARD1 - J1_H
 Z_COLT = -0.278                             # overkant betongsøyle
 Z_GROUND = -0.800                           # terreng i krypkjeller (ikke målt – vist omtrentlig)
@@ -177,7 +177,7 @@ def build(out_svg):
              ["2 stendere 48 × 148 i døråpningen i", "tømmerveggen: oppleggslengde ca. 98 mm", "+ 50 mm inn i veggen. Står på tømmer-",
               "stokk 148 × 148 rett over grunnmuren", "(ca. 0,25 m)."], size=T_XS, tsize=T_S)
     s.leader((X(L - 0.049), Y(0.62)), (X(L - 0.049) - 6.0, Y(0.72)), "O4 – opplegg ved betongsøylen",
-             ["2 stendere 48 × 98, sidestøttet", "(utførelse ikke kontrollert).", "Videre: gulvbjelke 48 × 196 med",
+             ["2 stendere 48 × 98, sidestøttet", "(utførelse ikke kontrollert).", "Videre: gulvbjelke 48 × 198 med",
               "sidekubbinger → stålplate →", "stolpesko → betongsøyle Ø ca. 200.", "Se detalj D2."], size=T_XS, tsize=T_S,
              align="right")
     s.leader((X(X_GABLE + 0.06), Y(1.02)), (X(X_GABLE + 0.06) + 4.0, Y(1.14)), "Opprinnelig hjørnestolpe",
@@ -306,7 +306,7 @@ def build(out_svg):
     zt, zb = 0.185, -0.50
     s.concrete(*DR(X_COL[0], zb, X_COL[1], Z_COLT))
     s.breakline(DX(X_COL[0]) - 1.5, DY(zb), DX(X_COL[1]) + 1.5, DY(zb))
-    # gulvbjelke 48 x 196 (snittet) og sidekubbinger (stiplet – omfang ikke dokumentert)
+    # gulvbjelke 48 x 198 (snittet) og sidekubbinger (stiplet – omfang ikke dokumentert)
     s.timber_section(*DR(3.4 - 0.024, Z_J1B, 3.4 + 0.024, Z_J1T))
     for xk in (3.4 - 0.048, 3.4 + 0.048):
         s.rect(*DR(xk - 0.024, Z_J1B, xk + 0.024, Z_J1T), (TIMBER, 0.3, "1.6 0.9"), fill=TIMBER_F)

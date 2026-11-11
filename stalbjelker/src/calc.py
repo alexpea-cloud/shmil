@@ -480,7 +480,7 @@ def calc_supports(R, dur, R610=None):
         for cls in ("C24", "C18"):
             c90[key][cls]["util"] = c90[key]["sigma"] / c90[key][cls]["fRd"]
             c90[key][cls]["util_98"] = c90[key]["sigma_98"] / c90[key][cls]["fRd"]
-    # gulvbjelke 48 x 196 under 2 x 48 x 98
+    # gulvbjelke 48 x 198 under 2 x 48 x 98
     #   flate A: stendere -> gulvbjelke, kontaktlengde 96 mm; flate B (bare O1): gulvbjelke -> IPN-flens, 90 mm
     for key in ("B1_pipe", "B2_col"):
         A_a = 48.0 * (96 + 60)
@@ -496,11 +496,11 @@ def calc_supports(R, dur, R610=None):
                                  util_with_blocking=c90[key]["sigma_with_blocking"] / f,
                                  util_with_blocking_kc1=c90[key]["sigma_with_blocking"] / (f / KC90))
     out["c90"] = c90
-    # --- skjærkapasitet for én gulvbjelke 48 x 196 (kan ikke føre oppleggskraften sideveis)
+    # --- skjærkapasitet for én gulvbjelke 48 x 198 (kan ikke føre oppleggskraften sideveis)
     sh = {}
     for key in ("B1_pipe", "B2_col"):
         fvd = KMOD[dur[key]] * TIMBER["C24"]["fvk"] / GM_TIMBER
-        sh[key] = dict(VRd_kcr067=2 / 3 * 0.67 * 48 * 196 * fvd / 1e3, VRd_kcr1=2 / 3 * 48 * 196 * fvd / 1e3)
+        sh[key] = dict(VRd_kcr067=2 / 3 * 0.67 * 48 * 198 * fvd / 1e3, VRd_kcr1=2 / 3 * 48 * 198 * fvd / 1e3)
     out["joist_shear"] = sh
     # --- betongsøyle Ø200 og grunntrykk uten utvidet fundament
     A_col = math.pi * 100 ** 2

@@ -16,7 +16,7 @@ L = 3.63
 H_STUD = 2.07
 Z_BB, Z_BT = H_STUD, H_STUD + 0.18          # stålbjelke under-/overkant
 J2_H, BOARD2 = 0.148, 0.037                 # bjelkelag og gulv 2. etasje (vist i prinsipp)
-BOARD1, J1_H = 0.022, 0.196                 # gulvbord og gulvbjelker 48 x 196 i 1. etasje
+BOARD1, J1_H = 0.022, 0.198                 # gulvbord og gulvbjelker 48 x 198 i 1. etasje
 Z_J1T, Z_J1B = -BOARD1, -BOARD1 - J1_H
 Z_IPNB = Z_J1B - 0.200
 Z_GROUND = -0.800                           # terreng i krypkjeller (ikke målt – vist omtrentlig)
@@ -74,7 +74,7 @@ def build(out_svg):
     cxa, cza = X_FOUND[0], Z_IPNB
     s.rect(*RR(cxa - 0.14, cza - 0.13, cxa, cza), (STEEL, 0.3, "1.4 0.8"), fill="#eef3f8")
     s.text(X(cxa - 0.07), Y(cza - 0.065) + 1.0, "?", size=T_M, weight=700, fill=STEEL, anchor="middle")
-    # gulvbjelker 48 x 196 (snittet) og gulvbord
+    # gulvbjelker 48 x 198 (snittet) og gulvbord
     for xj in JOISTS1:
         s.timber_section(*RR(xj - 0.024, Z_J1B, xj + 0.024, Z_J1T))
     s.timber_side(*RR(X_CHIM[1], Z_J1T, X_LOG[0], 0.0), grain=None)
@@ -127,7 +127,7 @@ def build(out_svg):
     xl = X(0.049) + 5.0
     s.leader((X(0.049), Y(0.62)), (xl + 4, Y(0.86)), "O1 – opplegg ved teglsteinspipa",
              ["2 stendere 48 × 98, skrudd fast i pipa.", "Oppleggslengde for B1: ca. 98 mm.",
-              "Videre lastvei: gulvbjelke 48 × 196 →", "IPN 200 → betongkloss. Se detalj D1."], size=T_XS, tsize=T_S)
+              "Videre lastvei: gulvbjelke 48 × 198 →", "IPN 200 → betongkloss. Se detalj D1."], size=T_XS, tsize=T_S)
     xr = X(X_LOG[0]) - 5.0
     s.leader((X(X_LOG[0]), Y(0.62)), (xr - 4, Y(0.86)), "O2 – opplegg mot grunnmuren",
              ["2 stendere 48 × 148 i døråpningen i tømmerveggen:", "oppleggslengde ca. 98 mm + 50 mm inn i veggen.",
@@ -145,7 +145,7 @@ def build(out_svg):
     s.text(X(X_LOGWALL[1]) + 2.6, Y(1.25), "tømmervegg (opprinnelig yttervegg)", size=T_XS, fill=TIMBER, anchor="middle",
            rot=90, weight=600)
     # under gulv
-    s.leader((X(1.2 + 0.024), Y(Z_J1B + 0.06)), (X(1.34), Y(Z_IPNB) + 4.6), "Gulvbjelker 48 × 196",
+    s.leader((X(1.2 + 0.024), Y(Z_J1B + 0.06)), (X(1.34), Y(Z_IPNB) + 4.6), "Gulvbjelker 48 × 198",
              ["avstand ikke målt – vist skjematisk"], size=T_XS, tsize=T_XS, color=TIMBER, line_fill=INK2)
     s.leader((X(cxa - 0.14), Y(cza - 0.065)), (X(3.26), Y(Z_IPNB) + 4.6), "Stålkonsoll i grunnmuren",
              ["bærer IPN-enden. Utforming og", "innfesting er ikke dokumentert."],
@@ -190,7 +190,7 @@ def build(out_svg):
     s.breakline(DX(-0.204) - 1.5, DY(zb), DX(0.205) + 1.5, DY(zb))
     # IPN 200 i tverrsnitt (b = 90, tw = 7,5, tf = 11,3)
     s.ibeam_section(DX(0.0), DY(Z_J1B), 0.200 * DK, 0.090 * DK, 0.0075 * DK, 0.0113 * DK)
-    # gulvbjelke 48 x 196 sett fra siden, gulvbord
+    # gulvbjelke 48 x 198 sett fra siden, gulvbord
     s.timber_side(*DR(-0.44, Z_J1B, 0.46, Z_J1T), grain="h", n=5)
     s.timber_side(*DR(-0.44, Z_J1T, 0.46, 0.0), grain=None)
     for xe in (-0.44, 0.46):
@@ -211,14 +211,14 @@ def build(out_svg):
     s.dim((DX(-0.045), DY(Z_IPNB)), (DX(0.045), DY(Z_IPNB)), -3.6, "90", size=T_XS, text_off=0.6, weight=600)
     s.text(DX(0.0), DY(zb) + 5.4, "bredde og underlag ikke målt", size=T_XS, fill=INK2, anchor="middle", italic=True)
     s.scalebar(cx, 26.2, DK, meters=(0, 0.1, 0.2), sub=0.05)
-    s.dim((DX(-0.44), DY(Z_J1T)), (DX(-0.44), DY(Z_J1B)), 4.5, "196", size=T_XS, text_off=0.6)
+    s.dim((DX(-0.44), DY(Z_J1T)), (DX(-0.44), DY(Z_J1B)), 4.5, "198", size=T_XS, text_off=0.6)
     # henvisninger i detaljen
     lx = cx + 100.0
     s.leader((DX(0.048), DY(0.13)), (lx, DY(0.195) - 0.5), "2 stendere 48 × 98", ["98 mm bredde langs B1,", "skrudd fast i pipa"],
              size=T_XS, tsize=T_XS, color=TIMBER, line_fill=INK2)
     s.leader((DX(0.048), DY(-BOARD1)), (lx, DY(0.05)), "Kontaktflate A", ["stendere → gulvbjelke:", "96 × 48 mm (bjelken er", "48 mm bred)"],
              size=T_XS, tsize=T_XS, color=RED, line_fill=INK2)
-    s.leader((DX(0.30), DY(Z_J1B + 0.10)), (lx, DY(-0.135)), "Gulvbjelke 48 × 196", ["ligger på tvers over IPN"], size=T_XS,
+    s.leader((DX(0.30), DY(Z_J1B + 0.10)), (lx, DY(-0.135)), "Gulvbjelke 48 × 198", ["ligger på tvers over IPN"], size=T_XS,
              tsize=T_XS, color=TIMBER, line_fill=INK2)
     s.leader((DX(0.045), DY(Z_J1B)), (lx, DY(-0.25)), "Kontaktflate B", ["gulvbjelke → IPN-flens:", "90 × 48 mm"], size=T_XS,
              tsize=T_XS, color=RED, line_fill=INK2)
