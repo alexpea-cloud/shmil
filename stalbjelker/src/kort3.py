@@ -24,10 +24,10 @@ Z_TOP = Z_F2 + 0.36                         # bruddlinje i tømmervegg og gavlve
 BOARD1, J1_H = 0.022, 0.198                 # gulvbord og gulvbjelker 48 x 198 i 1. etasje
 Z_J1T, Z_J1B = -BOARD1, -BOARD1 - J1_H
 Z_COLT = -0.278                             # overkant betongsøyle: søyleskoens stamme står litt opp av betongen (etter bilde, ikke målt)
-Z_FT = -0.830                               # overkant betongfundament, under terreng (tegnet enkelt, ikke målsatt)
+Z_FT = -0.955                               # betongfundament under terreng: vist stiplet under bruddlinjen, ikke i målestokk
 Z_GROUND = -0.800                           # terreng i krypkjelleren (tegnet enkelt, ikke målsatt)
 Z_BOT = -0.905                              # bruddlinje nederst
-Z_BOT_F = -1.000                            # bruddlinje nederst i betongfundamentet
+Z_BOT_F = -1.075                            # underkant av det stiplede fundamentet
 X_FOUND = (-0.150, 0.100)                   # gammel grunnmur
 X_LOG = (-0.099, 0.049)                     # stendere 48 x 148 og tømmerstokk 148 x 148
 X_LOGWALL = (-0.132, 0.082)                 # tømmerveggen bak snittet
@@ -110,9 +110,10 @@ def build(out_svg):
     # ---------------------------------------------------------------- under gulvet
     s.concrete(*RR(X_FOUND[0], Z_BOT, X_FOUND[1], -0.148))                       # gammel grunnmur
     open_bottom(*X_FOUND)
-    s.concrete(*RR(X_FOOT[0], Z_BOT_F, X_FOOT[1], Z_FT))                         # betongfundament, under terreng
-    open_bottom(*X_FOOT, zb=Z_BOT_F)
-    s.concrete(*RR(X_COL[0], Z_FT, X_COL[1], Z_COLT))                            # betongsøyle Ø ca. 200
+    # betongsøylen fortsetter ned under terreng (brutt); fundamentet under er ikke synlig og vises bare stiplet
+    s.concrete(*RR(X_COL[0], Z_BOT, X_COL[1], Z_COLT))                           # betongsøyle Ø ca. 200
+    open_bottom(*X_COL)
+    s.rect(*RR(X_FOOT[0], Z_BOT_F, X_FOOT[1], Z_FT), (CONC, 0.25, "1.6 1.0"), fill=CONC_F, opacity=0.55)
     # gulvbjelker 48 x 198 (snittet) og gulv i 1. etasje
     # kubbinger mellom gulvbjelkene ved opplegget (stykker på tvers, sett fra siden; antall og plass er tegnet enkelt)
     for xa, xb in ((JOISTS1[-2] + 0.024, L - 0.024), (L + 0.024, X_END)):
@@ -220,7 +221,7 @@ def build(out_svg):
     right(L + 0.12, -0.075, "Kubbinger mellom gulvbjelkene")
     right(L + 0.024 + 0.006, Z_J1B + 0.028, "Gulvbjelke 48 × 198", ["i innstøpt søylesko (U-beslag)"])
     right(X_COL[1], -0.50, "Betongsøyle Ø ca. 200", ["støpt i forskalingsrør"])
-    right(X_FOOT[1], -0.915, "Betongfundament")
+    right(X_FOOT[1], (Z_FT + Z_BOT_F) / 2, "Betongfundament under terreng")
 
     # ---------------------------------------------------------------- høyre kolonne: tegnforklaring, linjal, merknad
     s.text(COL_X, COL_Y, "Tegnforklaring", size=T_M, weight=700)
