@@ -42,7 +42,7 @@ G_FLOOR = 1.2          # kN/m2 etasjeskille (anslått)
 Q_FLOOR = 2.0          # kN/m2 nyttelast kategori A
 G_TERR = 1.2           # kN/m2 takterrasse inkl. takbjelker og himling (anslått)
 Q_TERR = 4.0           # kN/m2 nyttelast takterrasse (som balkong, kategori A)
-SK = 5.0               # kN/m2 snølast på mark brukt i følsomhetsregning (Vefsn generelt 5,0; Mosjøen/langs fjorden 4,0)
+SK = 5.0               # kN/m2 snølast på mark brukt i følsomhetsregning (må kontrolleres mot NA.4.1(901) for byggestedet)
 MU1 = 0.8
 GAMMA_SNOW = 2.0       # kN/m3
 H_GABLE = 3.72         # m, terrassegulv – underkant mønekasse ved mønet (målt)
@@ -592,6 +592,15 @@ def main():
     gable_heavy = 1.0 * H_GABLE * kR
     b2u = calc_b2("snø", stair_x=1.61, gable_P=gable_heavy, strips=(0.15, 0.45, 0.60))
     rob["unfav"] = dict(stair_x=1.61, gable_P=gable_heavy, MEd=b2u["MEd"], util=b2u["util_M"], RB=b2u["RB"])
+    # snøfonn med nyttelast på terrassen som ikke-dominerende last (lign. 6.10b) – følsomhet for pkt. 3.3.2
+    kRj = two_span_mid_reaction(*B2["joist_spans"])
+    both, _ = b2_loads("snø", s_terr=GAMMA_SNOW * H_GABLE)
+    for xj in B2["joist_x"]:
+        both.append(("pt", "T", xj, None, kRj * B2["joist_cc"] * Q_TERR, "Takbjelke – terrassebruk (ikke-dominerende)"))
+    bmb = build_beam(both, COMBOS["6.10b-snø"])
+    xb_, mb_ = bmb.max_M()
+    _, rbb = bmb.reactions()
+    rob["snow_plus_terrace_610b"] = dict(MEd=mb_, util=mb_ / res["MRd_el"], RB=rbb)
     drift = snow_drift()
 
     # opplegg: velg lastvarighet etter største F/kmod (snø: korttid, ellers halvår)

@@ -19,13 +19,14 @@ PROJECT = dict(
     municipality=_P.get("kommune", "[kommune]"),
     owner=_P.get("tiltakshaver", "[tiltakshaver]"),
     case=_P.get("sak", "[saksnummer]"),
-    date=_P.get("dato", "10.11.2026"),
+    date=_P.get("dato", "11.11.2026"),
     rev=_P.get("rev", "11"),
 )
 PROJECT["line"] = f'{PROJECT["address"]} · {PROJECT["gnr_bnr"]} · {PROJECT["municipality"]}'
 REV_ROWS = [
-    ("11", "10.11.2026",
-     "Ny utgave i A3. «ca.» på mål som ikke er kontrollmålt. Taksperrenes opplegg og oppleggsdetaljer er vist."),
+    ("11", PROJECT["date"],
+     "Ny utgave i A3. «ca.» på mål som ikke er kontrollmålt. Taksperrenes opplegg, oppleggsdetaljer, forbehold og "
+     "kontrollpunkter er ført inn."),
     ("10", "nov. 2026", "Tiltakshavers utkast (A4). Erstattes av rev. 11."),
 ]
 
@@ -54,9 +55,10 @@ WALLS = [
     (5.319, 8.151, 5.432, 8.680),
     # vegg vaskerom/bod
     (5.432, 6.890, 7.396, 7.002),
-    # tømmervegg (opprinnelig yttervegg) – med døråpning x = 3,951–4,925
-    (0.197, 8.680, 3.951, 8.894),
-    (4.925, 8.680, 7.396, 8.894),
+    # tømmervegg (opprinnelig yttervegg) – med døråpning. E2 viser åpningen x = 3,951–4,925. Oppleggene O2 og O3
+    # står i åpningen inntil karmene, og åpningen er derfor tegnet til stendernes ytterkant (3,880–5,028).
+    (0.197, 8.680, 3.880, 8.894),
+    (5.028, 8.680, 7.396, 8.894),
     # vegg bad / gang–entré («badveggen»)
     (3.343, 8.894, 3.457, 9.996),
     (3.343, 10.767, 3.457, 11.567),
@@ -77,7 +79,7 @@ WALLS = [
 ]
 # hvilke vegger er tømmervegg (opprinnelig yttervegg)
 LOG_WALL_Y = (8.680, 8.894)
-LOG_DOOR_X = (3.951, 4.925)        # døråpningen i tømmerveggen der oppleggene står
+LOG_DOOR_X = (3.880, 5.028)        # døråpningen i tømmerveggen der oppleggene står
 
 WINDOWS = [   # (x1, y1, x2, y2) i yttervegg
     (0.000, 5.814, 0.197, 6.777),     # kjøkken
@@ -98,6 +100,7 @@ ROOMS = [  # (navn, x, y)
     ("Bad", 1.65, 10.10),
     ("Soverom", 1.75, 12.95),
     ("Entré", 4.12, 11.74),
+    ("Gang", 3.92, 10.46),
     ("Stue", 3.8, 3.95),
     ("Soverom", 5.6, 13.45),
 ]
@@ -120,7 +123,7 @@ B2 = dict(x=4.979, y1=8.763, y2=12.260, b=0.091, L=3.40,
 B1_C = (5.132, 8.762)                         # oppleggssentre B1 (y)
 B2_C = (8.812, 12.212)                        # oppleggssentre B2 (y)
 
-IPN200 = (3.854, 4.787, 4.004, 8.667)         # under gulvet, rett under B1
+IPN200 = (3.884, 4.787, 3.974, 8.667)         # under gulvet, rett under B1 (flensbredde 90 mm)
 CONC_BLOCK = (3.725, 4.828, 4.134, 5.737)     # betongkloss under gulvet (0,90 m lang)
 FOUNDATION = (0.175, 8.657, 7.423, 8.916)     # grunnmur under tømmerveggen (ca. 0,25 m)
 COLUMN = (4.979, 12.212, 0.100)               # betongsøyle Ø ca. 200 under gulvet (x, y, r)

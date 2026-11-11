@@ -17,6 +17,8 @@ R = json.load(open(os.path.join(HERE, "results.json"), encoding="utf-8"))
 
 
 class Fig(Sheet):
+    M_L = M_R = M_T = M_B = 0.0
+
     def __init__(self, w, h):
         self.W, self.H = w, h
         super().__init__()
@@ -88,7 +90,7 @@ def fig_b2(path):
     pg = next(d["Ed"] for d in f if d["type"] == "pt" and abs(d["x1"] - 2.25) < 1e-6)
     pj = next(d["Ed"] for d in f if d["type"] == "pt" and abs(d["x1"] - 2.55) < 1e-6)
     ws = next(d["Ed"] for d in f if d["type"] == "udl" and d["x1"] == 0.0)
-    s = Fig(170, 108)
+    s = Fig(170, 116)
     x, w = 38.0, 112.0
     s.text(x - 3.0, 20.0, "Last og", size=T_S, weight=600, fill=INK2, anchor="end")
     s.text(x - 3.0, 23.3, "system", size=T_S, weight=600, fill=INK2, anchor="end")
@@ -104,11 +106,17 @@ def fig_b2(path):
     kk = w / L
     s.text(x + 0.14 * kk, 8.0 + 22.0 - 8.3, f"gulv {num(wf)} kN/m", size=T_S, weight=500)
     s.text(x + 3.30 * kk, 8.0 + 22.0 - 15.8, "takbjelker (snøfonn)", size=T_XS, fill=BLUE, weight=600, anchor="middle")
-    s.text(x + w, 8.0 + 22.0 + 18.6, f"i tillegg: egenvekt IPE 180, {num(ws)} kN/m over hele spennet", size=T_XS, fill=INK2,
+    # x-verdier (m fra oppleggssenter O3) under målkjeden – to rader, slik at tette verdier ikke kolliderer
+    yx = 8.0 + 22.0 + 13.0 + 4.6
+    s.text(x - 3.0, yx + 1.6, "x [m]", size=T_XS, fill=INK2, anchor="end")
+    for xv, row in ((0.0, 0), (0.10, 1), (1.20, 0), (2.10, 0), (2.25, 1), (2.55, 0), (3.15, 0), (3.40, 1)):
+        s.line(x + xv * kk, yx - 3.4, x + xv * kk, yx - 2.4 + row * 3.1, (INK3, 0.1, None))
+        s.text(x + xv * kk, yx + row * 3.1, "0" if xv == 0 else num(xv), size=T_XS, fill=INK2, anchor="middle")
+    s.text(x + w, yx + 7.6, f"i tillegg: egenvekt IPE 180, {num(ws)} kN/m over hele spennet", size=T_XS, fill=INK2,
            anchor="end")
     cur = b["curves"]
     vp = [(p["x"], p["V"]) for p in cur]
-    y = diagram(s, x, y + 5.5, w, L, vp, h=15.0, title="V_{Ed} [kN]", zero_mid=True, fill="#e6ebf0", color=INK2,
+    y = diagram(s, x, y + 13.5, w, L, vp, h=15.0, title="V_{Ed} [kN]", zero_mid=True, fill="#e6ebf0", color=INK2,
                 labels=[(0.0, b["RA"], num(b["RA"], 1), -1.2, "start"), (L, -b["RB"], "−" + num(b["RB"], 1), 3.6, "end")])
     mp = [(p["x"], p["M"]) for p in cur]
     diagram(s, x, y + 6.0, w, L, mp, h=15.0, title="M_{Ed} [kNm]",
@@ -124,9 +132,9 @@ def fig_snow(path):
     h = 3.72
     # øvre bygg (2. etasje med tak) – prinsipp
     s.rect(x0 - 4.2 * k, y0 - h * k + 0.0, 4.2 * k, h * k, (INK, 0.35, None), fill="#eef0f2")
-    s.text(x0 - 2.1 * k, y0 - h * k / 2 - 1.0, "2. etasje", size=T_M, fill=INK2, anchor="middle", weight=600)
-    s.text(x0 - 2.1 * k, y0 - h * k / 2 + 3.0, "gavlvegg mot terrassen", size=T_S, fill=INK2, anchor="middle")
-    s.text(x0 - 2.1 * k, y0 - h * k / 2 + 6.4, "b_{1} = 11,0 m (lengde 2. etasje)", size=T_XS, fill=INK3, anchor="middle")
+    s.text(x0 - 1.85 * k, y0 - h * k / 2 - 1.0, "2. etasje", size=T_M, fill=INK2, anchor="middle", weight=600)
+    s.text(x0 - 1.85 * k, y0 - h * k / 2 + 3.0, "gavlvegg mot terrassen", size=T_S, fill=INK2, anchor="middle")
+    s.text(x0 - 1.85 * k, y0 - h * k / 2 + 6.6, "b_{1} = 11,0 m (lengde 2. etasje)", size=T_XS, fill=INK2, anchor="middle")
     # terrasse
     b2 = 4.1
     s.rect(x0, y0, b2 * k, 2.2, (BLUE, 0.3, None), fill=BLUE_F)
@@ -147,7 +155,9 @@ def fig_snow(path):
     # jevn snø mu1*sk
     s.line(x0, y0 - base * ks, x0 + b2 * k, y0 - base * ks, (BLUE, 0.2, "0.8 0.8"))
     s.text(x0 + b2 * k + 1.5, y0 - se * ks - 1.0, f"{num(se, 1)} kN/m²", size=T_S, fill=BLUE, weight=600)
-    s.text(x0 + ls * k - 1.5, y0 - base * ks + 4.2, f"μ_{{1}}·s_{{k}} = 0,8 · {num(sn['sk'], 1)} = {num(base, 1)} kN/m²", size=T_S, fill=BLUE, anchor="end")
+    s.text(x0 + ls * k - 1.5, y0 - base * ks + 4.0, "μ_{1} · s_{k} =", size=T_S, fill=BLUE, anchor="end")
+    s.text(x0 + ls * k - 1.5, y0 - base * ks + 7.6, f"0,8 · {num(sn['sk'], 1)} = {num(base, 1)} kN/m²", size=T_S, fill=BLUE,
+           anchor="end")
     s.text(x0 + 1.5, y0 - peak * ks - 1.6, f"γ·h = 2,0 · 3,72 = {num(peak)} kN/m² ved veggen", size=T_S, fill=BLUE,
            weight=700)
     # h og ls
@@ -156,24 +166,28 @@ def fig_snow(path):
     # takbjelkene på B2
     for xj, lab in ((0.30, "0,30"), (0.90, "0,90")):
         s.line(x0 + xj * k, y0, x0 + xj * k, y0 - (peak - (peak - base) * xj / ls) * ks, (INK, 0.3, "1.2 0.8"))
-    s.text(x0 + 0.60 * k, y0 - 9.5, "takbjelkene", size=T_XS, fill=INK, anchor="middle", halo=1.4, weight=600)
-    s.text(x0 + 0.60 * k, y0 - 6.6, "på B2 (0,30 og", size=T_XS, fill=INK, anchor="middle", halo=1.4, weight=600)
-    s.text(x0 + 0.60 * k, y0 - 3.7, "0,90 m fra veggen)", size=T_XS, fill=INK, anchor="middle", halo=1.4, weight=600)
+    # henvisning under terrassen, utenfor lastfiguren
+    yb_ = y0 + 2.2
+    s.poly([(x0 + 0.30 * k, yb_), (x0 + 0.30 * k, yb_ + 1.6), (x0 + 0.90 * k, yb_ + 1.6), (x0 + 0.90 * k, yb_)], (INK, 0.2, None))
+    s.line(x0 + 0.60 * k, yb_ + 1.6, x0 - 2.0, yb_ + 5.0, (INK2, 0.13, None))
+    s.text(x0 - 3.0, yb_ + 5.4, "takbjelkene på B2", size=T_XS, fill=INK, anchor="end", weight=600)
+    s.text(x0 - 3.0, yb_ + 8.6, "0,30 og 0,90 m fra veggen", size=T_XS, fill=INK2, anchor="end")
+    s.text(x0 + 2.35 * k, y0 - 5.2, "lastordinat – ikke snødybde", size=T_XS, fill=BLUE, anchor="middle", halo=1.6)
     s.save(path)
 
 
 def fig_path(path):
     """Lastveier med status: grønn = regnet/kontrollert, gul = regnet med antakelse, rød = ikke dokumentert."""
     s = Fig(170, 86)
-    ASC, NDC = AMBER, RED
-    bw, bh, gap = 25.5, 11.0, 3.2
+    ASC, NDC, UNK = AMBER, RED, "#7d8791"
+    bw, bh, gap = 27.2, 11.0, 2.6
 
     def box(x, y, title, sub, color, w=bw):
         s.rect(x, y, w, bh, (color, 0.4, None), fill=PAPER, rx=1.4)
         s.rect(x, y, 1.2, bh, None, fill=color)
         s.text(x + 2.6, y + 4.4, title, size=T_S, weight=700)
         for i, ln in enumerate(sub):
-            s.text(x + 2.6, y + 7.4 + i * 2.5, ln, size=1.9, fill=INK2)
+            s.text(x + 2.6, y + 7.5 + i * 2.6, ln, size=2.0, fill=INK2)
 
     def chain(y, label, r, boxes):
         s.text(2.0, y + 4.6, label, size=T_M, weight=700, fill=STEEL)
@@ -203,31 +217,32 @@ def fig_path(path):
     chain(9.0, "B1 · O1", f"{num(b1['VEd'], 1)} kN", [
         steg(b1["VEd"]), stend("B1_pipe", "2 × 48×98"),
         ("Gulvbjelke", ["48×196, trykk ⊥ fiber", "flate ikke dokumentert"], NDC),
-        ("IPN 200", ["lastpunkt over kloss;", f"verste fall {num(su['ipn']['util'] * 100, 0)} %"], ASC),
+        ("IPN 200", ["lastpunkt anslått over", f"kloss; øvre grense {num(su['ipn']['util'] * 100, 0)} %"], ASC),
         ("Betongkloss", ["0,90 m; underlag", "ikke dokumentert"], NDC),
     ])
     chain(27.5, "B1 · O2", f"{num(b1['VEd'], 1)} kN", [
         steg(b1["VEd"]), stend("B1_wall", "2 × 48×148"), stokk("B1_wall"),
-        ("Grunnmur", ["ca. 0,25 m; tilstand", "ikke undersøkt"], ASC),
+        ("Grunnmur", ["materiale og tilstand", "ikke undersøkt"], UNK),
     ])
     chain(46.0, "B2 · O3", f"{num(b2['RA'], 1)} kN", [
         steg(b2["RA"]), stend("B2_wall", "2 × 48×148"), stokk("B2_wall"),
-        ("Grunnmur", ["ca. 0,25 m; tilstand", "ikke undersøkt"], ASC),
+        ("Grunnmur", ["materiale og tilstand", "ikke undersøkt"], UNK),
     ])
     chain(64.5, "B2 · O4", f"{num(b2['RB'], 1)} kN", [
         steg(b2["RB"]), stend("B2_col", "2 × 48×98"),
         ("Gulvbjelke", ["48×196 + kubbinger,", "flate ikke dokumentert"], NDC),
-        ("Stolpesko", ["plate 400 mm; type", "ikke dokumentert"], NDC),
+        ("Plate og stolpesko", ["plate 400 mm (opplyst);", "type og feste ikke kjent"], NDC),
         ("Betongsøyle", ["Ø ca. 200; fundament", "ikke dokumentert"], NDC),
     ])
     # forklaring
     yl = 80.5
-    x = 21.0
-    for color, txt in ((ASC, "regnet eller vurdert med antakelse (materialklasse, fastholding)"),
-                       (NDC, "ikke dokumentert – må kontrollmåles")):
+    x = 4.0
+    for color, txt in ((ASC, "regnet med antakelse (materialklasse, fastholding)"),
+                       (NDC, "ikke dokumentert – må kontrollmåles"),
+                       (UNK, "ikke undersøkt – bare overslag")):
         s.rect(x, yl - 2.4, 3.2, 3.2, None, fill=color, rx=0.6)
         s.text(x + 4.6, yl + 0.2, txt, size=T_XS, fill=INK2)
-        x += text_w(txt, T_XS) + 12.0
+        x += text_w(txt, T_XS) + 9.0
     s.save(path)
 
 

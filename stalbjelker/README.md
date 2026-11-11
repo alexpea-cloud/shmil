@@ -17,6 +17,12 @@ cd src
 Krever Python 3 med Pillow og pypdf, Node med pakkene `docx` og `playwright` (Chromium), LibreOffice og skriften
 Inter.
 
+Tegningene kontrolleres maskinelt for tekst som overlapper eller stikker utenfor rammen:
+
+```bash
+DRAWCHECK=1 python3 sheet1.py ../build/S-01.svg     # skriver én linje per funn
+```
+
 ## Filer
 
 | Fil | Rolle |
@@ -42,7 +48,11 @@ Inter.
   "sak": "0000/0000",
   "befaring": "befaring dd.mm.åååå med fagutdannet tømrer",
   "dato": "dd.mm.åååå",
-  "rev": "11"
+  "rev": "11",
+  "snolast_sted": "kommune; ev. avvikende verdi for tettstedet",
+  "snolast_gjelder": "Setning om hvilke steder grensen gjelder for.",
+  "soknad": "henvisning til punkt i søknaden",
+  "kommunens_brev": "brev dd.mm.åååå"
 }
 ```
 

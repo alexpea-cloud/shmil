@@ -17,6 +17,7 @@ from __future__ import annotations
 
 import html
 import math
+import os
 from PIL import ImageFont
 
 # --------------------------------------------------------------------------
@@ -80,7 +81,7 @@ def num(v: float, nd: int = 2) -> str:
 # --------------------------------------------------------------------------
 INK = "#1b2026"      # hovedstrek og tekst
 INK2 = "#48525c"     # sekundær tekst
-INK3 = "#7a8590"     # svak tekst / hjelpelinjer
+INK3 = "#5d6873"     # svak tekst / hjelpelinjer (kontrast ca. 5,8:1 mot hvitt)
 PAPER = "#ffffff"
 RULE = "#c4cad0"     # skillelinjer i tabeller/bokser
 
@@ -128,9 +129,9 @@ STYLES = {
 }
 
 # tekststørrelser (mm skrifthøyde, font-size)
-T_XS = 2.3
-T_S = 2.6
-T_M = 2.75
+T_XS = 2.47         # 7,0 pt – minste skrift på arket
+T_S = 2.72
+T_M = 2.88
 T_L = 3.3
 T_XL = 4.4
 T_XXL = 5.6
@@ -163,6 +164,7 @@ class Sheet:
     def __init__(self):
         self.parts: list[str] = []
         self.defs: list[str] = [HATCH_DEFS]
+        self.boxes: list[tuple] = []          # (x0, y0, x1, y1, tekst) for hver tekst – til overlappkontroll
         # indre ramme
         self.x0, self.y0 = self.M_L, self.M_T
         self.x1, self.y1 = self.W - self.M_R, self.H - self.M_B
@@ -206,6 +208,13 @@ class Sheet:
         halo: hvit bakgrunnsboks bak teksten (True eller polstring i mm)."""
         tr = f' transform="rotate({-rot:.2f} {x:.3f} {y:.3f})"' if rot else ""
         it = ' font-style="italic"' if italic else ""
+        if s and rot in (0, 90):
+            tw_ = text_w(s, size, weight)
+            a0 = 0.0 if anchor == "start" else (-tw_ / 2 if anchor == "middle" else -tw_)
+            if rot == 0:
+                self.boxes.append((x + a0, y - size * 0.74, x + a0 + tw_, y + size * 0.22, s))
+            else:       # leses nedenfra og opp
+                self.boxes.append((x - size * 0.74, y - a0 - tw_, x + size * 0.22, y - a0, s))
         bl = f' dominant-baseline="{baseline}"' if baseline else ""
         ls = f' letter-spacing="{spacing}"' if spacing else ""
         if halo:
@@ -228,7 +237,8 @@ class Sheet:
         self.rect(self.x0, self.y0, self.x1 - self.x0, self.y1 - self.y0, "frame")
 
     def titleblock(self, *, title, subtitle, drawing_no, sheet_no, scale, rev, date,
-                   status="PRINSIPPSKISSE – SOM UTFØRT 2018", w=178.0, project="[eiendom]", owner="[tiltakshaver]"):
+                   status="UTKAST TIL GJENNOMGANG – PRINSIPPSKISSE, SOM UTFØRT 2018", w=178.0, project="[eiendom]",
+                   owner="[tiltakshaver]", case="[saksnummer]"):
         """Tittelfelt nederst til høyre. Returnerer (x, y, w, h) for feltet."""
         h = 40.0
         x = self.x1 - w
@@ -240,34 +250,38 @@ class Sheet:
             self.line(x, ry, x + w, ry, "thin")
 
         def cell(cx, cy, label, value, vsize=T_M, vweight=600, cw=None):
-            self.text(cx + 1.6, cy + 2.9, label, size=1.85, fill=INK3, weight=500, spacing="0.05")
+            self.text(cx + 1.6, cy + 2.9, label, size=2.0, fill=INK3, weight=500, spacing="0.05")
+            if cw:      # krymp verdien om den ikke får plass i feltet
+                vsize = min(vsize, vsize * (cw - 3.2) / max(1e-6, text_w(value, vsize, vweight)))
             self.text(cx + 1.6, cy + 2.9 + vsize * 1.18 + 0.4, value, size=vsize, weight=vweight)
 
         # rad 1: prosjekt | tiltakshaver
-        c1 = x + w * 0.60
+        c1, c1b = x + w * 0.56, x + w * 0.80
         self.line(c1, y, c1, r1, "thin")
-        cell(x, y, "PROSJEKT / EIENDOM", project, vsize=T_S)
-        cell(c1, y, "TILTAKSHAVER", owner, vsize=T_S)
+        self.line(c1b, y, c1b, r1, "thin")
+        cell(x, y, "PROSJEKT / EIENDOM", project, vsize=T_S, cw=w * 0.56)
+        cell(c1, y, "TILTAKSHAVER", owner, vsize=T_S, cw=w * 0.24)
+        cell(c1b, y, "KOMMUNENS SAKSNR.", case, vsize=T_S, cw=w * 0.20)
         # rad 2: tittel
-        self.text(x + 1.6, r1 + 2.9, "TEGNING", size=1.85, fill=INK3, weight=500, spacing="0.05")
+        self.text(x + 1.6, r1 + 2.9, "TEGNING", size=2.0, fill=INK3, weight=500, spacing="0.05")
         self.text(x + 1.6, r1 + 8.6, title, size=T_XL, weight=700)
         self.text(x + 1.6, r1 + 12.6, subtitle, size=T_S, fill=INK2)
         # rad 3: målestokk | format | dato | rev | tegn.nr | ark
-        cols = [("MÅLESTOKK", scale, 0.19), ("FORMAT", "A3", 0.10), ("DATO", date, 0.17),
-                ("REV.", rev, 0.10), ("TEGN.NR.", drawing_no, 0.22), ("ARK", sheet_no, 0.22)]
+        cols = [("MÅLESTOKK", scale, 0.17), ("FORMAT", "A3 – skrives ut i A3", 0.23), ("DATO", date, 0.16),
+                ("REV.", rev, 0.08), ("TEGN.NR.", drawing_no, 0.16), ("ARK", sheet_no, 0.20)]
         cx = x
         for i, (lab, val, frac) in enumerate(cols):
             cw = w * frac
             if i:
                 self.line(cx, r2, cx, r3, "thin")
-            cell(cx, r2, lab, val, vsize=T_M, vweight=700)
+            cell(cx, r2, lab, val, vsize=T_M, vweight=700, cw=cw)
             cx += cw
         # rad 4: status | utarbeidet | gjennomgått
-        c2, c3 = x + w * 0.46, x + w * 0.70
+        c2, c3 = x + w * 0.52, x + w * 0.72
         self.line(c2, r3, c2, y + h, "thin")
         self.line(c3, r3, c3, y + h, "thin")
-        cell(x, r3, "STATUS", status, vsize=T_XS, vweight=700)
-        cell(c2, r3, "UTARBEIDET AV", "Tiltakshaver (utkast)", vsize=T_XS, vweight=500)
+        cell(x, r3, "STATUS", status, vsize=T_XS, vweight=700, cw=w * 0.52)
+        cell(c2, r3, "UTARBEIDET AV", "Tiltakshaver (utkast)", vsize=T_XS, vweight=500, cw=w * 0.20)
         cell(c3, r3, "GJENNOMGÅTT AV (dato/sign.)", "", vsize=T_XS)
         return x, y, w, h
 
@@ -286,9 +300,9 @@ class Sheet:
         total = head_h + sum(len(b[2]) * lh + 2.2 for b in blocks)
         y = y_bottom - total
         self.rect(x, y, w, total, "cut2", fill=PAPER)
-        self.text(x + 1.6, y + 3.4, "REV.", size=1.85, fill=INK3, weight=500, spacing="0.05")
-        self.text(x + cw[0] + 1.6, y + 3.4, "DATO", size=1.85, fill=INK3, weight=500, spacing="0.05")
-        self.text(x + cw[0] + cw[1] + 1.6, y + 3.4, "ENDRING", size=1.85, fill=INK3, weight=500, spacing="0.05")
+        self.text(x + 1.6, y + 3.4, "REV.", size=2.0, fill=INK3, weight=500, spacing="0.05")
+        self.text(x + cw[0] + 1.6, y + 3.4, "DATO", size=2.0, fill=INK3, weight=500, spacing="0.05")
+        self.text(x + cw[0] + cw[1] + 1.6, y + 3.4, "ENDRING", size=2.0, fill=INK3, weight=500, spacing="0.05")
         yy = y + head_h
         for rev, date, lines in blocks:
             self.line(x, yy, x + w, yy, "thin")
@@ -663,6 +677,49 @@ class Sheet:
         self.hatch(x, y, w, h, spacing=1.6, angle=45, color=BRICK, sw=0.14)
         self.rect(x, y, w, h, style)
 
+    def brick_elev(self, x, y, w, h, *, course=3.75):
+        """Murverk sett i oppriss (ikke snittet): lys fyll med vannrette skift og forskjøvne stussfuger."""
+        if h < 0:
+            y, h = y + h, -h
+        self.rect(x, y, w, h, None, fill="#fbefe9")
+        n = int(h / course)
+        for i in range(1, n + 1):
+            yy = y + h - i * course
+            if yy > y + 0.3:
+                self.line(x, yy, x + w, yy, (BRICK, 0.08, None))
+            x_off = (0.25 if i % 2 else 0.75) * w
+            self.line(x + x_off, yy, x + x_off, min(y + h, yy + course), (BRICK, 0.08, None))
+        self.rect(x, y, w, h, (BRICK, 0.25, None))
+
+    def legend_row(self, x, y, items, *, size=T_XS, gap=5.0, sw=6.0):
+        """Vannrett tegnforklaring. items: [(type, tekst)], type = steel | timber | timber_new | conc | brick |
+        removed | load | react | unknown. Returnerer x etter siste element."""
+        for kind, label in items:
+            yy = y - 2.0
+            if kind == "steel":
+                self.rect(x, yy, sw, 2.4, "steel", fill=STEEL_F, sw=0.35)
+            elif kind == "timber":
+                self.rect(x, yy, sw, 2.4, "timber", fill=TIMBER_F)
+            elif kind == "timber_new":
+                self.rect(x, yy, sw, 2.4, "timber", fill=TIMBER_F2)
+            elif kind == "conc":
+                self.rect(x, yy, sw, 2.4, None, fill=CONC_F)
+                self.stipple(x, yy, sw, 2.4)
+                self.rect(x, yy, sw, 2.4, "conc", sw=0.25)
+            elif kind == "brick":
+                self.brick_elev(x, yy, sw, 2.4, course=1.2)
+            elif kind == "removed":
+                self.rect(x, yy, sw, 2.4, "removed", fill="#fdf1f0", sw=0.25)
+            elif kind == "unknown":
+                self.rect(x, yy, sw, 2.4, (INK2, 0.25, "1.2 0.8"), fill="none")
+            elif kind == "load":
+                self.arrow(x + sw / 2, yy - 0.6, x + sw / 2, yy + 2.6, color=INK, lw=0.3, head=1.5)
+            elif kind == "react":
+                self.arrow(x + sw / 2, yy - 0.6, x + sw / 2, yy + 2.6, color=RED, lw=0.4, head=1.7)
+            self.text(x + sw + 1.4, y, label, size=size, fill=INK2)
+            x += sw + 1.4 + text_w(label, size) + gap
+        return x
+
     def loadfield(self, x, y, w, h, *, blue=False):
         """Lastfelt i plan: lys fyll med tynn skråskravur."""
         if blue:
@@ -734,9 +791,28 @@ class Sheet:
                 f'text-rendering="geometricPrecision" shape-rendering="geometricPrecision">\n'
                 f'<defs>{defs}</defs>\n<rect width="{self.W}" height="{self.H}" fill="{PAPER}"/>\n{body}\n</svg>')
 
+    def check(self, tol: float = 0.25) -> list[str]:
+        """Maskinell kontroll: tekster som overlapper hverandre eller stikker utenfor rammen."""
+        out = []
+        b = self.boxes
+        for i in range(len(b)):
+            x0, y0, x1, y1, t = b[i]
+            if x0 < self.x0 + 0.5 or x1 > self.x1 - 0.5 or y0 < self.y0 + 0.5 or y1 > self.y1 - 0.5:
+                out.append(f"UTENFOR RAMME: «{t}» ({x0:.1f},{y0:.1f})–({x1:.1f},{y1:.1f})")
+            for j in range(i + 1, len(b)):
+                u0, v0, u1, v1, t2 = b[j]
+                ox = min(x1, u1) - max(x0, u0)
+                oy = min(y1, v1) - max(y0, v0)
+                if ox > tol and oy > tol:
+                    out.append(f"OVERLAPP {ox:.1f}×{oy:.1f} mm ved ({max(x0, u0):.0f},{max(y0, v0):.0f}): «{t}» / «{t2}»")
+        return out
+
     def save(self, path: str):
         with open(path, "w", encoding="utf-8") as f:
             f.write(self.svg())
+        if os.environ.get("DRAWCHECK"):
+            for msg in self.check():
+                print("  !", msg)
 
 
 def rich(s: str) -> str:

@@ -6,15 +6,18 @@ from drawlib import *     # noqa: F403
 def static_system(s: Sheet, x, y, w, L, *, udls=(), points=(), reactions=("", ""), title="Statisk system og last",
                   dims=(), h_load=9.0):
     """Fritt opplagt bjelke med laster. x, y = øvre venstre hjørne av figurfeltet, w = bredde for spennet L (m).
-    udls: [(x1, x2, etikett, farge)], points: [(x, etikett, farge, nivå)], reactions: (tekst A, tekst B),
+    udls: [(x1, x2, etikett, farge[, etikett-x])], points: [(x, etikett, farge, nivå)], reactions: (tekst A, tekst B),
     dims: [(x1, x2, tekst)]. Returnerer y under figuren."""
     k = w / L
     s.text(x, y + 2.4, title, size=T_S, weight=700)
     yb = y + 8.0 + h_load + 6.0            # bjelkelinje
     X = lambda xm: x + xm * k              # noqa: E731
     # laster
-    for (x1, x2, label, color) in udls:
-        s.udl(X(x1), X(x2), yb - h_load * 0.55, yb - 0.8, color=color, label=label, size=T_XS, n=max(3, int((x2 - x1) * k / 5) + 1))
+    for (x1, x2, label, color, *pos) in udls:
+        s.udl(X(x1), X(x2), yb - h_load * 0.55, yb - 0.8, color=color, label=(None if pos else label), size=T_XS,
+              n=max(3, int((x2 - x1) * k / 5) + 1))
+        if pos:     # etikett plassert ved oppgitt x (m), venstrestilt – for å gå klar av punktlaster
+            s.text(X(pos[0]), yb - h_load * 0.55 - 1.2, label, size=T_XS, fill=color, weight=500)
     for (xp, label, color, level) in points:
         top = yb - h_load - 3.2 * level
         s.pload(X(xp), top, yb - 0.8, label, color=color, size=T_XS, lw=0.35)
@@ -49,7 +52,7 @@ def moment_diagram(s: Sheet, x, y, w, L, curve, *, h=11.0, label="", x_max=None,
     return y0 + h + 4.6
 
 
-def check_table(s: Sheet, x, y, w, rows, *, title="Kontroll", note=None):
+def check_table(s: Sheet, x, y, w, rows, *, title="Regnet utnyttelse (overslag)", note=None):
     """Kontrolltabell: rows = [(navn, Ed, Rd, utnyttelse 0–1 eller None, statusfarge, kommentar)].
     Returnerer y under tabellen."""
     s.text(x, y + 2.4, title, size=T_S, weight=700)

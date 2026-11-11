@@ -89,7 +89,7 @@ const none = { style: BorderStyle.NONE, size: 0, color: 'FFFFFF' };
 
 function cell(content, w, o = {}) {
   const paras = (Array.isArray(content) ? content : [content]).map((c) => (c instanceof Paragraph ? c : new Paragraph({
-    alignment: o.align || AlignmentType.LEFT, spacing: { before: 0, after: 0, line: 252 },
+    alignment: o.align || AlignmentType.LEFT, spacing: { before: 0, after: 0, line: 252 }, keepNext: o.keepNext,
     children: runs(c, { size: o.size || 18, bold: o.bold, color: o.color }),
   })));
   return new TableCell({
@@ -123,7 +123,7 @@ function tbl(rows, widths, o = {}) {
             bold: obj.bold ?? (isHead || (o.boldFirstCol && ci === 0) || (o.boldLast && ri === rows.length - 1)),
             color: obj.color || (isHead ? INK2 : undefined),
             fill: obj.fill || (isHead ? HEADFILL : undefined), span: span > 1 ? span : undefined,
-            valign: o.valign, padV: o.padV,
+            valign: o.valign, padV: o.padV, keepNext: o.keep && ri < rows.length - 1,
           }));
           ci += span;
         }
