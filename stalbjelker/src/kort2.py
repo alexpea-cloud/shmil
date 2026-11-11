@@ -34,9 +34,11 @@ JOISTS1 = [0.0, 0.6, 1.2, 1.8, 2.4, 3.0]
 JOISTS2 = [0.42, 1.02, 1.62, 2.22, 2.82, 3.42]
 
 # ---- plassering på arket (mm) ----
-PX, PY = 88.0, 184.0                        # papirpunktet for x = 0, z = 0 (overkant gulv 1. etasje)
-COL_X = 333.3                               # høyre kolonne: tegnforklaring, målestokklinjal, merknad (flukter med tittelfeltet)
-COL_Y = 55.0
+PX, PY = 88.0, 186.0                        # papirpunktet for x = 0, z = 0 (overkant gulv 1. etasje)
+COL_X = 333.3                               # høyre kolonne: tegnforklaring, målestokklinjal, merknad
+COL_Y = 57.0
+
+CENTER = (INK2, 0.13, "3 0.8 0.5 0.8")      # senterlinje i oppleggene
 
 
 def build(out_svg):
@@ -55,19 +57,33 @@ def build(out_svg):
     def RR(x1, z1, x2, z2):
         return (X(min(x1, x2)), Y(max(z1, z2)), abs(x2 - x1) * K, abs(z2 - z1) * K)
 
+    def open_bottom(xa, xb, marks=None):
+        """Brutt nederst: fjern underkanten og tegn bruddlinje med ett bruddmerke (sikksakk) i hver x i marks."""
+        y, z = Y(Z_BOT), 1.4
+        s.line(X(xa) + 0.2, y, X(xb) - 0.2, y, (PAPER, 0.9, None))
+        pts = [(X(xa) - 1.5, y)]
+        for xm in (marks or [(xa + xb) / 2]):
+            m = X(xm)
+            pts += [(m - z, y), (m - 0.3 * z, y + z), (m + 0.3 * z, y - z), (m + z, y)]
+        pts.append((X(xb) + 1.5, y))
+        s.poly(pts, "thin")
+
+    # ---------------------------------------------------------------- terreng i krypkjelleren
+    s.ground(X(-0.62), X(3.92), Y(Z_GROUND))
+
     # ---------------------------------------------------------------- bak snittet: pipe og tømmervegg
-    # pipa står bak snittet og går ned gjennom gulvet; under gulvet dekkes den delvis av stålbjelken og klossen
-    s.brick_elev(*RR(X_CHIM[0], Z_GROUND, X_CHIM[1], Z_TOP))
+    # pipa står bak snittet og fortsetter ned under gulvet; der dekkes den delvis av stålbjelken og betongklossen
+    s.brick_elev(*RR(X_CHIM[0], Z_BOT, X_CHIM[1], Z_TOP))
     s.breakline(X(X_CHIM[0]) - 1.5, Y(Z_TOP), X(X_CHIM[1]) + 1.5, Y(Z_TOP))
     s.logwall(*RR(X_LOGWALL[0], 0.0, X_LOGWALL[1], Z_TOP), n=18)
     s.breakline(X(X_LOGWALL[0]) - 1.5, Y(Z_TOP), X(X_LOGWALL[1]) + 1.5, Y(Z_TOP))
 
     # ---------------------------------------------------------------- under gulvet
-    s.ground(X(-0.62), X(3.92), Y(Z_GROUND))
-    for (xa, xb, zt) in ((X_BLOCK[0], X_BLOCK[1], Z_OLDB), (X_FOUND[0], X_FOUND[1], -0.148)):
-        s.concrete(*RR(xa, Z_BOT, xb, zt))
-        s.line(X(xa) + 0.2, Y(Z_BOT), X(xb) - 0.2, Y(Z_BOT), (PAPER, 0.9, None))      # brutt nederst
-        s.breakline(X(xa) - 1.5, Y(Z_BOT), X(xb) + 1.5, Y(Z_BOT))
+    s.concrete(*RR(X_BLOCK[0], Z_BOT, X_BLOCK[1], Z_OLDB))                       # støpt betongkloss
+    # felles bruddlinje under pipe og kloss, med ett bruddmerke i hver del (til side for senterlinjen i x = 0)
+    open_bottom(X_CHIM[0], X_BLOCK[1], marks=[(X_CHIM[0] + X_BLOCK[0]) / 2, X_BLOCK[1] / 2])
+    s.concrete(*RR(X_FOUND[0], Z_BOT, X_FOUND[1], -0.148))                       # gammel grunnmur
+    open_bottom(*X_FOUND)
     # eldre stålbjelke i krypkjelleren, rett under B1
     s.ibeam_side(*RR(X_OLD[0], Z_OLDB, X_OLD[1], Z_J1B), tf=0.0113 * K, label="eldre stålbjelke i krypkjelleren", size=T_S)
     # gulvbjelker 48 x 196 (snittet) og gulv i 1. etasje
@@ -89,7 +105,7 @@ def build(out_svg):
     zL = 1.72
     s.dim((X(0), Y(zL)), (X(L), Y(zL)), 0, "L = 3,63 (senter–senter opplegg)", ext=False, weight=700, text_shift=-34.0)
     for xs in (0.0, L):
-        s.line(X(xs), Y(Z_BB) + 0.6, X(xs), Y(zL) + 2.5, (INK2, 0.13, "3 0.8 0.5 0.8"))
+        s.line(X(xs), Y(Z_BB) + 0.6, X(xs), Y(zL) + 2.5, CENTER)
     xh = 2.10                                                                   # mellom gulvbjelkene, til side for påskriften på B1
     s.dim((X(xh), Y(0.0)), (X(xh), Y(H_STUD)), 0, "2,07", ext=False, weight=700)
     s.text(X(xh) + 3.0, Y(H_STUD / 2), "gulv – underkant stålbjelke", size=T_XS, fill=INK2, anchor="middle", rot=90)
@@ -105,7 +121,7 @@ def build(out_svg):
     s.dim((X(X_BLOCK[0]), yb1 + 6.2), (X(X_BLOCK[1]), yb1 + 6.2), 0, "0,90", ext=False, size=T_S)
     for xx in X_BLOCK:
         s.line(X(xx), Y(Z_BOT) + 1.0, X(xx), yb1 + 7.4, (INK, 0.13, None))
-    s.line(X(0.0), Y(Z_OLDB) + 0.8, X(0.0), yb1 + 1.2, (INK2, 0.13, "3 0.8 0.5 0.8"))        # senter stendere
+    s.line(X(0.0), Y(Z_OLDB) + 0.8, X(0.0), yb1 + 1.2, CENTER)                              # senter stendere
     # grunnmuren
     s.dim((X(X_FOUND[0]), yb1), (X(X_FOUND[1]), yb1), 0, "ca. 0,25", ext=False, size=T_XS, halo=False)
     for xx in X_FOUND:
@@ -130,17 +146,17 @@ def build(out_svg):
     s.leader((X(0.024), Y(Z_J1B + 0.10)), (X(0.049) + 10.0, Y(0.34)), "Under gulvet ved pipa",
              ["gulvbjelke 48 × 196,", "eldre stålbjelke og betongkloss"])
     s.leader((X(JOISTS2[1] + 0.012), Y(Z_BT + 0.085)), (X(1.20), Y(Z_TOP) + 2.6), "Gulvbjelker 2. etasje",
-             ["på overflensen (avstand ikke målt)"])
+             ["på overflensen (vist i prinsipp)"])
 
     # ---------------------------------------------------------------- høyre kolonne: tegnforklaring, linjal, merknad
     s.text(COL_X, COL_Y, "Tegnforklaring", size=T_M, weight=700)
     yy = COL_Y + 7.5
-    for item in (("steel", "stål"), ("timber_new", "tre fra 2018"), ("timber", "eldre treverk"), ("conc", "betong"),
+    for item in (("steel", "stål"), ("timber_new", "stendere fra 2018"), ("timber", "annet treverk"), ("conc", "betong"),
                  ("brick", "tegl")):
         s.legend_row(COL_X, yy, [item], size=T_S)
         yy += 6.2
     s.scalebar(COL_X, yy + 6.0, K, meters=(0, 0.5, 1), sub=0.1)
-    s.mtext(COL_X, yy + 21.0, ["Mål i meter, tverrsnitt i mm.", "Mål merket «ca.» er ikke kontrollmålt."], size=T_S,
+    s.mtext(COL_X, yy + 21.0, ["Mål i meter, tverrsnitt i mm.", "Mål merket «ca.» er omtrentlige."], size=T_S,
             fill=INK2)
 
     s.save(out_svg)
