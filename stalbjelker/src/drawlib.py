@@ -233,11 +233,13 @@ class Sheet:
         return y + len(lines) * size * lh
 
     # ---- ramme, tittelfelt ---------------------------------------------
-    def frame(self):
+    def frame(self, attachment=None):
         self.rect(self.x0, self.y0, self.x1 - self.x0, self.y1 - self.y0, "frame")
+        if attachment:      # vedleggsnummer i saken, øverst til høyre
+            self.text(self.x1 - 2.5, self.y0 + 4.9, f"Vedlegg {attachment}", size=T_S, weight=600, fill=INK2, anchor="end")
 
     def titleblock(self, *, title, subtitle, drawing_no, sheet_no, scale, rev, date,
-                   status="UTKAST TIL GJENNOMGANG – PRINSIPPSKISSE, SOM UTFØRT 2018", w=178.0, project="[eiendom]",
+                   status="PRINSIPPSKISSE, SOM UTFØRT 2018 – IKKE KONTROLLERT AV FORETAK", w=178.0, project="[eiendom]",
                    owner="[tiltakshaver]", case="[saksnummer]"):
         """Tittelfelt nederst til høyre. Returnerer (x, y, w, h) for feltet."""
         h = 40.0
@@ -281,7 +283,7 @@ class Sheet:
         self.line(c2, r3, c2, y + h, "thin")
         self.line(c3, r3, c3, y + h, "thin")
         cell(x, r3, "STATUS", status, vsize=T_XS, vweight=700, cw=w * 0.52)
-        cell(c2, r3, "UTARBEIDET AV", "Tiltakshaver (utkast)", vsize=T_XS, vweight=500, cw=w * 0.20)
+        cell(c2, r3, "UTARBEIDET AV", "Tiltakshaver", vsize=T_XS, vweight=500, cw=w * 0.20)
         cell(c3, r3, "GJENNOMGÅTT AV (dato/sign.)", "", vsize=T_XS)
         return x, y, w, h
 

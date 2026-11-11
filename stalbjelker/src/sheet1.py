@@ -18,7 +18,7 @@ GONE_ST = (RED, 0.2, "1.6 0.9")              # bærevegg fjernet 2018
 
 def build(out_svg):
     s = Sheet()
-    s.frame()
+    s.frame(M.PROJECT["attachment"])
     tb = s.titleblock(title="Stålbjelker B1 og B2 – plan 1. etasje",
                       subtitle="Utsnitt 1. etasje: bjelker, opplegg, lastfelt og konstruksjon over og under",
                       drawing_no="S-01", sheet_no="1 av 3", scale="1:50", rev=M.PROJECT["rev"],

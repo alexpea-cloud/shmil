@@ -52,7 +52,9 @@ DRAWCHECK=1 python3 sheet1.py ../build/S-01.svg     # skriver én linje per funn
   "snolast_sted": "kommune; ev. avvikende verdi for tettstedet",
   "snolast_gjelder": "Setning om hvilke steder grensen gjelder for.",
   "soknad": "henvisning til punkt i søknaden",
-  "kommunens_brev": "brev dd.mm.åååå"
+  "kommunens_brev": "brev dd.mm.åååå",
+  "vedlegg_tegninger": "E3",
+  "vedlegg_notat": "F3"
 }
 ```
 

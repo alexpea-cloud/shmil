@@ -33,7 +33,7 @@ JOISTS2 = [0.42, 1.02, 1.62, 2.22, 2.82, 3.42]
 
 def build(out_svg):
     s = Sheet()
-    s.frame()
+    s.frame(M.PROJECT["attachment"])
     tb = s.titleblock(title="Stålbjelke B1 – snitt A–A og opplegg",
                       subtitle="Snitt langs kjøkkenbjelken B1, detalj ved opplegg O1 og beregningssammendrag",
                       drawing_no="S-02", sheet_no="2 av 3", scale="1:20 / 1:10", rev=M.PROJECT["rev"],

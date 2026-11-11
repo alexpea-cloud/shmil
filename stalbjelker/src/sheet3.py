@@ -37,7 +37,7 @@ X_END = 3.62                                # bruddlinje mot resten av terrassen
 
 def build(out_svg):
     s = Sheet()
-    s.frame()
+    s.frame(M.PROJECT["attachment"])
     tb = s.titleblock(title="Stålbjelke B2 – snitt B–B og opplegg",
                       subtitle="Snitt langs gangbjelken B2, taksperrenes opplegg (C–C), detalj ved O4 og beregningssammendrag",
                       drawing_no="S-03", sheet_no="3 av 3", scale="1:20 / 1:10", rev=M.PROJECT["rev"],

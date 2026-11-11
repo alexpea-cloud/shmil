@@ -41,5 +41,6 @@ if [ -f ../privat/redegjorelse.js ]; then
   doc ../privat/redegjorelse.js "$PFX – redegjørelse utførelse og medhjelperkompetanse (utkast)"
   doc ../privat/brev.js         "$PFX – utkast svar til kommunen"
   doc ../privat/mangelliste.js  "$PFX – dokumentasjon som gjenstår"
+  [ -f ../privat/frist.js ] && doc ../privat/frist.js "$PFX – utkast anmodning om utsatt frist"
 fi
 ls -la "$OUT"

@@ -21,6 +21,7 @@ PROJECT = dict(
     case=_P.get("sak", "[saksnummer]"),
     date=_P.get("dato", "11.11.2026"),
     rev=_P.get("rev", "11"),
+    attachment=_P.get("vedlegg_tegninger"),      # f.eks. "E3" – vises øverst til høyre på hvert ark
 )
 PROJECT["line"] = f'{PROJECT["address"]} · {PROJECT["gnr_bnr"]} · {PROJECT["municipality"]}'
 REV_ROWS = [

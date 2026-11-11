@@ -40,7 +40,7 @@ c.push(kv([
   ['Gjelder', 'To stålbjelker IPE 180 som i 2018 erstattet bærende vegger: B1 ved kjøkkenet og B2 i gangen ved trappeåpningen. Bjelker, opplegg og videre lastføring.'],
   ['Tegninger', 'S-01, S-02 og S-03, rev. 11 (plan 1:50, snitt 1:20, detaljer 1:10)'],
   ['Revisjon', `Rev. 11 · ${proj('dato', '11.11.2026')} · erstatter tiltakshavers utkast rev. 10`],
-  ['Status', '**Tiltakshavers etterregning – utkast til gjennomgang.** Ikke kontrollert av foretak med ansvarsrett. Feltet for faglig gjennomgang i kapittel 12 er åpent.'],
+  ['Status', '**Tiltakshavers etterregning.** Ikke kontrollert av foretak med ansvarsrett. Feltet for faglig gjennomgang i kapittel 12 er åpent.'],
 ]));
 c.push(spacer(160));
 
@@ -406,7 +406,7 @@ c.push(H1('11  Konklusjon'));
 c.push(P(`Med forutsetningene i kapittel 3 viser etterregningen at begge stålbjelkene har tilstrekkelig kapasitet i bøyning og skjær. Utnyttelsen er ${pct(b1.util_M)} for B1 og ${pct(b2.util_M)} for B2 av elastisk momentkapasitet, og nedbøyningene ligger under kontrollgrensen L/300. Bjelkene holder også i hvert av følsomhetstilfellene alene, men marginene er da små. Notatet gjelder bare vertikale laster. Brann, avstivning mot vind og treverkets tilstand er ikke vurdert.`));
 c.push(P('Resultatet forutsetter at overflensen er sideveis fastholdt av treverket som ligger på den, at stenderne er sideveis fastholdt, og at stål og trevirke minst har de antatte kvalitetene.'));
 c.push(P('For oppleggene er stålbjelkens steg, stenderne og tømmerstokken over grunnmuren regnet og funnet tilstrekkelige under de samme antakelsene. Trykk vinkelrett på fiber i gulvbjelken ved O1 og O4, stolpeskoen, betongsøylen med fundament og betongklossens underlag er ikke dokumentert. Notatet konkluderer derfor ikke for disse delene. De må kontrollmåles og vurderes av en fagkyndig før oppleggene kan dokumenteres i sin helhet. Ved O4 har opplegget ingen regnemessig margin, og tiltak kan bli nødvendig.'));
-c.push(P(`Notatet er et utkast til gjennomgang. Det er ikke prosjektering eller kontroll fra foretak med ansvarsrett, og det tar ikke stilling til kommunens krav i ${proj('kommunens_brev', 'mangelbrevet')} om erklæring om ansvarsrett fra foretak.`));
+c.push(P(`Notatet er tiltakshavers etterregning og er ikke gjennomgått av fagkyndig. Det er ikke prosjektering eller kontroll fra foretak med ansvarsrett, og det tar ikke stilling til kommunens krav i ${proj('kommunens_brev', 'mangelbrevet')} om erklæring om ansvarsrett fra foretak.`));
 
 // ===================================================================== 12
 c.push(pageBreak());
@@ -453,7 +453,7 @@ c.push(P(`Bodveggen som punktlast P i feltet på 1,50 m, 0,5 m fra B1: fritt opp
 
 const doc = makeDoc({
   title: `Beregningsnotat – stålbjelker B1 og B2, ${proj('filprefiks', 'eiendom')}`,
-  headerText: [`${proj('filprefiks', 'Eiendom')} · Beregningsnotat stålbjelker B1 og B2`, `Rev. 11 · ${proj('dato', '11.11.2026')} · Utkast til gjennomgang`],
+  headerText: [`${proj('filprefiks', 'Eiendom')} · Beregningsnotat stålbjelker B1 og B2`, `${proj('vedlegg_notat', '') ? 'Vedlegg ' + proj('vedlegg_notat', '') + ' · ' : ''}Rev. 11 · ${proj('dato', '11.11.2026')} · Tiltakshavers etterregning`],
   children: c,
 });
 save(doc, out);
