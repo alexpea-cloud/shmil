@@ -238,7 +238,17 @@ function makeDoc({ title, headerText, children, margins }) {
 }
 
 async function save(doc, file) {
-  const buf = await Packer.toBuffer(doc);
+  let buf = await Packer.toBuffer(doc);
+  // docx-biblioteket skriver <w:highlightCs/> for markert tekst. Elementet finnes ikke i skjemaet og fjernes,
+  // slik at filen validerer. JSZip følger med docx-pakken.
+  const JSZip = require(require.resolve('jszip', { paths: [path.dirname(require.resolve('docx'))] }));
+  const zip = await JSZip.loadAsync(buf);
+  const part = 'word/document.xml';
+  const xml = await zip.file(part).async('string');
+  if (xml.includes('<w:highlightCs')) {
+    zip.file(part, xml.replace(/<w:highlightCs[^>]*\/>/g, ''));
+    buf = await zip.generateAsync({ type: 'nodebuffer', compression: 'DEFLATE' });
+  }
   fs.writeFileSync(file, buf);
   console.log('skrev', file);
 }
