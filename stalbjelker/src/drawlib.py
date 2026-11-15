@@ -282,6 +282,9 @@ class Sheet:
             cx += cw
         # rad 4: status | utarbeidet | gjennomgått
         c2, c3 = x + w * 0.52, x + w * 0.72
+        if author is None and not review:      # uten felt for utarbeider: status over hele bredden
+            cell(x, r3, "STATUS", status, vsize=T_XS, vweight=700, cw=w)
+            return x, y, w, h
         self.line(c2, r3, c2, y + h, "thin")
         cell(x, r3, "STATUS", status, vsize=T_XS, vweight=700, cw=w * 0.52)
         if review:      # eget felt for gjennomgang (detaljerte ark)

@@ -29,7 +29,7 @@ def build(out_svg):
                  subtitle="Utsnitt av 1. etasje med stålbjelker og opplegg",
                  drawing_no="E3-1", sheet_no="1 av 3", scale="1:50", rev="–",
                  date=M.PROJECT["date"], project=M.PROJECT["line"], owner=M.PROJECT["owner"], case=M.PROJECT["case"],
-                 status="PRINSIPPSKISSE – SOM UTFØRT 2018", author=M.PROJECT["owner"], review=False)
+                 status="PRINSIPPSKISSE – SOM UTFØRT 2018", author=None, review=False)
     s.figtitle(22, 21.5, "Plan 1. etasje – utsnitt", "1:50")
 
     y_top, y_bot = M.PLAN_Y

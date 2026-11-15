@@ -69,7 +69,7 @@ def build(out_svg):
                  subtitle="Snitt langs bjelken med opplegg og lastvei til grunnen",
                  drawing_no="E3-2", sheet_no="2 av 3", scale="1:20", rev="–",
                  date=M.PROJECT["date"], project=M.PROJECT["line"], owner=M.PROJECT["owner"], case=M.PROJECT["case"],
-                 status="PRINSIPPSKISSE – SOM UTFØRT 2018", author=M.PROJECT["owner"], review=False)
+                 status="PRINSIPPSKISSE – SOM UTFØRT 2018", author=None, review=False)
     s.figtitle(22, 21.5, "Snitt A–A langs B1 – bjelken ved kjøkkenet", "1:20", "sett i pilretningen på plan E3-1")
 
     v = View(s, 20, PX, PY, mx=0.0, my=0.0, flip_y=True)
