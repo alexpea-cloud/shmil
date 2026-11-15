@@ -42,7 +42,8 @@ function runs(text, o = {}) {
       flush();
       const j = s.indexOf('}', i);
       buf = s.slice(i + 2, j);
-      flush(s[i] === '_' ? { subScript: true } : { superScript: true });
+      // LibreOffice og Word setter indekser i ca. 58 % av skriftstørrelsen; 1,35 × gir ca. 78 %, som er lesbart på trykk
+      flush({ ...(s[i] === '_' ? { subScript: true } : { superScript: true }), size: Math.round(base.size * 1.35) });
       i = j + 1; continue;
     }
     buf += s[i]; i += 1;
