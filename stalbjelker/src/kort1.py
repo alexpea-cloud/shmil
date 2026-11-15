@@ -56,7 +56,7 @@ def build(out_svg):
     # ------------------------------------------------------------ under gulvet (stiplet)
     v.rect(*M.FOUNDATION, "hid", fill="none")                       # gammel grunnmur under tømmerveggen
     v.rect(*M.CONC_BLOCK, "hid", fill=CONC_F, opacity=0.7)          # støpt betongkloss ved pipa
-    v.rect(*M.IPN200, "hid", fill="none")                           # eldre stålbjelke, ligger rett under B1
+    v.rect(*M.IPN200, "hid", fill="none")                           # eksisterende stålbjelke (IPN 200 etter oppmåling), ligger rett under B1
 
     # ------------------------------------------------------------ vegger, vinduer, dører
     for (x1, y1, x2, y2) in M.WALLS:
@@ -145,8 +145,8 @@ def build(out_svg):
 
     # ------------------------------------------------------------ påskrifter: bjelkene
     s.text(X(b1x) - DIM_OFF - 5.0, Y(7.63), "B1 – IPE 180", size=T_L, weight=700, fill=STEEL, anchor="end")
-    s.text(X(b1x) - DIM_OFF - 5.0, Y(7.63) + 4.1, "rett under B1: eldre stålbjelke i krypkjelleren", size=T_XS,
-           fill=INK2, anchor="end")
+    s.text(X(b1x) - DIM_OFF - 5.0, Y(7.63) + 4.1, "rett under B1: eksisterende stålbjelke", size=T_XS, fill=INK2, anchor="end")
+    s.text(X(b1x) - DIM_OFF - 5.0, Y(7.63) + 7.4, "IPN 200 i krypkjelleren", size=T_XS, fill=INK2, anchor="end")
     s.text(X(b2x) + 8.0, Y(12.35), "B2 – IPE 180", size=T_L, weight=700, fill=STEEL)
 
     # ------------------------------------------------------------ påskrifter: oppleggene

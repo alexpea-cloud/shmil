@@ -21,12 +21,12 @@ Z_F2 = Z_BT + J2_H + BOARD2                 # overkant gulv 2. etasje
 Z_TOP = Z_F2 + 0.27                         # bruddlinje i pipe og tømmervegg
 BOARD1, J1_H = 0.022, 0.198                 # gulvbord og gulvbjelker 48 x 198 i 1. etasje
 Z_J1T, Z_J1B = -BOARD1, -BOARD1 - J1_H
-Z_OLDB = Z_J1B - 0.200                      # underkant eldre stålbjelke
+Z_OLDB = Z_J1B - 0.200                      # underkant eksisterende stålbjelke (IPN 200 etter oppmåling)
 Z_GROUND = -0.800                           # terreng i krypkjelleren (tegnet enkelt, ikke målsatt)
 Z_BOT = -0.905                              # bruddlinje nederst
 X_CHIM = (-0.454, -0.049)
 X_BLOCK = (-0.300, 0.600)
-X_OLD = (-0.340, 3.529)                     # eldre stålbjelke: fra betongklossen fram til grunnmuren
+X_OLD = (-0.340, 3.529)                     # eksisterende stålbjelke: fra betongklossen fram til grunnmuren
 X_FOUND = (3.529, 3.779)
 X_LOG = (3.580, 3.728)
 X_LOGWALL = (3.547, 3.761)
@@ -105,8 +105,8 @@ def build(out_svg):
     open_bottom(X_CHIM[0], X_BLOCK[1], marks=[(X_CHIM[0] + X_BLOCK[0]) / 2, X_BLOCK[1] / 2])
     s.concrete(*RR(X_FOUND[0], Z_BOT, X_FOUND[1], -0.148))                       # gammel grunnmur
     open_bottom(*X_FOUND)
-    # eldre stålbjelke i krypkjelleren, rett under B1
-    s.ibeam_side(*RR(X_OLD[0], Z_OLDB, X_OLD[1], Z_J1B), tf=0.0113 * K, label="eldre stålbjelke i krypkjelleren", size=T_S)
+    # eksisterende stålbjelke i krypkjelleren, rett under B1
+    s.ibeam_side(*RR(X_OLD[0], Z_OLDB, X_OLD[1], Z_J1B), tf=0.0113 * K, label="eksisterende stålbjelke IPN 200 i krypkjelleren", size=T_S)
     # gulvbjelker 48 x 198 (snittet) og gulv i 1. etasje
     for xj in JOISTS1:
         s.timber_section(*RR(xj - 0.024, Z_J1B, xj + 0.024, Z_J1T))
@@ -165,7 +165,7 @@ def build(out_svg):
     s.leader((X(X_LOG[0]), Y(zt - 0.20)), (X(X_LOG[0]) - 10.0, Y(zt)), "Ved tømmerveggen",
              ["2 stendere 48 × 148", "på tømmerstokk 148 × 148", "over gammel grunnmur"], align="right")
     s.leader((X(0.024), Y(Z_J1B + 0.10)), (X(0.049) + 10.0, Y(0.34)), "Under gulvet ved pipa",
-             ["gulvbjelke 48 × 198,", "eldre stålbjelke og betongkloss"])
+             ["gulvbjelke 48 × 198,", "eksisterende stålbjelke og betongkloss"])
     s.leader((X(JOISTS2[1] + 0.012), Y(Z_BT + 0.085)), (X(1.20), Y(Z_TOP) + 2.6), "Gulvbjelker 2. etasje",
              ["på overflensen (vist i prinsipp)"])
 

@@ -61,21 +61,24 @@ def beam(s, x, y, w, L, *, udls=(), points=(), reactions=("", ""), dims=()):
     return yd + 3.0
 
 
-def fig_b1(path, shear=True, ends=None):
-    """shear=False gir en enklere figur uten skjærkraftdiagram. ends = (tekst, tekst) settes under oppleggene."""
+def fig_b1(path, shear=True, ends=None, plain=False):
+    """shear=False gir en enklere figur uten skjærkraftdiagram. ends = (tekst, tekst) settes under oppleggene.
+    plain=True bruker vanlige ord i stedet for symboler der det går."""
     b = R["B1"]
     L = b["L"]
     q = b["qEd"]["forenklet"]
-    s = Fig(170, 92 if shear else 70)
+    s = Fig(170, 92 if shear else 73)
     x, w = 38.0, 112.0
-    s.text(x - 3.0, 12.0, "Last og", size=T_S, weight=600, fill=INK2, anchor="end")
-    s.text(x - 3.0, 15.3, "system", size=T_S, weight=600, fill=INK2, anchor="end")
+    note = INK if plain else INK2          # hjelpetekst: svart i den enkle varianten, som trykkes i mindre format
+    s.text(x - 3.0, 12.0, "Dimensjonerende" if plain else "Last og", size=T_S, weight=600, fill=note, anchor="end")
+    s.text(x - 3.0, 15.3, "last" if plain else "system", size=T_S, weight=600, fill=note, anchor="end")
+    rlab = f"opplagerkraft {num(b['VEd'], 1)} kN" if plain else f"R_{{Ed}} = {num(b['VEd'], 1)} kN"
     y = beam(s, x, 2.0, w, L, udls=[(0, L, f"q_{{Ed}} = {num(q)} kN/m", INK, 7.0)],
-             reactions=(f"R_{{Ed}} = {num(b['VEd'], 1)} kN", f"R_{{Ed}} = {num(b['VEd'], 1)} kN"),
+             reactions=(rlab, rlab),
              dims=[(0, L, f"L = {num(L)} m")])
     if ends:
         for xs, txt in ((0.0, ends[0]), (L, ends[1])):
-            s.text(x + xs * w / L, y + 3.2, txt, size=T_XS, fill=INK2, anchor="middle")
+            s.text(x + xs * w / L, y + 3.2, txt, size=T_XS, fill=note, anchor="middle")
         y += 4.0
     if shear:
         vp = [(0, b["VEd"]), (L, -b["VEd"])]
@@ -83,13 +86,14 @@ def fig_b1(path, shear=True, ends=None):
                     labels=[(0.0, b["VEd"], num(b["VEd"], 1), -1.2, "start"),
                             (L, -b["VEd"], "−" + num(b["VEd"], 1), 3.4, "end")])
     mp = [(L * i / 80, q * (L * i / 80) * (L - L * i / 80) / 2) for i in range(81)]
-    diagram(s, x, y + 6.0, w, L, mp, h=15.0, title="M_{Ed} [kNm]",
-            labels=[(L / 2, b["MEd"], f"M_{{Ed}} = {num(b['MEd'], 1)} kNm", 4.0, "middle")])
+    diagram(s, x, y + 6.0, w, L, mp, h=15.0, title="Bøyemoment [kNm]" if plain else "M_{Ed} [kNm]",
+            labels=[(L / 2, b["MEd"], ("størst: " if plain else "") + f"M_{{Ed}} = {num(b['MEd'], 1)} kNm", 4.0, "middle")])
     s.save(path)
 
 
-def fig_b2(path, shear=True, ends=None):
-    """shear=False gir en enklere figur uten skjærkraftdiagram. ends = (tekst, tekst) settes under x-aksen."""
+def fig_b2(path, shear=True, ends=None, plain=False):
+    """shear=False gir en enklere figur uten skjærkraftdiagram. ends = (tekst, tekst) settes under x-aksen.
+    plain=True bruker vanlige ord i stedet for symboler der det går."""
     b = R["B2"]
     L = b["L"]
     f = b["design_loads"]
@@ -100,8 +104,9 @@ def fig_b2(path, shear=True, ends=None):
     ws = next(d["Ed"] for d in f if d["type"] == "udl" and d["x1"] == 0.0)
     s = Fig(170, 116 if shear else 92)
     x, w = 38.0, 112.0
-    s.text(x - 3.0, 20.0, "Last og", size=T_S, weight=600, fill=INK2, anchor="end")
-    s.text(x - 3.0, 23.3, "system", size=T_S, weight=600, fill=INK2, anchor="end")
+    note = INK if plain else INK2          # hjelpetekst: svart i den enkle varianten, som trykkes i mindre format
+    s.text(x - 3.0, 20.0, "Dimensjonerende" if plain else "Last og", size=T_S, weight=600, fill=note, anchor="end")
+    s.text(x - 3.0, 23.3, "last" if plain else "system", size=T_S, weight=600, fill=note, anchor="end")
     y = beam(s, x, 8.0, w, L,
              udls=[(0.10, 2.10, None, INK, 7.0)],
              points=[(1.20, f"trapp {num(ps, 2)} kN", INK, 14.5, "middle", 0.0),
@@ -113,18 +118,22 @@ def fig_b2(path, shear=True, ends=None):
                    (2.55, 3.15, "0,60"), (3.15, L, "0,25")])
     kk = w / L
     s.text(x + 0.14 * kk, 8.0 + 22.0 - 8.3, f"gulv {num(wf)} kN/m", size=T_S, weight=500)
-    s.text(x + 3.30 * kk, 8.0 + 22.0 - 15.8, "takbjelker (snøfonn)", size=T_XS, fill=BLUE, weight=600, anchor="middle")
+    s.text(x + 3.30 * kk, 8.0 + 22.0 - 15.8, "takbjelker med snø" if plain else "takbjelker (snøfonn)", size=T_XS, fill=BLUE,
+           weight=600, anchor="middle")
     # x-verdier (m fra oppleggssenter O3) under målkjeden – to rader, slik at tette verdier ikke kolliderer
     yx = 8.0 + 22.0 + 13.0 + 4.6
-    s.text(x - 3.0, yx + 1.6, "x [m]", size=T_XS, fill=INK2, anchor="end")
+    s.text(x - 3.0, yx + 1.6, "x [m]", size=T_XS, fill=note, anchor="end")
     for xv, row in ((0.0, 0), (0.10, 1), (1.20, 0), (2.10, 0), (2.25, 1), (2.55, 0), (3.15, 0), (3.40, 1)):
         s.line(x + xv * kk, yx - 3.4, x + xv * kk, yx - 2.4 + row * 3.1, (INK3, 0.1, None))
-        s.text(x + xv * kk, yx + row * 3.1, "0" if xv == 0 else num(xv), size=T_XS, fill=INK2, anchor="middle")
-    s.text(x + w, yx + 7.6, f"i tillegg: egenvekt IPE 180, {num(ws)} kN/m over hele spennet", size=T_XS, fill=INK2,
-           anchor="end")
-    if ends:
-        s.text(x, yx + 7.6, ends[0], size=T_XS, fill=INK2, anchor="start")
-        s.text(x + w, yx + 11.0, ends[1], size=T_XS, fill=INK2, anchor="end")
+        s.text(x + xv * kk, yx + row * 3.1, "0" if xv == 0 else num(xv), size=T_XS, fill=note, anchor="middle")
+    if ends:      # stedsnavn på samme linje, egenvekten alene på linjen under
+        s.text(x, yx + 7.6, ends[0], size=T_XS, fill=note, anchor="start")
+        s.text(x + w, yx + 7.6, ends[1], size=T_XS, fill=note, anchor="end")
+        s.text(x + w / 2, yx + 11.0, f"i tillegg: egenvekt IPE 180, {num(ws)} kN/m over hele spennet", size=T_XS, fill=note,
+               anchor="middle")
+    else:
+        s.text(x + w, yx + 7.6, f"i tillegg: egenvekt IPE 180, {num(ws)} kN/m over hele spennet", size=T_XS, fill=INK2,
+               anchor="end")
     cur = b["curves"]
     y += 13.5 + (3.4 if ends else 0.0)
     if shear:
@@ -133,8 +142,9 @@ def fig_b2(path, shear=True, ends=None):
                     labels=[(0.0, b["RA"], num(b["RA"], 1), -1.2, "start"),
                             (L, -b["RB"], "−" + num(b["RB"], 1), 3.6, "end")]) + 6.0
     mp = [(p["x"], p["M"]) for p in cur]
-    diagram(s, x, y, w, L, mp, h=15.0, title="M_{Ed} [kNm]",
-            labels=[(b["x_M"], b["MEd"], f"M_{{Ed}} = {num(b['MEd'], 1)} kNm ved x = {num(b['x_M'])} m", 4.0, "middle")])
+    diagram(s, x, y, w, L, mp, h=15.0, title="Bøyemoment [kNm]" if plain else "M_{Ed} [kNm]",
+            labels=[(b["x_M"], b["MEd"], ("størst: " if plain else "") + f"M_{{Ed}} = {num(b['MEd'], 1)} kNm ved x = {num(b['x_M'])} m",
+                     4.0, "middle")])
     s.save(path)
 
 
@@ -264,8 +274,9 @@ if __name__ == "__main__":
     out = sys.argv[1] if len(sys.argv) > 1 else os.path.join(HERE, "..", "build", "fig")
     os.makedirs(out, exist_ok=True)
     if len(sys.argv) > 2 and sys.argv[2] == "kort":      # enkle figurer til den korte etterregningen
-        fig_b1(os.path.join(out, "fig_b1_kort.svg"), shear=False, ends=("ved teglsteinspipa", "ved tømmerveggen"))
-        fig_b2(os.path.join(out, "fig_b2_kort.svg"), shear=False, ends=("x = 0 ved tømmerveggen", "x = 3,40 ved betongsøylen"))
+        fig_b1(os.path.join(out, "fig_b1_kort.svg"), shear=False, ends=("ved teglsteinspipa", "ved tømmerveggen"), plain=True)
+        fig_b2(os.path.join(out, "fig_b2_kort.svg"), shear=False, ends=("x = 0 ved tømmerveggen", "x = 3,40 ved betongsøylen"),
+               plain=True)
         print("skrev korte figurer til", out)
         sys.exit(0)
     fig_b1(os.path.join(out, "fig_b1.svg"))
