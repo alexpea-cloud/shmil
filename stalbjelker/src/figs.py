@@ -2,6 +2,7 @@
 
 fig_b1      statisk system, skjærkraft og moment for B1
 fig_b2      statisk system, skjærkraft og moment for B2 (snøfonn)
+fig_b1_bred, fig_b2_bred   brede figurer i klartekst til etterregningen på tre sider (python3 figs.py <ut> bred)
 fig_snow    snøfonn mot gavlveggen etter NS-EN 1991-1-3 pkt. 5.3.6
 fig_path    lastveier med dokumentasjonsstatus
 """
@@ -148,6 +149,100 @@ def fig_b2(path, shear=True, ends=None, plain=False):
     s.save(path)
 
 
+# ---- brede figurer til etterregningen på tre sider -------------------------------------------------------
+# Tegnes 174 mm brede (tekstbredden i notatet) og trykkes i tegnet størrelse. Overskriftene står over hver del,
+# slik at bjelken kan bruke nesten hele bredden. Bare vanlige ord, og de samme tallene som i results.json.
+W_TS, W_TXS, W_TH = 3.05, 2.8, 3.2          # tekst, liten tekst og overskrift (mm)
+W_X0, W_W = 17.0, 140.0                     # bjelkens venstre ende og lengde på papiret (mm)
+
+
+def _wide_support(s, xs, yb):
+    s.poly([(xs, yb), (xs - 2.6, yb + 4.2), (xs + 2.6, yb + 4.2)], (INK, 0.3, None), fill=PAPER, close=True)
+    s.line(xs - 3.6, yb + 4.2, xs + 3.6, yb + 4.2, (INK, 0.3, None))
+
+
+def _wide_moment(s, y, L, pts, label_x, label, h=20.0):
+    """Momentdiagram under bjelken: overskrift, flate og påskrift ved største verdi. Returnerer nederste y."""
+    k = W_W / L
+    s.text(2.0, y, "Bøyemomentet langs bjelken [kNm]", size=W_TH, weight=700)
+    y0 = y + 4.0
+    vmax = max(v for _, v in pts)
+    poly = [(W_X0, y0)] + [(W_X0 + xm * k, y0 + v * h / vmax) for xm, v in pts] + [(W_X0 + W_W, y0)]
+    s.poly(poly, (STEEL, 0.3, None), fill=STEEL_F, close=True, opacity=0.85)
+    s.line(W_X0, y0, W_X0 + W_W, y0, (INK, 0.3, None))
+    s.text(W_X0 + label_x * k, y0 + h + 4.6, label, size=W_TS, weight=700, fill=STEEL, anchor="middle")
+    return y0 + h + 6.0
+
+
+def fig_b1_bred(path):
+    """B1 til tresidersnotatet: jevnt fordelt last, opplegg og bøyemoment."""
+    b = R["B1"]
+    L = b["L"]
+    k = W_W / L
+    s = Fig(174, 91)
+    s.text(2.0, 5.0, "Lasten på bjelken (dimensjonerende)", size=W_TH, weight=700)
+    yb = 27.0
+    s.udl(W_X0, W_X0 + W_W, yb - 10.0, yb - 0.8, label=f"jevnt fordelt last q_{{Ed}} = {num(b['qEd']['forenklet'])} kN/m",
+          size=W_TS, n=25, label_dy=-1.6)
+    s.line(W_X0, yb, W_X0 + W_W, yb, (INK, 0.9, None))
+    for xs, place in ((0.0, "ved teglsteinspipa"), (L, "ved tømmerveggen")):
+        _wide_support(s, W_X0 + xs * k, yb)
+        s.text(W_X0 + xs * k, yb + 9.6, f"opplagerkraft {num(b['VEd'], 1)} kN", size=W_TS, weight=700, anchor="middle")
+        s.text(W_X0 + xs * k, yb + 13.8, place, size=W_TXS, anchor="middle")
+    s.dim((W_X0, yb + 20.5), (W_X0 + W_W, yb + 20.5), 0, f"spenn L = {num(L)} m", ext=False, size=W_TS, text_off=0.9)
+    mp = [(L * i / 40, b["qEd"]["forenklet"] * (L * i / 40) * (L - L * i / 40) / 2) for i in range(41)]
+    _wide_moment(s, yb + 31.0, L, mp, L / 2, f"størst på midten: M_{{Ed}} = {num(b['MEd'], 1)} kNm")
+    s.save(path)
+
+
+def fig_b2_bred(path):
+    """B2 til tresidersnotatet: lastene der de står, opplegg, mål og bøyemoment."""
+    b = R["B2"]
+    L = b["L"]
+    k = W_W / L
+    f = b["design_loads"]
+    wf = next(d["Ed"] for d in f if d["type"] == "udl" and abs(d["x1"] - 0.10) < 1e-6)
+    ps = next(d["Ed"] for d in f if d["type"] == "pt" and abs(d["x1"] - 1.20) < 1e-6)
+    pg = next(d["Ed"] for d in f if d["type"] == "pt" and abs(d["x1"] - 2.25) < 1e-6)
+    pj = next(d["Ed"] for d in f if d["type"] == "pt" and abs(d["x1"] - 2.55) < 1e-6)
+    ws = next(d["Ed"] for d in f if d["type"] == "udl" and d["x1"] == 0.0)
+    X = lambda xm: W_X0 + xm * k          # noqa: E731
+    s = Fig(174, 105)
+    s.text(2.0, 5.0, "Lastene på bjelken (dimensjonerende)", size=W_TH, weight=700)
+    s.text(2.0, 9.4, f"I tillegg kommer stålbjelkens egenvekt, {num(ws)} kN/m over hele spennet.", size=W_TXS)
+    yb = 39.5
+    # gulvet: jevnt fordelt fra x = 0,10 til 2,10
+    s.udl(X(0.10), X(2.10), yb - 8.0, yb - 0.8, n=15)
+    s.text(X(0.14), yb - 9.6, f"gulv {num(wf)} kN/m", size=W_TS, weight=500)
+    # punktlastene
+    s.pload(X(1.20), yb - 16.0, yb - 0.8, f"trapp {num(ps, 2)} kN", size=W_TS)
+    s.pload(X(2.25), yb - 23.0, yb - 0.8, f"gavlvegg {num(pg, 2)} kN", color=ABOVE, size=W_TS, anchor="end", label_dx=4.0)
+    for xj in (2.55, 3.15):
+        s.pload(X(xj), yb - 15.0, yb - 0.8, f"{num(pj, 2)} kN", color=BLUE, size=W_TS)
+    s.text(X(2.85), yb - 20.4, "to takbjelker med snø", size=W_TXS, fill=BLUE, weight=600, anchor="middle")
+    # bjelken og oppleggene
+    s.line(X(0), yb, X(L), yb, (INK, 0.9, None))
+    _wide_support(s, X(0), yb)
+    _wide_support(s, X(L), yb)
+    s.text(X(0) - 8.0, yb + 9.6, f"opplagerkraft R_{{A}} = {num(b['RA'], 1)} kN", size=W_TS, weight=700)
+    s.text(X(L) + 8.0, yb + 9.6, f"opplagerkraft R_{{B}} = {num(b['RB'], 1)} kN", size=W_TS, weight=700, anchor="end")
+    # målkjede og x-verdier (to rader, slik at tette verdier ikke kolliderer)
+    yd = yb + 15.5
+    for (x1, x2, label) in ((0, 0.10, ""), (0.10, 1.20, "1,10"), (1.20, 2.10, "0,90"), (2.10, 2.25, ""), (2.25, 2.55, "0,30"),
+                            (2.55, 3.15, "0,60"), (3.15, L, "0,25")):
+        s.dim((X(x1), yd), (X(x2), yd), 0, label, ext=False, size=W_TS, text_off=0.9)
+    yx = yd + 5.4
+    s.text(W_X0 - 5.0, yx + 1.7, "x [m]", size=W_TXS, anchor="end")
+    for xv, row in ((0.0, 0), (0.10, 1), (1.20, 0), (2.10, 0), (2.25, 1), (2.55, 0), (3.15, 0), (3.40, 0)):
+        s.line(X(xv), yx - 4.0, X(xv), yx - 2.6 + row * 3.4, (INK3, 0.1, None))
+        s.text(X(xv), yx + row * 3.4, "0" if xv == 0 else num(xv), size=W_TXS, anchor="middle")
+    s.text(X(0) - 8.0, yx + 9.2, "x = 0 ved tømmerveggen", size=W_TXS)
+    s.text(X(L) + 8.0, yx + 9.2, f"x = {num(L)} ved betongsøylen", size=W_TXS, anchor="end")
+    mp = [(p["x"], p["M"]) for p in b["curves"]]
+    _wide_moment(s, yx + 17.0, L, mp, b["x_M"], f"størst under gavlveggen: M_{{Ed}} = {num(b['MEd'], 1)} kNm", h=17.0)
+    s.save(path)
+
+
 def fig_snow(path):
     sn = R["snow"]
     s = Fig(170, 78)
@@ -278,6 +373,11 @@ if __name__ == "__main__":
         fig_b2(os.path.join(out, "fig_b2_kort.svg"), shear=False, ends=("x = 0 ved tømmerveggen", "x = 3,40 ved betongsøylen"),
                plain=True)
         print("skrev korte figurer til", out)
+        sys.exit(0)
+    if len(sys.argv) > 2 and sys.argv[2] == "bred":      # brede figurer til etterregningen på tre sider
+        fig_b1_bred(os.path.join(out, "fig_b1_bred.svg"))
+        fig_b2_bred(os.path.join(out, "fig_b2_bred.svg"))
+        print("skrev brede figurer til", out)
         sys.exit(0)
     fig_b1(os.path.join(out, "fig_b1.svg"))
     fig_b2(os.path.join(out, "fig_b2.svg"))
