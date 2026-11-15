@@ -191,10 +191,10 @@ function callout(paras, color = AMBER, fill = 'FBF6EC', width = 9410) {
   });
 }
 
-function makeDoc({ title, headerText, children, margins }) {
+function makeDoc({ title, headerText, children, margins, creator = 'Tiltakshaver' }) {
   const m = margins || { top: 20, bottom: 18, left: 22, right: 22 };
   return new Document({
-    creator: 'Tiltakshaver', title, description: title,
+    creator, lastModifiedBy: creator, title, description: title,
     styles: {
       paragraphStyles: [
         { id: 'FootSmall', name: 'Foot Small', basedOn: 'Normal', run: { font: FONT, size: 15, color: INK3 } },
