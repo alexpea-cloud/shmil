@@ -34,6 +34,23 @@ FONT_FAMILY = "Inter, 'Liberation Sans', Arial, sans-serif"
 _FONT_CACHE: dict = {}
 
 
+def use_font(name: str):
+    """Velg skrift for hele kjøringen: "inter" (tegningene, standard) eller "liberation" (figurer som står
+    inne i dokumentene, slik at figurteksten får samme skrift som teksten rundt)."""
+    global FONT_DIR, FONT_FILES, FONT_FAMILY
+    if name == "liberation":
+        FONT_DIR = "/usr/share/fonts/truetype/liberation/"
+        FONT_FILES = {400: "LiberationSans-Regular.ttf", 700: "LiberationSans-Bold.ttf"}
+        FONT_FAMILY = "'Liberation Sans', Arial, sans-serif"
+    elif name == "inter":
+        FONT_DIR = "/usr/share/fonts/opentype/inter/"
+        FONT_FILES = {400: "Inter-Regular.otf", 500: "Inter-Medium.otf", 600: "Inter-SemiBold.otf", 700: "Inter-Bold.otf"}
+        FONT_FAMILY = "Inter, 'Liberation Sans', Arial, sans-serif"
+    else:
+        raise ValueError(name)
+    _FONT_CACHE.clear()
+
+
 def _font(weight: int = 400):
     weight = min(FONT_FILES, key=lambda w: abs(w - weight))
     if weight not in _FONT_CACHE:

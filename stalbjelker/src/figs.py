@@ -3,6 +3,7 @@
 fig_b1      statisk system, skjærkraft og moment for B1
 fig_b2      statisk system, skjærkraft og moment for B2 (snøfonn)
 fig_b1_bred, fig_b2_bred   brede figurer i klartekst til etterregningen på tre sider (python3 figs.py <ut> bred)
+fig_f3_b1, fig_f3_b2_last, fig_f3_b2_kraft   figurer til etterregningen på fem sider (python3 figs.py <ut> f3)
 fig_snow    snøfonn mot gavlveggen etter NS-EN 1991-1-3 pkt. 5.3.6
 fig_path    lastveier med dokumentasjonsstatus
 """
@@ -365,6 +366,164 @@ def fig_path(path):
     s.save(path)
 
 
+# ---- figurer til etterregningen på fem sider (python3 figs.py <ut> f3) ------------------------------------
+# fig_f3_b1         B1: lasten, oppleggene med opplagerkreftene, spennet og bøyemomentet i én figur
+# fig_f3_b2_last    B2: lastene der de står, med tall, x-akse og spenn
+# fig_f3_b2_kraft   B2: lastene igjen (navn uten tall), opplagerkreftene, x-aksen og bøyemomentet
+# Felles: 174 mm brede (tekstbredden), bjelken på samme sted (17–157 mm), ingen overskrifter i bildet (mellomtitlene
+# står i dokumentet), navn i vanlig skrift og tall i fet, Liberation Sans 10 pt (3,53 mm) og 9 pt (3,18 mm) som i
+# dokumentet. Bøyemomentet er tegnet i samme målestokk for begge bjelkene, med det bjelken tåler som stiplet linje.
+F3_TS, F3_TXS = 3.53, 3.18         # 10 pt og 9 pt
+F3_FW = 174.0                      # figurbredde = tekstbredde
+F3_X0, F3_WW = 17.0, 140.0         # bjelkens venstre ende og lengde på papiret
+F3_KM = 0.62                       # mm per kNm i bøyemomentet (samme målestokk for begge bjelkene)
+F3_MRD = R["section"]["MRd_el"]
+
+
+class _F3Fig(Sheet):
+    M_L = M_R = M_T = M_B = -0.5      # ingen ramme; teksten kan gå helt ut til kanten
+
+    def __init__(self, w, h):
+        self.W, self.H = w, h
+        super().__init__()
+
+
+def _f3_support(s, xs, yb):
+    s.poly([(xs, yb), (xs - 2.6, yb + 4.2), (xs + 2.6, yb + 4.2)], (INK, 0.3, None), fill=PAPER, close=True)
+    s.line(xs - 3.6, yb + 4.2, xs + 3.6, yb + 4.2, (INK, 0.3, None))
+
+
+def _f3_beam(s, yb):
+    s.line(F3_X0, yb, F3_X0 + F3_WW, yb, (INK, 0.9, None))
+    _f3_support(s, F3_X0, yb)
+    _f3_support(s, F3_X0 + F3_WW, yb)
+
+
+def _f3_reactions(s, yb, left, right):
+    """Opplagerkraft og sted, skrevet ved siden av hvert opplegg (innenfor bjelkeendene)."""
+    for (val, place), x, anc in ((left, F3_X0 + 6.2, "start"), (right, F3_X0 + F3_WW - 6.2, "end")):
+        s.text(x, yb + 6.0, f"opplagerkraft **{val} kN**", size=F3_TS, anchor=anc)
+        s.text(x, yb + 10.4, place, size=F3_TXS, anchor=anc, fill=INK2)
+
+
+def _f3_moment(s, y0, L, pts, label_x, label, lab_x=0.20):
+    """Bøyemomentet langs bjelken (blått felt), med det bjelken tåler som stiplet linje i samme målestokk."""
+    k = F3_WW / L
+    peak = max(v for _, v in pts) * F3_KM
+    poly = [(F3_X0, y0)] + [(F3_X0 + xm * k, y0 + v * F3_KM) for xm, v in pts] + [(F3_X0 + F3_WW, y0)]
+    s.poly(poly, (STEEL, 0.3, None), fill=STEEL_F, close=True, opacity=0.85)
+    s.line(F3_X0, y0, F3_X0 + F3_WW, y0, (INK, 0.3, None))
+    s.text(F3_X0 + lab_x * F3_WW, y0 + 4.2, "bøyemomentet langs bjelken", size=F3_TXS, fill=STEEL)
+    s.text(F3_X0 + label_x * k, y0 + peak + 4.6, label, size=F3_TS, fill=STEEL, anchor="middle")
+    yc = y0 + F3_MRD * F3_KM
+    s.line(F3_X0, yc, F3_X0 + F3_WW, yc, (INK2, 0.3, "2.4 1.5"))
+    s.text(F3_X0, yc + 4.3, f"det bjelken tåler: M_{{Rd}} = **{num(F3_MRD, 1)} kNm**", size=F3_TXS, fill=INK2)
+    return yc + 5.6
+
+
+# x-verdiene langs B2: verdi, tekstfeste og forskyvning (mm), slik at 0 / 0,10 og 2,10 / 2,25 ikke kolliderer
+F3_B2_X = ((0.0, "end", 0.6), (0.10, "start", -0.9), (1.20, "middle", 0), (2.10, "end", 0.9), (2.25, "start", -0.9),
+           (2.55, "middle", 0), (3.15, "middle", 0), (3.40, "middle", 0))
+
+
+# ---- B1 -------------------------------------------------------------------------------------------------
+def fig_f3_b1(path):
+    """B1: jevnt fordelt last, opplegg med opplagerkrefter, spenn og bøyemoment."""
+    b = R["B1"]
+    L = b["L"]
+    q = b["qEd"]["forenklet"]
+    yb = 17.0
+    y0 = yb + 16.5
+    s = _F3Fig(F3_FW, y0 + F3_MRD * F3_KM + 5.6)
+    s.text(F3_X0 + F3_WW / 2, 4.2, f"jevnt fordelt last q_{{Ed}} = **{num(q)} kN/m**", size=F3_TS, anchor="middle")
+    s.udl(F3_X0, F3_X0 + F3_WW, 6.8, yb - 0.8, n=25)
+    _f3_beam(s, yb)
+    v = num(b["VEd"], 1)
+    _f3_reactions(s, yb, (v, "ved teglsteinspipa"), (v, "ved tømmerveggen"))
+    s.text(F3_X0 + F3_WW / 2, yb + 6.0, f"spenn L = {num(L)} m", size=F3_TS, anchor="middle")
+    mp = [(L * i / 60, q * (L * i / 60) * (L - L * i / 60) / 2) for i in range(61)]
+    _f3_moment(s, y0, L, mp, L / 2, f"størst på midten: M_{{Ed}} = **{num(b['MEd'], 1)} kNm**")
+    s.save(path)
+
+
+# ---- B2 -------------------------------------------------------------------------------------------------
+def _f3_b2():
+    b = R["B2"]
+    f = b["design_loads"]
+    wf = next(d for d in f if d["type"] == "udl" and d["x1"] > 0)
+    ps = next(d for d in f if d["type"] == "pt" and abs(d["x1"] - 1.20) < 1e-6)
+    pg = next(d for d in f if d["type"] == "pt" and abs(d["x1"] - 2.25) < 1e-6)
+    pj = [d for d in f if d["type"] == "pt" and d["x1"] > 2.4]
+    return b, wf, ps, pg, pj
+
+
+def fig_f3_b2_last(path):
+    """B2: lastene på bjelken med tall. Alle punktlastene har like lange piler; x-aksen er eneste målsystem."""
+    b, wf, ps, pg, pj = _f3_b2()
+    L = b["L"]
+    k = F3_WW / L
+    X = lambda xm: F3_X0 + xm * k          # noqa: E731
+    s = _F3Fig(F3_FW, 47.5)
+    yb = 25.5
+    top = yb - 14.6
+    # gulvet: jevnt fordelt mellom x1 og x2
+    s.udl(X(wf["x1"]), X(wf["x2"]), yb - 7.6, yb - 0.8, n=15)
+    s.text(X(wf["x1"]) - 2.0, yb - 9.4, f"gulvet mot badet **{num(wf['Ed'])} kN/m**", size=F3_TS)
+    # punktlastene: navn i vanlig skrift, tallet i fet
+    s.pload(X(ps["x1"]), top, yb - 0.8, f"trappa **{num(ps['Ed'])} kN**", size=F3_TS, weight=400, anchor="end", label_dx=1.2)
+    s.pload(X(pg["x1"]), top, yb - 0.8, f"gavlveggen **{num(pg['Ed'])} kN**", color=ABOVE, size=F3_TS, weight=400,
+            anchor="end", label_dx=1.2)
+    for d in pj:
+        s.pload(X(d["x1"]), top, yb - 0.8, f"**{num(d['Ed'])} kN**", color=BLUE, size=F3_TS, weight=400)
+    s.text((X(pj[0]["x1"]) + X(pj[1]["x1"])) / 2, top - 6.0, "to takbjelker med snø", size=F3_TXS, fill=BLUE, anchor="middle")
+    _f3_beam(s, yb)
+    # mållinje med spennet, x-verdiene under linja og stedsnavn under oppleggene
+    yd = yb + 9.2
+    s.dim((F3_X0, yd), (F3_X0 + F3_WW, yd), 0, f"spenn L = {num(L)} m", ext=False, size=F3_TS, weight=400, text_off=1.0)
+    for xv, anchor, dx in F3_B2_X:
+        xp = X(xv)
+        s.line(xp, yd - 0.9, xp, yd + 0.9, (INK, 0.2, None))
+        s.text(xp + dx, yd + 4.6, "0" if xv == 0 else num(xv), size=F3_TXS, anchor=anchor)
+    s.text(F3_X0 - 5.0, yd + 4.6, "x [m]", size=F3_TXS, anchor="end", fill=INK2)
+    s.text(F3_X0, yd + 10.4, "ved tømmerveggen", size=F3_TXS, anchor="middle", fill=INK2)
+    s.text(F3_X0 + F3_WW, yd + 10.4, "ved betongsøylen", size=F3_TXS, anchor="middle", fill=INK2)
+    s.save(path)
+
+
+def fig_f3_b2_kraft(path):
+    """B2: lastene som påminnelse (navn uten tall, se lastfiguren), opplagerkreftene, x-aksen og bøyemomentet."""
+    b, wf, ps, pg, pj = _f3_b2()
+    L = b["L"]
+    k = F3_WW / L
+    X = lambda xm: F3_X0 + xm * k          # noqa: E731
+    yb = 14.5
+    y0 = yb + 21.0
+    s = _F3Fig(F3_FW, y0 + F3_MRD * F3_KM + 5.6)
+    top = yb - 8.6
+    # lastene, samme farger og plassering som i lastfiguren
+    s.udl(X(wf["x1"]), X(wf["x2"]), yb - 4.6, yb - 0.8, n=15, color=INK2)
+    s.text(X(wf["x1"]) - 2.0, yb - 6.2, "gulvet mot badet", size=F3_TXS, fill=INK2)
+    s.pload(X(ps["x1"]), top, yb - 0.8, "trappa", size=F3_TXS, weight=400, lw=0.3, color=INK2)
+    s.pload(X(pg["x1"]), top, yb - 0.8, "gavlveggen", color=ABOVE, size=F3_TXS, weight=400, anchor="end", label_dx=1.2, lw=0.3)
+    for d in pj:
+        s.pload(X(d["x1"]), top, yb - 0.8, None, color=BLUE, lw=0.3)
+    s.text((X(pj[0]["x1"]) + X(pj[1]["x1"])) / 2, top - 1.2, "to takbjelker", size=F3_TXS, fill=BLUE, anchor="middle")
+    _f3_beam(s, yb)
+    _f3_reactions(s, yb, (num(b["RA"], 1), "ved tømmerveggen"), (num(b["RB"], 1), "ved betongsøylen"))
+    # x-aksen står på grunnlinjen til bøyemomentet
+    for xv, anchor, dx in F3_B2_X:
+        xp = X(xv)
+        s.line(xp, y0 - 1.4, xp, y0, (INK, 0.2, None))
+        s.text(xp + dx, y0 - 2.6, "0" if xv == 0 else num(xv), size=F3_TXS, anchor=anchor)
+    s.text(F3_X0 - 5.0, y0 - 2.6, "x [m]", size=F3_TXS, anchor="end", fill=INK2)
+    mp = [(p["x"], p["M"]) for p in b["curves"]]
+    _f3_moment(s, y0, L, mp, b["x_M"], f"størst under gavlveggen: M_{{Ed}} = **{num(b['MEd'], 1)} kNm**")
+    # hjelpelinje fra x = 2,25 ned til største bøyemoment
+    xg = X(b["x_M"])
+    s.line(xg, y0, xg, y0 + b["MEd"] * F3_KM, (STEEL, 0.2, "1.2 0.9"))
+    s.save(path)
+
+
 if __name__ == "__main__":
     out = sys.argv[1] if len(sys.argv) > 1 else os.path.join(HERE, "..", "build", "fig")
     os.makedirs(out, exist_ok=True)
@@ -373,6 +532,12 @@ if __name__ == "__main__":
         fig_b2(os.path.join(out, "fig_b2_kort.svg"), shear=False, ends=("x = 0 ved tømmerveggen", "x = 3,40 ved betongsøylen"),
                plain=True)
         print("skrev korte figurer til", out)
+        sys.exit(0)
+    if len(sys.argv) > 2 and sys.argv[2] == "f3":        # figurer til etterregningen på fem sider (vedlegg F3)
+        use_font("liberation")
+        for fn in (fig_f3_b1, fig_f3_b2_last, fig_f3_b2_kraft):
+            fn(os.path.join(out, fn.__name__ + ".svg"))
+        print("skrev figurer til etterregningen til", out)
         sys.exit(0)
     if len(sys.argv) > 2 and sys.argv[2] == "bred":      # brede figurer til etterregningen på tre sider
         fig_b1_bred(os.path.join(out, "fig_b1_bred.svg"))
