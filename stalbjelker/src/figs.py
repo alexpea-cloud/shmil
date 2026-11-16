@@ -467,7 +467,7 @@ def fig_f3_b2_last(path):
     yb = 25.5
     top = yb - 14.6
     # gulvet: jevnt fordelt mellom x1 og x2
-    s.udl(X(wf["x1"]), X(wf["x2"]), yb - 7.6, yb - 0.8, n=15)
+    s.udl(X(wf["x1"]), X(wf["x2"]), yb - 7.6, yb - 0.8, n=21)
     s.text(X(wf["x1"]) - 2.0, yb - 9.4, f"gulvet mot badet **{num(wf['Ed'])} kN/m**", size=F3_TS)
     # punktlastene: navn i vanlig skrift, tallet i fet
     s.pload(X(ps["x1"]), top, yb - 0.8, f"trappa **{num(ps['Ed'])} kN**", size=F3_TS, weight=400, anchor="end", label_dx=1.2)
@@ -501,13 +501,13 @@ def fig_f3_b2_kraft(path):
     s = _F3Fig(F3_FW, y0 + F3_MRD * F3_KM + 5.6)
     top = yb - 8.6
     # lastene, samme farger og plassering som i lastfiguren
-    s.udl(X(wf["x1"]), X(wf["x2"]), yb - 4.6, yb - 0.8, n=15, color=INK2)
+    s.udl(X(wf["x1"]), X(wf["x2"]), yb - 4.6, yb - 0.8, n=21, color=INK2)
     s.text(X(wf["x1"]) - 2.0, yb - 6.2, "gulvet mot badet", size=F3_TXS, fill=INK2)
     s.pload(X(ps["x1"]), top, yb - 0.8, "trappa", size=F3_TXS, weight=400, lw=0.3, color=INK2)
     s.pload(X(pg["x1"]), top, yb - 0.8, "gavlveggen", color=ABOVE, size=F3_TXS, weight=400, anchor="end", label_dx=1.2, lw=0.3)
     for d in pj:
         s.pload(X(d["x1"]), top, yb - 0.8, None, color=BLUE, lw=0.3)
-    s.text((X(pj[0]["x1"]) + X(pj[1]["x1"])) / 2, top - 1.2, "to takbjelker", size=F3_TXS, fill=BLUE, anchor="middle")
+    s.text((X(pj[0]["x1"]) + X(pj[1]["x1"])) / 2, top - 1.2, "to takbjelker med snø", size=F3_TXS, fill=BLUE, anchor="middle")
     _f3_beam(s, yb)
     _f3_reactions(s, yb, (num(b["RA"], 1), "ved tømmerveggen"), (num(b["RB"], 1), "ved betongsøylen"))
     # x-aksen står på grunnlinjen til bøyemomentet
